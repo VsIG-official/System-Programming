@@ -10,15 +10,23 @@ includelib/masm32/lib/user32.lib
 
 .data
 	MsgBoxName  db "Some window with numbers", 0 
-	MsgBoxText db 
-	MsgBoxTextPosA    db "A Positive = %s", 0
-	MsgBoxTextNegA    db "A Negative = %s", 0
+	MsgBoxText db "Symbols - '%s'", 13,
+           "A plus = %x", 13, 
+           "A minus, = %x", 13,
+           "B plus = %x", 13,
+           "B minus = %x", 13,
+           "C plus = %x", 13,
+           "C minus = %x", 13, 
+           "D plus = %x", 13, 
+           "D minus = %x", 13,
+           "E plus = %x%x", 13,
+           "E minus = %x%x", 13,
+           "F plus = %x%x%x", 13,
+           "F minus = %x%x%x", 0
 	
-	APositiveByte db +22, 0
-	ANegativeByte db -22, 0
+	APlusByte db +22, 0
+	AMinusByte db -22, 0
 	
-	APositiveByteBuffer db 64 DUP(?)
-	ANegativeByteBuffer db 64 DUP(?)
 .code
 
 	Main:
