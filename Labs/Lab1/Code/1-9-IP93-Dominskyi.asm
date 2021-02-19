@@ -4,30 +4,33 @@
 option  CaseMap:None
 
 ; Libraries And Macroses
-include/masm32/include/windows.inc
-include/masm32/include/kernel32.inc
-include/masm32/include/user32.inc
-includelib/masm32/lib/kernel32.lib
-includelib/masm32/lib/user32.lib
+include /masm32/include/masm32rt.inc
 
+.data?
+	BufferForText DB 64 DUP(?)
+	BufferDPlus DB 32 DUP(?)
+	BufferDMinus DB 32 DUP(?)
+	BufferEPlus DB 32 DUP(?)
+	BufferEMinus DB 32 DUP(?)
+	BufferFPlus DB 32 DUP(?)
+	BufferFMinus DB 32 DUP(?)
+	
 ; Data Segment
 .data
 	; Name Of Message Box
-	MsgBoxName  DB "Lab1-9-IP-93-Dominskyi", 0 
+	MsgBoxName  DB "1-9-IP93-Dominskyi", 0 
 	
 		; Symbols
 	Symbols DB "22022002", 0
 	
 	; Text Of Message Box
-	MsgBoxText DB "Symbols - '%s'", 13, 
-		"A plus = %x", 13,  "A minus = %x", 13,
-        "B plus = %x", 13, "B minus = %x", 13,
-		"C plus = %x", 13, "C minus = %x", 13, 
-		"D plus = %x", 13,  "D minus = %x", 13,
-		"E plus = %x%x", 13, "E minus = %x%x", 13,
-		"F plus = %x%x%x", 13,"F minus = %x%x%x", 0
-	
-	BufferForText DB 128 DUP(?)
+	Form DB "Symbols - '%s'", 10, 
+		"A plus = %d", 10,  "A minus = %d", 10,
+        "B plus = %d", 10, "B minus = %d", 10,
+		"C plus = %d", 10, "C minus = %d", 10,
+		"D plus = %s", 10, "D minus = %s", 10, 
+		"E plus = %s", 10, "E minus = %s", 10, 
+		"F plus = %s", 10, "F minus = %s", 0
 	
 	; A Byte Numbers
 	APlusByte DB +22
@@ -81,16 +84,23 @@ includelib/masm32/lib/user32.lib
 .code
 	; Enter point
 	Main:
-		    invoke wsprintf, addr BufferForText, addr MsgBoxText, 
-			addr Symbols,
+			invoke FloatToString2, DPlusSingle, offset BufferDPlus
+			invoke FloatToString2, DMinusSingle, offset BufferDMinus
+			invoke FloatToString2, EPlusDouble, offset BufferEPlus
+			invoke FloatToString2, EMinusDouble, offset BufferEMinus
+			invoke FloatToString2, FPlusExtended, offset BufferFPlus
+			invoke FloatToString2, FMinusExtended, offset BufferFMinus
+			
+			invoke wsprintf, offset BufferForText, offset Form, 
+			offset Symbols,
             APlusShortlnt, AMinusShortlnt,
             BPlusShortlnt, BMinusShortlnt,
 			CPlusShortlnt, CMinusShortlnt,
-			DPlusSingle, DMinusSingle,
-			EPlusDouble, EMinusDouble,
-			FPlusExtended, FMinusExtended
+			BufferDPlus, BufferDMinus,
+			BufferEPlus, BufferEMinus,
+			BufferFPlus, BufferFMinus
 	
-		invoke MessageBox, 0, addr BufferForText, addr MsgBoxName, MB_OK
+		invoke MessageBox, 0, offset BufferForText, offset MsgBoxName, MB_OK
 		invoke ExitProcess, 0
 		; End of a program
 	end Main
