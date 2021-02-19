@@ -1,5 +1,5 @@
 ; Processors
-.486
+.386
 .model flat, stdcall
 option  CaseMap:None
 
@@ -16,61 +16,81 @@ includelib/masm32/lib/user32.lib
 	MsgBoxName  db "Lab1-9-IP-93-Dominskyi", 0 
 	
 	; Text Of Message Box
-	MsgBoxText db "Symbols - '%S'", 13, 
-		"A plus = %X", 13,  "A minus, = %X", 13,
-        "B plus = %X", 13, "B minus = %X", 13,
-        "C plus = %X", 13, "C minus = %X", 13, 
-        "D plus = %X", 13,  "D minus = %X", 13,
-        "E plus = %X%X", 13, "E minus = %X%X", 13,
-        "F plus = %X%X", 13, "F minus = %X%X", 0
-		   
-	BufferForText db 64 dup(?)
+	MsgBoxText1 db "Symbols - '%s'", 13, 
+		"A plus (Byte) = %X", 13,  "A minus (Byte) = %X", 13,
+		"A plus (Word) = %x", 13,  "A minus (Word) = %X", 13,
+		"A plus (Shortlnt) = %X", 13,  "A minus (Shortlnt) = %X", 13,
+        "B plus (Word) = %X", 13, "B minus (Word) = %X", 13,
+
+	MsgBoxText2 db "B plus (Shortlnt) = %X", 13, "B minus (Shortlnt) = %X", 13,
+        "C plus (Shortlnt) = %X", 13, "C minus (Shortlnt) = %X", 13, 
+        "D plus (Single (Float)) = %X", 13,  "D minus (Single (Float)) = %X", 13,
+        "E plus (Double) = %X%X", 13, "E minus (Double) = %X%X", 13,
+        "F plus (Extended (Long Double)) = %X%X", 13,
+		"F minus (Extended (Long Double)) = %X%X", 0
+	
+	BufferForText db 128 dup(?)
+	
+	; Symbols
+	Symbols db "22022002"
 	
 	; A Byte Numbers
-	APlusByte db +22, 0
-	AMinusByte db -22, 0
+	APlusByte db +22
+	AMinusByte db -22
 	
 	; A Word Numbers
-	APlusWord dw +22, 0
-	AMinusWord dw -22, 0
+	APlusWord dw +22
+	AMinusWord dw -22
 	
 	; A Shortlnt Numbers
-	APlusWord dd +22, 0
-	AMinusWord dd -22, 0
+	APlusShortlnt dd +22
+	AMinusShortlnt dd -22
 	
 	; B Word Numbers
-	BPlusWord dw +2202, 0
-	BMinusWord dw -2202, 0
+	BPlusWord dw +2202
+	BMinusWord dw -2202
 	
 	; B Shortlnt Numbers
-	BPlusWord dd +2202, 0
-	BMinusWord dd -2202, 0
+	BPlusShortlnt dd +2202
+	BMinusShortlnt dd -2202
 	
 	; C Shortlnt Numbers
-	CPlusWord dd +22022002, 0
-	CMinusWord dd -22022002, 0
+	CPlusShortlnt dd +22022002
+	CMinusShortlnt dd -22022002
 	
 	; D Single (Float) Numbers
-	DPlusSingle dd +0.002, 0
-	DMinusSingle dd -0.002, 0
+	DPlusSingle dd +0.002
+	DMinusSingle dd -0.002
 	
 	; E Double Numbers
-	EPlusSingle dd +0.236, 0
-	EMinusSingle dd -0.236, 0
+	EPlusDouble dq +0.236
+	EMinusDouble dq -0.236
 	
 	; F Extended (Long Double) Numbers
-	FPlusSingle dd +2365.16, 0
-	FMinusSingle dd -2365.16, 0
+	FPlusExtended dt +2365.16
+	FMinusExtended dt -2365.16
 	
 ; Code Segment
 .code
 	; Enter point
 	Main:
-		invoke wsprintf, addr APositiveByteBuffer, addr MsgBoxTextPosA, addr APositiveByte
-
-		invoke wsprintf, addr ANegativeByteBuffer, addr MsgBoxTextNegA, addr ANegativeByte
+		    invoke wsprintf, addr BufferForText, addr MsgBoxText1, 
+			addr Symbols,
+            APlusByte, AMinusByte,
+			APlusWord, AMinusWord,
+			APlusShortlnt, AMinusShortlnt,
+            BPlusWord, BMinusWord
+			
+			invoke MessageBoxA, NULL, addr BufferForText, addr MsgBoxName, MB_OK
+			
+			invoke wsprintf, addr BufferForText, addr MsgBoxText2, 
+			addr BPlusShortlnt, BMinusShortlnt,
+			CPlusShortlnt, CMinusShortlnt,
+			DPlusSingle, DMinusSingle,
+			EPlusDouble, EMinusDouble,
+			FPlusExtended, FMinusExtended
 	
-		invoke MessageBoxA, NULL, addr MsgBoxText, addr MsgBoxName, MB_OK
+		invoke MessageBoxA, NULL, addr BufferForText, addr MsgBoxName, MB_OK
 		invoke ExitProcess, 0
 		; End of a program
 	end Main
