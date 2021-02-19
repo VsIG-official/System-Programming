@@ -7,7 +7,7 @@ option  CaseMap:None
 include /masm32/include/masm32rt.inc
 
 .data?
-	BufferForText DB 128 DUP(?)
+	BufferForText DB 256 DUP(?)
 	BufferDPlus DB 32 DUP(?)
 	BufferDMinus DB 32 DUP(?)
 	BufferEPlus DB 32 DUP(?)
@@ -21,14 +21,14 @@ include /masm32/include/masm32rt.inc
 	MsgBoxName  DB "1-9-IP93-Dominskyi", 0 
 	
 		; Symbols
-	Symbols DB "22022002", 0
+	Symbols DB "Number is 22022002", 0
 	
 	; Text Of Message Box
-	Form DB "Symbols - '%s'", 10, 
+	Form DB "Symbols - %s", 10, 
 		"A plus = %d", 10,  "A minus = %d", 10,
         "B plus = %d", 10, "B minus = %d", 10,
 		"C plus = %d", 10, "C minus = %d", 10,
-		"D plus = %s", 10, "D minus = %s", 10, 
+		"D plus = %s", 10, "D minus = %s", 10,
 		"E plus = %s", 10, "E minus = %s", 10, 
 		"F plus = %s", 10, "F minus = %s", 0
 	
