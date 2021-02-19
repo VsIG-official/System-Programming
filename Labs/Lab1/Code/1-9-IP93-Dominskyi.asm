@@ -7,7 +7,7 @@ option  CaseMap:None
 include /masm32/include/masm32rt.inc
 
 .data?
-	BufferForText DB 64 DUP(?)
+	BufferForText DB 128 DUP(?)
 	BufferDPlus DB 32 DUP(?)
 	BufferDMinus DB 32 DUP(?)
 	BufferEPlus DB 32 DUP(?)
@@ -35,7 +35,7 @@ include /masm32/include/masm32rt.inc
 	; A Byte Numbers
 	APlusByte DB +22
 	AMinusByte DB -22
-	
+
 	; A Word Numbers
 	APlusWord DW +22
 	AMinusWord DW -22
@@ -72,9 +72,17 @@ include /masm32/include/masm32rt.inc
 	DPlusSingle DD +0.002
 	DMinusSingle DD -0.002
 	
+	; D Double Numbers
+	DPlusDouble DQ +0.002
+	DMinusDouble DQ -0.002
+	
 	; E Double Numbers
 	EPlusDouble DQ +0.236
 	EMinusDouble DQ -0.236
+	
+	; F Double Numbers
+	FPlusDouble DQ +2365.16
+	FMinusDouble DQ -2365.16
 	
 	; F Extended (Long Double) Numbers
 	FPlusExtended DT +2365.16
@@ -84,21 +92,21 @@ include /masm32/include/masm32rt.inc
 .code
 	; Enter point
 	Main:
-			invoke FloatToString2, DPlusSingle, offset BufferDPlus
-			invoke FloatToString2, DMinusSingle, offset BufferDMinus
-			invoke FloatToString2, EPlusDouble, offset BufferEPlus
-			invoke FloatToString2, EMinusDouble, offset BufferEMinus
-			invoke FloatToString2, FPlusExtended, offset BufferFPlus
-			invoke FloatToString2, FMinusExtended, offset BufferFMinus
+			invoke FloatToStr2, DPlusDouble, addr BufferDPlus
+			invoke FloatToStr2, DMinusDouble, addr BufferDMinus
+			invoke FloatToStr2, EPlusDouble, addr BufferEPlus
+			invoke FloatToStr2, EMinusDouble, addr BufferEMinus
+			invoke FloatToStr2, FPlusDouble, addr BufferFPlus
+			invoke FloatToStr2, FMinusDouble, addr BufferFMinus
 			
-			invoke wsprintf, offset BufferForText, offset Form, 
-			offset Symbols,
+			invoke wsprintf, addr BufferForText, addr Form, 
+			addr Symbols,
             APlusShortlnt, AMinusShortlnt,
             BPlusShortlnt, BMinusShortlnt,
 			CPlusShortlnt, CMinusShortlnt,
-			BufferDPlus, BufferDMinus,
-			BufferEPlus, BufferEMinus,
-			BufferFPlus, BufferFMinus
+			addr BufferDPlus, addr BufferDMinus,
+			addr BufferEPlus, addr BufferEMinus,
+			addr BufferFPlus, addr BufferFMinus
 	
 		invoke MessageBox, 0, offset BufferForText, offset MsgBoxName, MB_OK
 		invoke ExitProcess, 0
