@@ -1,10 +1,6 @@
 ; Processors
 .386
-.model flat, stdcall
-option  CaseMap:None
-
-; Libraries And Macroses
-include /masm32/include/masm32rt.inc
+.model TINY
 
 .data?
 	BufferForText DB 256 DUP(?)
@@ -34,7 +30,16 @@ include /masm32/include/masm32rt.inc
 			addr PIB,
             DateOfBirth, Zalikovka
 	
-		invoke MessageBox, 0, offset BufferForText, offset MsgBoxName, MB_OK
-		invoke ExitProcess, 0
+		mov dx, offset BufferForText
+		mov ah, 9h
+		int 21h
+		
+		mov ah, 8h
+		int 21h
+	
+		;invoke MessageBox, 0, offset BufferForText, offset MsgBoxName, MB_OK
+		mov ah, 4Ch
+		mov al, 00h
+		int 21h
 		; End of a program
 	end Main
