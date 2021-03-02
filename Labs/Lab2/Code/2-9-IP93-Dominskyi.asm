@@ -5,7 +5,7 @@
 
 ; Data Segment
 .data	
-	StartingText DB "Введіть пароль: $", 0
+	StartingText DB "Введіть пароль: ", 0
 	Success DB "Пароль вірний. Показую дані", 0
 	Failure DB "Пароль невірний. Спробуйте ще раз", 0
 	Password  DB "ЛР2", 0 
@@ -15,7 +15,7 @@
 		"Дата народження = 22.02.2002", 10,
 		"Номер залікової книжки = 9311", 0
 	
-
+	
 	
 ; Code Segment
 .code
