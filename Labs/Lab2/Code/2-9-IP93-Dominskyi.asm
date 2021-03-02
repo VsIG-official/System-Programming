@@ -3,34 +3,27 @@
 .model TINY
 
 .data?
-	BufferForText DB 256 DUP(?)
+	;BufferForText DB 256 DUP(?)
 	
 ; Data Segment
-.data
-	; Name Of Message Box
-	MsgBoxName  DB "2-9-IP93-Dominskyi", 0 
+.data	
+	StartingText DB "Введіть пароль:", 0
+	Success DB "Пароль вірний. Показую дані", 0
+	Failure DB "Пароль невірний. Спробуйте ще раз", 0
+	Password  DB "ЛР2", 0 
 	
-	PIB  DB "Домінський Валентин Олексійович", 0 
-	DateOfBirth  DB "22.02.2002", 0 
-	Zalikovka  DB "9311", 0 
-	
-	PassWord  DB "Lab2", 0 
-	
-	; Text Of Message Box
-	Form DB "ПІБ - %s", 10, 
-		"Дата народження = %d", 10,  "Номер залікової книжки = %d", 0
+	; Text To Show
+	TextToShow DB "ПІБ - Домінський Валентин Олексійович", 13, 
+		"Дата народження = 22.02.2002", 10,
+		"Номер залікової книжки = 9311", 0
 	
 
 	
 ; Code Segment
 .code
 	; Enter point
-	Main:
-			invoke wsprintf, addr BufferForText, addr Form, 
-			addr PIB,
-            DateOfBirth, Zalikovka
-	
-		mov dx, offset BufferForText
+	Main:	
+		mov dx, offset TextToShow
 		mov ah, 9h
 		int 21h
 		
