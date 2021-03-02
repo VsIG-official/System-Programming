@@ -1,13 +1,11 @@
 ; Processors
-.386
 .model TINY
 
 .data?
-	;BufferForText DB 256 DUP(?)
-	
+
 ; Data Segment
 .data	
-	StartingText DB "Введіть пароль:", 0
+	StartingText DB "Введіть пароль: $", 0
 	Success DB "Пароль вірний. Показую дані", 0
 	Failure DB "Пароль невірний. Спробуйте ще раз", 0
 	Password  DB "ЛР2", 0 
@@ -30,7 +28,6 @@
 		mov ah, 8h
 		int 21h
 	
-		;invoke MessageBox, 0, offset BufferForText, offset MsgBoxName, MB_OK
 		mov ah, 4Ch
 		mov al, 00h
 		int 21h
