@@ -1,35 +1,51 @@
-; Processors
-.model TINY
-
-.data?
-
-; Data Segment
-.data	
-	StartingText DB "Введіть пароль: ", 0
-	Success DB "Пароль вірний. Показую дані", 0
-	Failure DB "Пароль невірний. Спробуйте ще раз", 0
-	Password  DB "ЛР2", 0 
-	
-	; Text To Show
-	TextToShow DB "ПІБ - Домінський Валентин Олексійович", 13, 
-		"Дата народження = 22.02.2002", 10,
-		"Номер залікової книжки = 9311", 0
-	
-	
-	
-; Code Segment
+.model tiny
+.data
+START_MSG DB "• о е ©: $"
+ERROR_MSG DB "Неправильний пароль.$"
+PASSWD DB "pavlov"
+DATA DB "ДАНI СТУДЕНТА:", 10,
+"IМ'Я - Ковалишин О. Ю.", 10,
+"ДАТА НАРОДЖЕННЯ - 12.09.2001", 10,
+"ГРУПА - IП-8410$"
+PASSWD_LEN DB 6
+USR_INPUT DB 32 DUP (?)
 .code
-	; Enter point
-	Main:	
-		mov dx, offset TextToShow
-		mov ah, 9h
-		int 21h
-		
-		mov ah, 8h
-		int 21h
-	
-		mov ah, 4Ch
-		mov al, 00h
-		int 21h
-		; End of a program
-	end Main
+org 100h
+.startup
+MAIN:
+; CLEARING SCREEN
+MOV AX, 03h
+INT 10h
+; PRINTING START MESSAGE
+MOV AH, 09h
+MOV DX, offset START_MSG
+INT 21h
+; READING USER'S INPUT
+MOV AH, 3Fh
+MOV BX, 0
+MOV CX, 32
+MOV DX, offset USR_INPUT
+INT 21h
+; CHECKING LENGTH
+CMP AX, 8
+JNE MAIN
+MOV DI, 0
+VALIDATION:
+; COMPARING CHARACTERS
+MOV BL, USR_INPUT[DI]
+MOV BH, PASSWD[DI]
+CMP BL, BH
+JNE MAIN
+; INCREASING COUNTER
+INC DI
+CMP DI, 6
+JB VALIDATION
+MOV AH, 09h
+MOV DX, offset DATA
+INT 21h
+; END PROCESS
+EXIT:
+MOV AH, 4Ch
+MOV AL, 0
+INT 21h
+END

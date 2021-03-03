@@ -19,6 +19,6 @@ set folder=%cd%
 @echo "DIR = %folder%"
 
 %masm_path%\ml /Bl %masm_path%\link16.exe %asmfile%
-%dos_box% -c "mount c %folder% " -c c: -c %filename:.asm=.COM%
+%dos_box% -c "mount c %folder% " -c c:
 
 cd %startFolder%
