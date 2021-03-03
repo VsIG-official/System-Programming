@@ -1,3 +1,5 @@
+@echo off
+
 set startFolder=%cd%
 set masm_path=D:\masm32\bin
 set dos_box="D:\masm32\DosBox\DOSBox-0.74-3\DOSBox.exe"
