@@ -17,6 +17,6 @@ set folder=%cd%
 
 %masm_path%\ml /Bl %masm_path%\link16.exe %asmfile%
 :: line beneath should be deleted
-%dos_box% -c "mount c %folder% " -c c:
+%dos_box% -c "mount c %folder% " -c c:  -c %filename:.asm=COM%
 
 cd %startFolder%
