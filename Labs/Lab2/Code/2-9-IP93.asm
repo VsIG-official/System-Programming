@@ -6,17 +6,17 @@
 
 ; Data Segment
 .data	
-	StartingText DB "Введiть пароль. Ви маєте 3 спроби: $"
+	StartingText DB "Введiть пароль. Попереджаю, що у Вас є лише 3 спроби: $"
 	SuccessText DB "Пароль вiрний. Виводжу данi: $"
 	FailureText DB "Пароль невiрний. $"
 	
 	; We can write password in two ways:
-	Password  DB "123"
+	Password  DB "2-9-IP93"
 	
 	; And another one is:
 	; Password  DB 31h 32h 33h
 	
-	PasswordCount DB 3
+	PasswordCount DB 8
 	MaxLengthOfUsersString DB 128
 	
 	; Text To Show
@@ -36,7 +36,7 @@
 	; address (offset) 100h in this segment.
 	; For com format the offset is always 100h
 	
-	.startup ; Generates program start-up code
+.startup ; Generates program start-up code
 	InvitePoint:	; Starting Code
 		; Clear the screen
 		mov ax, 0600h
@@ -52,36 +52,43 @@
 		mov dh, 00
 		int 10h
 
+		mov bx, offset PasswordCount
+
 		; Display The Text
 		mov dx, offset StartingText
 		mov ah, 9h
 		int 21h
+		
+		jmp InputOfTheUser
 
 	; Responsible For Input
 	InputOfTheUser:
 		mov ah, 03Fh ; Function to read the file
-		;mov bx, 0
+		mov bx, 0
 		mov cx, 128 ; MaxLengthOfUsersString
-		lea 	dx, offset StringFromUser
+		mov 	dx, offset StringFromUser
 		int 	21h
+		
+		;cmp dx, [bx]
+		; jne WrongPasswordByUser
 	
-	; Responsible For Wrong Input
-	WrongPasswordByUser:
-		mov dx,offset FailureText
-		mov ah,09h
-		int 21h
+	; ; Responsible For Wrong Input
+	; WrongPasswordByUser:
+		; mov dx,offset FailureText
+		; mov ah,09h
+		; int 21h
 		
-	; Responsible For Correct Input
-	CorrectPasswordByUser:
-		mov dx,offset SuccessText
-		mov ah,09h
-		int 21h
+	; ; Responsible For Correct Input
+	; CorrectPasswordByUser:
+		; mov dx,offset SuccessText
+		; mov ah,09h
+		; int 21h
 		
-	; Responsible For Output
-	OutputInfo:
-		mov dx,offset InformationText
-		mov ah,09h
-		int 21h
+	; ; Responsible For Output
+	; OutputInfo:
+		; mov dx,offset InformationText
+		; mov ah,09h
+		; int 21h
 		
 	; Responsible For Exit
 	ExitCode:
