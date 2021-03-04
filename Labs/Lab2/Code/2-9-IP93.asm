@@ -2,7 +2,7 @@
 .model tiny
 
 .data?
-USR_INPUT    DB 32 DUP (?)
+USR_INPUT DB 32 DUP (?)
 
 ; Data Segment
 .data	
@@ -57,11 +57,11 @@ USR_INPUT    DB 32 DUP (?)
 		int 21h
 
 	InputOfTheUser:
-		    MOV		AH, 3Fh
-			dec 		BX, 0
-			MOV		CX, USR_INPUT
-			lea 		DX, offset USR_INPUT
-			INT 	21h
+		    mov ah, 03Fh ; Function to read the file
+			;mov bx, 0
+			mov cx, 32
+			lea 	dx, offset USR_INPUT
+			int 	21h
 	
 	ExitCode:
 		; For exiting program We can use this code or...
