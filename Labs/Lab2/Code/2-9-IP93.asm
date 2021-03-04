@@ -5,9 +5,9 @@
 ; Data Segment
 .data	
 	StartingText DB "Введiть пароль. Попереджаю, що у Вас є лише 3 спроби: $", 10
-	FailureText DB "Пароль невiрний. Спробуйте ще раз. К-сть спроб, яка залишилася =  $", 10
+	FailureText DB "Пароль невiрний. Спробуйте ще раз. К-сть спроб, яка залишилася =  $",  10
 	
-	StringFromUser2 DB 128 dup(128)
+	StringFromUser DB 128 dup(128)
 	
 	; We can write password in two ways:
 	Password  DB '123'
@@ -16,7 +16,6 @@
 	; Password  DB 31h 32h 33h
 	
 	PasswordCount = $-Password
-	PossibleTries DB " ", 10
 	
 	; Text To Show
 	InformationText DB "ПIБ = Домiнський Валентин Олексiйович", 10, 
@@ -61,19 +60,17 @@
 		jmp InputOfTheUser ; Unconditional jump
 
 	; Responsible For Input
-	InputOfTheUser:
-
-	
+	InputOfTheUser:	
 		mov ah, 0Ah
-		mov dx, offset StringFromUser2
+		mov dx, offset StringFromUser
 		int 21h
 
 		mov ax, PasswordCount
-		cmp al, StringFromUser2+1 ; Compare
+		cmp al, StringFromUser+1 ; Compare
         jne WrongPasswordByUser ; Jump Not Equal
 
 		mov si, offset Password
-		mov di, offset StringFromUser2+2 ; low-order 16 bits of 32-bit registers
+		mov di, offset StringFromUser+2 ; low-order 16 bits of 32-bit registers
 		mov cl,PasswordCount ; counter register
 		
 	; Responsible For Checking, if password and input string are the same
@@ -133,10 +130,13 @@
 		mov dx, offset FailureText
 		int 21h
 		
-		mov  ah, 02h
+		mov  ah, 02h ; Display Counter
 		mov  dl, bl
 		add  dl, "0"   ; Integer to single-digit ASCII character
 		int  21h
+		
+		mov dl, 0ah ; New Line
+		int 21h
 		
 		; counting tries
 		add bx, -01 ; decrementing
