@@ -35,7 +35,7 @@ USR_INPUT    DB 32 DUP (?)
 	; address (offset) 100h in this segment.
 	; For com format the offset is always 100h
 	
-	; Enter point
+	.startup ; Generates program start-up code
 	InvitePoint:	
 		; Clear the screen
 		mov ax, 0600h
@@ -55,17 +55,13 @@ USR_INPUT    DB 32 DUP (?)
 		mov dx, offset StartingText
 		mov ah, 9h
 		int 21h
-	
-		;jmp InputOfTheUser
-	
-		; End of a program
-	end InvitePoint
 
 	InputOfTheUser:
-		MOV        AH, 3Fh
-		MOV        DX, offset USR_INPUT
-		INT     21h
-	end InputOfTheUser
+		    MOV		AH, 3Fh
+			dec 		BX, 0
+			MOV		CX, USR_INPUT
+			lea 		DX, offset USR_INPUT
+			INT 	21h
 	
 	ExitCode:
 		; For exiting program We can use this code or...
@@ -76,4 +72,4 @@ USR_INPUT    DB 32 DUP (?)
 		; ... this one
 		
 		.exit
-	end ExitCode
+end
