@@ -6,18 +6,18 @@
 
 ; Data Segment
 .data	
-	StartingText DB "Введiть пароль. Ви маєте 3 спроби: $", 0
-	SuccessText DB "Пароль вiрний. Виводжу данi: $", 0
-	FailureText DB "Пароль невiрний. $", 0
+	StartingText DB "Введiть пароль. Ви маєте 3 спроби: $"
+	SuccessText DB "Пароль вiрний. Виводжу данi: $"
+	FailureText DB "Пароль невiрний. $"
 	
 	; We can write password in two ways:
-	Password  DB "123", 0 
+	Password  DB "123"
 	
 	; And another one is:
-	; Password  DB 31h 32h 33h, 0
+	; Password  DB 31h 32h 33h
 	
-	PasswordCount DB 3, 0
-	MaxLengthOfUsersString DB 128, 0
+	PasswordCount DB 3
+	MaxLengthOfUsersString DB 128
 	
 	; Text To Show
 	InformationText DB "ПIБ - Домiнський Валентин Олексiйович", 10, 
@@ -37,7 +37,7 @@
 	; For com format the offset is always 100h
 	
 	.startup ; Generates program start-up code
-	InvitePoint:	
+	InvitePoint:	; Starting Code
 		; Clear the screen
 		mov ax, 0600h
 		mov bh, 7h
@@ -57,6 +57,7 @@
 		mov ah, 9h
 		int 21h
 
+	; 
 	InputOfTheUser:
 		mov ah, 03Fh ; Function to read the file
 		;mov bx, 0
@@ -64,6 +65,21 @@
 		lea 	dx, offset StringFromUser
 		int 	21h
 	
+	WrongPasswordByUser:
+		mov dx,offset FailureText
+		mov ah,09h
+		int 21h
+		
+	CorrectPasswordByUser:
+		mov dx,offset SuccessText
+		mov ah,09h
+		int 21h
+		
+	OutputInfo:
+		mov dx,offset InformationText
+		mov ah,09h
+		int 21h
+		
 	ExitCode:
 		; For exiting program We can use this code or...
 		;mov ah, 4Ch
