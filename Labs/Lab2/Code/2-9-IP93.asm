@@ -57,7 +57,7 @@
 		mov ah, 9h
 		int 21h
 
-	; 
+	; Responsible For Input
 	InputOfTheUser:
 		mov ah, 03Fh ; Function to read the file
 		;mov bx, 0
@@ -65,21 +65,25 @@
 		lea 	dx, offset StringFromUser
 		int 	21h
 	
+	; Responsible For Wrong Input
 	WrongPasswordByUser:
 		mov dx,offset FailureText
 		mov ah,09h
 		int 21h
 		
+	; Responsible For Correct Input
 	CorrectPasswordByUser:
 		mov dx,offset SuccessText
 		mov ah,09h
 		int 21h
 		
+	; Responsible For Output
 	OutputInfo:
 		mov dx,offset InformationText
 		mov ah,09h
 		int 21h
 		
+	; Responsible For Exit
 	ExitCode:
 		; For exiting program We can use this code or...
 		;mov ah, 4Ch
