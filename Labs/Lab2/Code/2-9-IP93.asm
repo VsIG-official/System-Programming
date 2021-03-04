@@ -38,10 +38,21 @@
 	
 	; Enter point
 	Main:	
-		mov ah, 00h
-		mov al, 2
+		; Clear the screen
+		mov ax, 0600h
+		mov bh, 7h
+		mov cx, 0000
+		mov dx, 184fh
 		int 10h
-	
+		
+		; Set the position of cursor
+		mov ah, 02
+		mov bh, 00
+		mov dl, 00
+		mov dh, 00
+		int 10h
+		
+		; Display The Text
 		mov dx, offset StartingText
 		mov ah, 9h
 		int 21h
