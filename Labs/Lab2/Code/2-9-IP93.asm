@@ -2,7 +2,7 @@
 .model tiny
 
 .data?
-USR_INPUT DB 32 DUP (?)
+	StringFromUser DB 128 DUP (?)
 
 ; Data Segment
 .data	
@@ -17,6 +17,7 @@ USR_INPUT DB 32 DUP (?)
 	; Password  DB 31h 32h 33h, 0
 	
 	PasswordCount DB 3, 0
+	MaxLengthOfUsersString DB 128, 0
 	
 	; Text To Show
 	InformationText DB "ПIБ - Домiнський Валентин Олексiйович", 10, 
@@ -43,25 +44,25 @@ USR_INPUT DB 32 DUP (?)
 		mov cx, 0000
 		mov dx, 184fh
 		int 10h
-		
+
 		; Set the position of cursor
 		mov ah, 02
 		mov bh, 00
 		mov dl, 00
 		mov dh, 00
 		int 10h
-		
+
 		; Display The Text
 		mov dx, offset StartingText
 		mov ah, 9h
 		int 21h
 
 	InputOfTheUser:
-		    mov ah, 03Fh ; Function to read the file
-			;mov bx, 0
-			mov cx, 32
-			lea 	dx, offset USR_INPUT
-			int 	21h
+		mov ah, 03Fh ; Function to read the file
+		;mov bx, 0
+		mov cx, 128 ; MaxLengthOfUsersString
+		lea 	dx, offset StringFromUser
+		int 	21h
 	
 	ExitCode:
 		; For exiting program We can use this code or...
@@ -70,6 +71,5 @@ USR_INPUT DB 32 DUP (?)
 		;int 21h
 		
 		; ... this one
-		
 		.exit
 end
