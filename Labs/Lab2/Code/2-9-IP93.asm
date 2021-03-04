@@ -7,10 +7,9 @@
 ; Data Segment
 .data	
 	StartingText DB "Введiть пароль. Попереджаю, що у Вас є лише 3 спроби: $"
-	FailureText DB "Пароль невiрний. $"
+	FailureText DB "Пароль невiрний. Спробуйте ще раз: $"
 	
-	StringFromUser DB 128 DUP (?)
-	StringFromUser2 db 10,0,10 dup(?)
+	StringFromUser2 db 128 dup(128)
 	
 	; We can write password in two ways:
 	Password  DB '123'
@@ -59,33 +58,32 @@
 		mov ah, 9h
 		int 21h
 		
-		jmp InputOfTheUser
+		jmp InputOfTheUser ;Unconditional jump
 
 	; Responsible For Input
 	InputOfTheUser:
-    mov ah,0Ah
-    lea dx,StringFromUser2
-    int 21h
+		mov ah,0Ah
+		mov dx, offset StringFromUser2
+		int 21h
 
-		mov al,PasswordCount
-		cmp al,[StringFromUser2+1];2
+		mov ax, PasswordCount
+		cmp al, StringFromUser2+1
         jne WrongPasswordByUser
 
-		cld
-		lea si,Password
-		lea di,StringFromUser2+2;2
-		xor cx,cx
+		mov si, offset Password
+		mov di, offset StringFromUser2+2
 		mov cl,PasswordCount
-		check:
-			lodsb
-			cmp al,byte ptr [di]
-			je step
+		
+	IsPasswordCorrect:
+		lodsb
+		cmp al, byte ptr [di]
+		je LoopItself
  
-			jmp WrongPasswordByUser
+		jmp WrongPasswordByUser ; Unconditional jump
         
-			step:
-			inc di
-    loop check
+	LoopItself:
+		inc di
+		loop IsPasswordCorrect
  
 	; Responsible For Correct Input
 	CorrectPasswordByUser:
@@ -104,24 +102,40 @@
 		int 10h
 	
 		mov ah,09h
-		lea dx, InformationText
+		mov dx, offset InformationText
 		int 21h
 	
-		jmp ExitCode
+		jmp ExitCode ; Unconditional jump
 	
 	; Responsible For Wrong Input
 	WrongPasswordByUser:
+		; Clear the screen
+		mov ax, 0600h
+		mov bh, 7h
+		mov cx, 0000
+		mov dx, 184fh
+		int 10h
+
+		; Set the position of cursor
+		mov ah, 02
+		mov bh, 00
+		mov dl, 00
+		mov dh, 00
+		int 10h
+	
 		mov ah,09h
-		lea dx, FailureText
+		mov dx, offset FailureText
 		int 21h
+		
+		jmp InputOfTheUser ; Unconditional jump
 		
 	; Responsible For Exit
 	ExitCode:
-		; For exiting program We can use this code or...
+		; For exiting program We can use this code...
 		;mov ah, 4Ch
 		;mov al, 00h
 		;int 21h
 		
-		; ... this one
+		; ... or this one
 		.exit
 end
