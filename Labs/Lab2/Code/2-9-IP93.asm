@@ -1,43 +1,16 @@
-; Processors
 .model tiny
-
-.data?
-	StringFromUser DB 128 DUP (?)
-
-; Data Segment
-.data	
-	StartingText DB "Введiть пароль. Попереджаю, що у Вас є лише 3 спроби: $"
-	SuccessText DB "Пароль вiрний. Виводжу данi: $"
-	FailureText DB "Пароль невiрний. $"
-	
-	; We can write password in two ways:
-	Password  DB "2-9-IP93"
-	
-	; And another one is:
-	; Password  DB 31h 32h 33h
-	
-	PasswordCount DB 8
-	MaxLengthOfUsersString DB 128
-	
-	; Text To Show
-	InformationText DB "ПIБ - Домiнський Валентин Олексiйович", 10, 
-		"Дата Народження = 22.02.2002", 10,
-		"Номер Залiковки книжки = 9311 $", 0
-	
-; Code Segment
+.386
+ 
+.data
+pass1 db '12345'
+len1 = $-pass1
+pass2 db 10,0,10 dup(?)
+msg1  db 0Dh,0Ah,'true$'
+msg2  db 0Dh,0Ah,'false$'
+ 
 .code
-	org	100h ; this is offset for com programs:
-	; It defines where the machine code (translated 
-	; assembly program) is to place in memory.
-	; As for org 100h this deals with 80x86 COM 
-	; program format (COMMAND) which consist 
-	; of only one segment of max. 64k bytes. 
-	; 100h says that the machine code starts from 
-	; address (offset) 100h in this segment.
-	; For com format the offset is always 100h
-	
-.startup ; Generates program start-up code
-	InvitePoint:	; Starting Code
+org	100h
+start: 
 		; Clear the screen
 		mov ax, 0600h
 		mov bh, 7h
@@ -52,51 +25,45 @@
 		mov dh, 00
 		int 10h
 
-		mov bx, offset PasswordCount
-
-		; Display The Text
-		mov dx, offset StartingText
-		mov ah, 9h
-		int 21h
-		
-		jmp InputOfTheUser
-
-	; Responsible For Input
-	InputOfTheUser:
 		mov ah, 03Fh ; Function to read the file
-		mov bx, 0
 		mov cx, 128 ; MaxLengthOfUsersString
-		mov 	dx, offset StringFromUser
+		mov 	dx, offset pass2
 		int 	21h
-		
-		;cmp dx, [bx]
-		; jne WrongPasswordByUser
-	
-	; ; Responsible For Wrong Input
-	; WrongPasswordByUser:
-		; mov dx,offset FailureText
-		; mov ah,09h
-		; int 21h
-		
-	; ; Responsible For Correct Input
-	; CorrectPasswordByUser:
-		; mov dx,offset SuccessText
-		; mov ah,09h
-		; int 21h
-		
-	; ; Responsible For Output
-	; OutputInfo:
-		; mov dx,offset InformationText
-		; mov ah,09h
-		; int 21h
-		
-	; Responsible For Exit
-	ExitCode:
-		; For exiting program We can use this code or...
-		;mov ah, 4Ch
-		;mov al, 00h
-		;int 21h
-		
-		; ... this one
-		.exit
-end
+ 
+    mov al,len1
+    cmp al,[pass2+1]
+    jne wrong
+ 
+    cld
+    lea si,pass1
+    lea di,pass2+2
+    xor cx,cx
+    mov cl,len1
+    check:
+        lodsb
+        cmp al,byte ptr [di]
+        je step
+ 
+        jmp wrong
+        
+        step:
+        inc di
+    loop check
+ 
+    good:
+    mov ah,09h
+    lea dx,msg1
+    int 21h
+    
+    jmp exit    
+ 
+    wrong:
+    mov ah,09h
+    lea dx,msg2
+    int 21h
+ 
+    exit:
+    mov ah,4Ch
+    mov al,0
+    int 21h
+end start
