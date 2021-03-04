@@ -1,7 +1,8 @@
 ; Processors
-.model TINY
+.model tiny
 
 .data?
+USR_INPUT    DB 32 DUP (?)
 
 ; Data Segment
 .data	
@@ -22,8 +23,6 @@
 		"Дата Народження = 22.02.2002", 10,
 		"Номер Залiковки книжки = 9311 $", 0
 	
-	
-	
 ; Code Segment
 .code
 	org	100h ; this is offset for com programs:
@@ -37,7 +36,7 @@
 	; For com format the offset is always 100h
 	
 	; Enter point
-	Main:	
+	InvitePoint:	
 		; Clear the screen
 		mov ax, 0600h
 		mov bh, 7h
@@ -56,17 +55,25 @@
 		mov dx, offset StartingText
 		mov ah, 9h
 		int 21h
-		
-		mov ah, 8h
-		int 21h
 	
+		;jmp InputOfTheUser
+	
+		; End of a program
+	end InvitePoint
+
+	InputOfTheUser:
+		MOV        AH, 3Fh
+		MOV        DX, offset USR_INPUT
+		INT     21h
+	end InputOfTheUser
+	
+	ExitCode:
 		; For exiting program We can use this code or...
 		;mov ah, 4Ch
 		;mov al, 00h
 		;int 21h
 		
 		; ... this one
+		
 		.exit
-		; End of a program
-	end Main
-	
+	end ExitCode
