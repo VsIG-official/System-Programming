@@ -2,14 +2,12 @@
 .model tiny
 .386
 
-.data?
-
 ; Data Segment
 .data	
-	StartingText DB "Введiть пароль. Попереджаю, що у Вас є лише 3 спроби: $"
-	FailureText DB "Пароль невiрний. Спробуйте ще раз: $"
+	StartingText DB "Введiть пароль. Попереджаю, що у Вас є лише 3 спроби: $", 10
+	FailureText DB "Пароль невiрний. Спробуйте ще раз: $", 10
 	
-	StringFromUser2 db 128 dup(128)
+	StringFromUser2 DB 128 dup(128)
 	
 	; We can write password in two ways:
 	Password  DB '123'
@@ -18,7 +16,6 @@
 	; Password  DB 31h 32h 33h
 	
 	PasswordCount = $-Password
-	;MaxLengthOfUsersString DB 128
 	
 	; Text To Show
 	InformationText DB "ПIБ = Домiнський Валентин Олексiйович", 10, 
@@ -54,21 +51,21 @@
 		int 10h
 
 		; Display The Text
-		mov dx, offset StartingText
 		mov ah, 9h
+		mov dx, offset StartingText
 		int 21h
 		
-		jmp InputOfTheUser ;Unconditional jump
+		jmp InputOfTheUser ; Unconditional jump
 
 	; Responsible For Input
 	InputOfTheUser:
-		mov ah,0Ah
+		mov ah, 0Ah
 		mov dx, offset StringFromUser2
 		int 21h
 
 		mov ax, PasswordCount
 		cmp al, StringFromUser2+1
-        jne WrongPasswordByUser
+        jne WrongPasswordByUser ; Jump Not Equal
 
 		mov si, offset Password
 		mov di, offset StringFromUser2+2
@@ -77,7 +74,7 @@
 	IsPasswordCorrect:
 		lodsb
 		cmp al, byte ptr [di]
-		je LoopItself
+		je LoopItself ; Jump Equal
  
 		jmp WrongPasswordByUser ; Unconditional jump
         
