@@ -1,6 +1,8 @@
 :: Creating variable
 set NameOfTheFileAsParametr=%1
 
+for /r \ %%a in (%NameOfTheFileAsParametr%) do set "location=%%~dpa"
+
 :: Creating COM File
 start D:\masm32\bin\ml /Bl D:\masm32\bin\link16.exe %NameOfTheFileAsParametr%
 
