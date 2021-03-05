@@ -1,8 +1,9 @@
-:: Creating variable to use in two places
+:: Creating variable
 set NameOfTheFileAsParametr=%1
 
 :: Creating COM File
 start D:\masm32\bin\ml /Bl D:\masm32\bin\link16.exe %NameOfTheFileAsParametr%
+
 :: I'm using DOSBox for emulating DOS. That's why I launch this program there
 :: Launching COM File
 :: mount c %cd% - connect physical folders and drives to virtual drives inside DOSBox
