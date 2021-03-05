@@ -1,3 +1,5 @@
+:: Input: should have name of the file and name of the disk
+
 :: Creating variables
 :: Name of the file to search
 set NameOfTheFileAsParametr=%1
