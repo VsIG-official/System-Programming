@@ -10,12 +10,13 @@
 	StringFromUser DB 128 dup(128)
 	
 	; We can write password in two ways:
-	Password  DB '123'
+	Password  DB "N@"
 	
 	; And another one is:
 	; Password  DB 31h 32h 33h
 	
 	PasswordCount = $-Password
+	XORKey DB 22h
 	
 	; Text To Show
 	InformationText DB "ПIБ = Домiнський Валентин Олексiйович", 10, 
@@ -64,19 +65,27 @@
 		mov ah, 0Ah
 		mov dx, offset StringFromUser
 		int 21h
-
+		
 		mov ax, PasswordCount
+
 		cmp al, StringFromUser+1 ; Compare
+		
         jne WrongPasswordByUser ; Jump Not Equal
 
 		mov si, offset Password
+
 		mov di, offset StringFromUser+2 ; low-order 16 bits of 32-bit registers
+
 		mov cl,PasswordCount ; counter register
 		
 	; Responsible For Checking, if password and input string are the same
 	IsPasswordCorrect:
 		lodsb ; loads 1 byte into the AL register
+
+		;xor bl, XORKey
+	    ;mov bl, PasswordCount[di]
 		cmp al, byte ptr [di] ; Compare 
+
 		; ptr = The first operator forces the expression to be treated as having
 		; the specified type. The second operator specifies a pointer to type
 		je LoopItself ; Jump Equal
@@ -84,6 +93,8 @@
 		jmp WrongPasswordByUser ; Unconditional jump
         
 	LoopItself:
+
+
 		inc di ; incrementing
 		loop IsPasswordCorrect
  
