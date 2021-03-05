@@ -39,15 +39,15 @@
 		; Clear the screen
 		mov ax, 0600h
 		mov bh, 7h
-		mov cx, 0000
+		mov cx, 0000h
 		mov dx, 184fh
 		int 10h
 
 		; Set the position of cursor
-		mov ah, 02
-		mov bh, 00
-		mov dl, 00
-		mov dh, 00
+		mov ah, 02h
+		mov bh, 00h
+		mov dl, 00h
+		mov dh, 00h
 		int 10h
 
 		; Display The Text
@@ -55,7 +55,7 @@
 		mov dx, offset StartingText
 		int 21h
 		
-		mov  bx, 02 ; counter for tries
+		mov  bx, 02h ; counter for tries
 		
 		jmp InputOfTheUser ; Unconditional jump
 
@@ -92,18 +92,18 @@
 		; Clear the screen
 		mov ax, 0600h ; register si 32-bit general-purpose register, used for temporary data storage and memory access
 		mov bh, 7h ; register represent the high-order 8 bits of the corresponding register
-		mov cx, 0000
+		mov cx, 0000h
 		mov dx, 184fh
 		int 10h
 
 		; Set the position of cursor
-		mov ah, 02
-		mov bh, 00
-		mov dl, 00
-		mov dh, 00
+		mov ah, 02h
+		mov bh, 00h
+		mov dl, 00h
+		mov dh, 00h
 		int 10h
 	
-		mov ah,09h
+		mov ah, 09h
 		mov dx, offset InformationText
 		int 21h
 	
@@ -114,15 +114,15 @@
 		; Clear the screen
 		mov ax, 0600h
 		mov bh, 7h
-		mov cx, 0000
+		mov cx, 0000h
 		mov dx, 184fh
 		int 10h
 
 		; Set the position of cursor
-		mov ah, 02
-		mov bh, 00
-		mov dl, 00
-		mov dh, 00
+		mov ah, 02h
+		mov bh, 00h
+		mov dl, 00h
+		mov dh, 00h
 		int 10h
 	
 		; display text
@@ -139,8 +139,8 @@
 		int 21h
 		
 		; counting tries
-		add bx, -01 ; decrementing
-		cmp bx, -01 ; negative possible tries
+		add bx, -01h ; decrementing
+		cmp bx, -01h ; negative possible tries
 		je ExitCode ; Jump Equal
 		
 		jmp InputOfTheUser ; Unconditional jump
