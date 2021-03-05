@@ -76,7 +76,9 @@
 	; Responsible For Checking, if password and input string are the same
 	IsPasswordCorrect:
 		lodsb ; loads 1 byte into the AL register
+		
 		mov bh, byte ptr [di]
+		
 		cmp al, bh ; Compare 
 		; ptr = The first operator forces the expression to be treated as having
 		; the specified type. The second operator specifies a pointer to type
