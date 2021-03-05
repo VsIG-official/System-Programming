@@ -4,13 +4,13 @@
 
 ; Data Segment
 .data	
-	StartingText DB "Введiть пароль. Попереджаю, що у Вас є лише 3 спроби: $", 10
+	StartingText DB "Введiть пароль. Попереджаю, що у Вас є лише 4 спроби: $", 10
 	FailureText DB "Пароль невiрний. Спробуйте ще раз. К-сть спроб, яка залишилася =  $",  10
 	
 	StringFromUser DB 128 dup(128)
 	
 	; We can write password in two ways:
-	Password  DB '123'
+	Password  DB "Dominskyi"
 	
 	; And another one is:
 	; Password  DB 31h 32h 33h
@@ -55,7 +55,7 @@
 		mov dx, offset StartingText
 		int 21h
 		
-		mov  bx, 02h ; counter for tries
+		mov  bx, 03h ; counter for tries
 		
 		jmp InputOfTheUser ; Unconditional jump
 
@@ -76,7 +76,8 @@
 	; Responsible For Checking, if password and input string are the same
 	IsPasswordCorrect:
 		lodsb ; loads 1 byte into the AL register
-		cmp al, byte ptr [di] ; Compare 
+		mov bh, byte ptr [di]
+		cmp al, bh ; Compare 
 		; ptr = The first operator forces the expression to be treated as having
 		; the specified type. The second operator specifies a pointer to type
 		je LoopItself ; Jump Equal
