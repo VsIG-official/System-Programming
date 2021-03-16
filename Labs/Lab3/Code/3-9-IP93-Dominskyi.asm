@@ -13,13 +13,13 @@ includelib /masm32/lib/kernel32.lib
 
 ; Data Segment
 .data	
-	StartingText DB "Введiть пароль. Попереджаю, що у Вас є лише 4 спроби:  ", 10
-	FailureText DB "Пароль невiрний. Спробуйте ще раз. К-сть спроб, яка залишилася =  ",  10
+	StartingText DB "Введiть пароль. Попереджаю, що у Вас є лише 4 спроби:  ", 0
+	FailureText DB "Пароль невiрний. Спробуйте ще раз. К-сть спроб, яка залишилася =  ",  0
 	
 	; Name Of Message Box
-	MsgBoxName  DB "3-9-IP93-Dominskyi", 10
+	MsgBoxName  DB "3-9-IP93-Dominskyi", 0
 	
-	StringFromUser DB 128 dup(128)
+	;StringFromUser DB 128 dup(128)
 	
 	; We can write password in two ways:
 	Password  DB "Dominskyi"
@@ -30,8 +30,8 @@ includelib /masm32/lib/kernel32.lib
 	PasswordCount = $-Password
 	
 	; Text To Show
-	InformationText DB "ПIБ = Домiнський Валентин Олексiйович", 10, 
-		 "Дата Народження = 22.02.2002", 10,
+	InformationText DB "ПIБ = Домiнський Валентин Олексiйович", 13, 
+		 "Дата Народження = 22.02.2002", 13,
 		 "Номер Залiковки книжки = 9311", 0
 	
 ; Code Segment
@@ -39,7 +39,7 @@ includelib /masm32/lib/kernel32.lib
 start: ; Generates program start-up code
 	InvitePoint:	; Starting Code
 		
-		invoke MessageBox, NULL, addr StartingText, addr MsgBoxName, MB_OK
+		invoke MessageBox, 0, offset StartingText, offset MsgBoxName, MB_OK
 		
 		;jmp InputOfTheUser ; Unconditional jump
 
