@@ -3,6 +3,8 @@
 .model flat, stdcall
 option  CaseMap:None
 
+WinMain proto :DWORD,:DWORD,:DWORD,:DWORD
+
 ; Libraries And Macroses
 include /masm32/include/windows.inc
 include /masm32/include/user32.inc
@@ -51,12 +53,42 @@ IDC_INFORMATION equ 3002
 start: ; Generates program start-up code
 	InvitePoint:	; Starting Code
 		
-		invoke MessageBox, 0, offset StartingText, offset MsgBoxName, MB_OK
+invoke GetModuleHandle, NULL
+mov hInstance,eax
+invoke GetCommandLine
+mov CommandLine,eax
+invoke WinMain , hInstance,NULL,CommandLine, SW_SHOWDEFAULT
+invoke ExitProcess,eax
 		
-		jmp InputOfTheUser ; Unconditional jump
+		;jmp InputOfTheUser ; Unconditional jump
 
 	; ; Responsible For Input
-	InputOfTheUser:	
+	WinMain  proc hInst:HINSTANCE,hPrevInst:HINSTANCE,CmdLine:LPSTR,CmdShow:DWORD
+LOCAL wc:WNDCLASSEX
+LOCAL msg:MSG
+LOCAL hDlg:HWND
+mov wc.cbSize,SIZEOF WNDCLASSEX
+mov wc.style, CS_HREDRAW or CS_VREDRAW
+mov wc.lpfnWndProc, OFFSET WndProc
+mov wc.cbClsExtra,NULL
+mov wc.cbWndExtra,DLGWINDOWEXTRA
+push hInst
+pop wc.hInstance
+mov wc.hbrBackground,COLOR_BTNFACE+1
+mov wc.lpszMenuName,OFFSET MenuName
+mov wc.lpszClassName,OFFSET ClassName
+invoke LoadIcon,NULL,IDI_APPLICATION
+mov wc.hIcon,eax
+mov wc.hIconSm,eax
+invoke LoadCursor,NULL,IDC_ARROW
+mov wc.hCursor,eax
+invoke RegisterClassEx, addr wc
+invoke CreateDialogParam,hInstance,ADDR DlgName,NULL,NULL,NULL
+mov hDlg,eax
+invoke ShowWindow, hDlg,SW_SHOWNORMAL
+invoke UpdateWindow, hDlg
+invoke GetDlgItem,hDlg,IDC_EDIT
+invoke SetFocus,eax
 		; mov ah, 0Ah
 		; mov dx, offset StringFromUser
 		; int 21h
