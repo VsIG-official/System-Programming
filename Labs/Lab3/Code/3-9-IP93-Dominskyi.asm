@@ -41,14 +41,15 @@ start: ; Generates program start-up code
 		
 		invoke MessageBox, 0, offset StartingText, offset MsgBoxName, MB_OK
 		
-		;jmp InputOfTheUser ; Unconditional jump
+		jmp InputOfTheUser ; Unconditional jump
 
 	; ; Responsible For Input
-	; InputOfTheUser:	
+	InputOfTheUser:	
 		; mov ah, 0Ah
 		; mov dx, offset StringFromUser
 		; int 21h
-
+		;invoke MessageBox, 0, offset StartingText, offset MsgBoxName, MB_OK
+		
 		; mov ax, PasswordCount
 		; cmp al, StringFromUser+1 ; Compare
         ; jne WrongPasswordByUser ; Jump Not Equal
