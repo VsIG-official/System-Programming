@@ -34,6 +34,18 @@ includelib /masm32/lib/kernel32.lib
 		 "Дата Народження = 22.02.2002", 13,
 		 "Номер Залiковки книжки = 9311", 0
 	
+;constant data (constants)
+.const
+;The EQU directive assigns a value to the label, which is determined as the 
+;result of the integer expression on the right-hand side. The result of this 
+;expression can be an integer, an address, or any string of characters:
+;BUT
+;The EQU directive is most often used to introduce parameters common;
+; to the entire program, similar to the #define command of the C preprocessor
+IDC_START equ 3000
+IDC_FAILURE equ 3001
+IDC_INFORMATION equ 3002
+
 ; Code Segment
 .code
 start: ; Generates program start-up code
