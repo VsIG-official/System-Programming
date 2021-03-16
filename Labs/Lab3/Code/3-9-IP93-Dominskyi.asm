@@ -4,8 +4,12 @@
 option  CaseMap:None
 
 ; Libraries And Macroses
-include /masm32/include/masm32rt.inc
-
+include /masm32/include/windows.inc
+include /masm32/include/user32.inc
+include /masm32/include/kernel32.inc
+ 
+includelib /masm32/lib/user32.lib
+includelib /masm32/lib/kernel32.lib
 
 ; Data Segment
 .data	
