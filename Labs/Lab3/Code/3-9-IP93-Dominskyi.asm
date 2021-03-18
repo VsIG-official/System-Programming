@@ -42,7 +42,7 @@ DataDlgProc PROTO :DWORD, :DWORD, :DWORD, :DWORD
 	FailureText DB "Пароль невiрний. Спробуйте ще раз. К-сть спроб, яка залишилася =  ",  0
 	
 	; Name Of Message Box
-	MsgBoxName  DB "3-9-IP93-Dominskyi", 0
+	MsgBoxName  DB "Dominskyi", 0
 	
 	; We can write password in two ways:
 	Password  DB "Dominskyi"
@@ -61,11 +61,6 @@ DataDlgProc PROTO :DWORD, :DWORD, :DWORD, :DWORD
 
     msg_title  EQU "Лаба 3"
     msg_pass   EQU "Введіть пароль, будь ласка:"
-    msg_data   EQU 10, "ОСОБИСТІ ДАНІ:", 10 ,\
-        "ПІБ - КОВАЛИШИН О. Ю.", 10,      \
-        "ДАТА НАРОДЖЕННЯ - 12.09.2001", 10,\
-        "НОМЕР ЗАЛІКОВКИ - 8410", 0
-    msg_error  EQU 10, "Неправильний пароль, спробуйте ще раз!", 0
 
 ; Code Segment
 .code
@@ -77,7 +72,7 @@ start: ; Generates program start-up code
         INVOKE ExitProcess, 0
 
     mainWindow PROC
-        Dialog msg_title, "Monotype Corsiva", 20,    \
+        Dialog MsgBoxName, "Monotype Corsiva", 20,    \
             WS_OVERLAPPED or WS_SYSMENU or DS_CENTER, \
             3,                                         \
             50, 50, 150, 75,                            \
