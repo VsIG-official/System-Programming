@@ -78,40 +78,6 @@ start: ; Generates program start-up code
 	; assign variables of WNDCLASSEX
 	; window class is a specification of a window
 	
-	;EXAMPLE
-	
-	; WNDCLASSEX STRUCT dword
-  ; cbSize            dword      ?
-  ; style             dword      ?
-  ; lpfnWndProc       dword      ?
-  ; cbClsExtra        dword      ?
-  ; cbWndExtra        dword      ?
-  ; hInstance         dword      ?
-  ; hIcon             dword      ?
-  ; hCursor           dword      ?
-  ; hbrBackground     dword      ?
-  ; lpszMenuName      dword      ?
-  ; lpszClassName     dword      ?
-  ; hIconSm           dword      ?
-  ; WNDCLASSEX ENDS
-
-	; cbSize: The size of WNDCLASSEX structure in bytes. We can use SIZEOF operator to get the value.
-	; style: The style of windows created from this class. You can combine several styles together using "or" operator.
-	; lpfnWndProc: The address of the window procedure responsible for windows created from this class.
-	; cbClsExtra: Specifies the number of extra bytes to allocate following the window-class structure. 
-	;The operating system initializes the bytes to zero. You can store window class-specific data here.
-	; cbWndExtra: Specifies the number of extra bytes to allocate following the window instance. The operating 
-	;system initializes the bytes to zero. If an application uses the WNDCLASS structure to register a dialog box created
-	;by using the CLASS directive in the resource file, it must set this member to DLGWINDOWEXTRA.
-	; hInstance: Instance handle of the module.
-	; hIcon: Handle to the icon. Get it from LoadIcon call.
-	; hCursor: Handle to the cursor. Get it from LoadCursor call.
-	; hbrBackground: Background color of windows created from the class.
-	; lpszMenuName: Default menu handle for windows created from the class.
-	; lpszClassName: The name of this window class.
-	; hIconSm: Handle to a small icon that is associated with the window class. If this member is NULL, the system 
-	;searches the icon resource specified by the hIcon member for an icon of the appropriate size to use as the small icon.
-	
     mov   wc.cbSize, sizeof WNDCLASSEX
     mov   wc.style, CS_HREDRAW or CS_VREDRAW
     mov   wc.lpfnWndProc, offset WndProc
@@ -127,8 +93,9 @@ start: ; Generates program start-up code
     mov   wc.hIconSm, eax
     invoke LoadCursor, NULL, IDC_ARROW
     mov   wc.hCursor, eax
+	
 	; create class of the window
-    invoke RegisterClassEx, addr wc                       
+    invoke RegisterClassEx, addr wc
     invoke CreateWindowEx, NULL,\
                 addr NameOfTheStartingWindows,\
                 addr MsgBoxName,\
