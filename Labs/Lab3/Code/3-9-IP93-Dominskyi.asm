@@ -9,12 +9,16 @@ WinMain proto :dword,:dword,:dword
 include /masm32/include/windows.inc
 include /masm32/include/user32.inc
 include /masm32/include/kernel32.inc
+; library for dialog windows
+ include /masm32/include/DIALOGS.INC
  
 includelib /masm32/lib/user32.lib
 includelib /masm32/lib/kernel32.lib
 
 .data?
-hInstance HINSTANCE ?        ; Handle of our program
+	hInstance HINSTANCE ?        ; Handle of our program
+	
+	StringFromUser DB 128 dup(?)
 
 ; Data Segment
 .data	
@@ -23,8 +27,6 @@ hInstance HINSTANCE ?        ; Handle of our program
 	
 	; Name Of Message Box
 	MsgBoxName  DB "3-9-IP93-Dominskyi", 0
-	
-	;StringFromUser DB 128 dup(128)
 	
 	; We can write password in two ways:
 	Password  DB "Dominskyi"
@@ -49,14 +51,16 @@ hInstance HINSTANCE ?        ; Handle of our program
 	;BUT
 	;The EQU directive is most often used to introduce parameters common;
 	; to the entire program, similar to the #define command of the C preprocessor
-	IDC_START equ 3000
-	IDC_FAILURE equ 3001
-	IDC_INFORMATION equ 3002
+	IDC_STARTINGWINDOW equ 3000
+	IDC_EDIT equ 3001
+	    msg_title  EQU "Ырср 3"
 
 ; Code Segment
 .code
 start: ; Generates program start-up code
 	InvitePoint:	; Starting Code
+
+	invoke MessageBox, 0, offset StartingText, offset MsgBoxName, MB_OK
 
 	invoke GetModuleHandle, NULL
 	mov hInstance, eax
@@ -64,69 +68,69 @@ start: ; Generates program start-up code
 	invoke WinMain, hInstance,NULL, SW_SHOWDEFAULT ;invoke function
 	invoke ExitProcess, eax ; quit program. code returns in EAX register from Main Function.
 
-	;jmp InputOfTheUser ; Unconditional jump
-
-	; Responsible For Input
 	; function declaration of WinMain
 	WinMain  proc hInst:HINSTANCE,hPrevInst:HINSTANCE,CmdShow:dword
 	 ; there we need local variables
 	 
-	local wc:WNDCLASSEX
-    local msg:MSG
-    local hwnd:HWND
+	 
+	; local wc:WNDCLASSEX
+    ; local msg:MSG
+    ; local hwnd:HWND
 
-	; assign variables of WNDCLASSEX
-	; window class is a specification of a window
+	; ; assign variables of WNDCLASSEX
+	; ; window class is a specification of a window
 	
-    mov   wc.cbSize, sizeof WNDCLASSEX
-    mov   wc.style, CS_HREDRAW or CS_VREDRAW
-    mov   wc.lpfnWndProc, offset WndProc
-    mov   wc.cbClsExtra, NULL
-    mov   wc.cbWndExtra, NULL
-    push  hInstance
-    pop   wc.hInstance
-    mov   wc.hbrBackground, COLOR_WINDOW
-    mov   wc.lpszMenuName, NULL
-    mov   wc.lpszClassName, offset NameOfTheStartingWindows
-    invoke LoadIcon, NULL, IDI_APPLICATION
-    mov   wc.hIcon, eax
-    mov   wc.hIconSm, eax
-    invoke LoadCursor, NULL, IDC_ARROW
-    mov   wc.hCursor, eax
+    ; mov   wc.cbSize, sizeof WNDCLASSEX
+    ; mov   wc.style, CS_HREDRAW or CS_VREDRAW
+    ; mov   wc.lpfnWndProc, offset WndProc
+    ; mov   wc.cbClsExtra, NULL
+    ; mov   wc.cbWndExtra, NULL
+    ; push  hInstance
+    ; pop   wc.hInstance
+    ; mov   wc.hbrBackground, COLOR_WINDOW
+    ; mov   wc.lpszMenuName, NULL
+    ; mov   wc.lpszClassName, offset NameOfTheStartingWindows
+    ; invoke LoadIcon, NULL, IDI_APPLICATION
+    ; mov   wc.hIcon, eax
+    ; mov   wc.hIconSm, eax
+    ; invoke LoadCursor, NULL, IDC_ARROW
+    ; mov   wc.hCursor, eax
 	
-	; create class of the window
-    invoke RegisterClassEx, addr wc
-    invoke CreateWindowEx, NULL,\
-                addr NameOfTheStartingWindows,\
-                addr MsgBoxName,\
-                WS_OVERLAPPEDWINDOW,\
-                CW_USEDEFAULT,\
-                CW_USEDEFAULT,\
-                300,\
-                200,\
-                NULL,\
-                NULL,\
-                hInst,\
-                NULL
-    mov   hwnd,eax
-	; Show window
-    invoke ShowWindow, hwnd,CmdShow
-	; update screen
-    invoke UpdateWindow, hwnd
+	; ; create class of the window
+    ; invoke RegisterClassEx, addr wc
+    ; invoke CreateWindowEx, NULL,
+                ; addr NameOfTheStartingWindows,
+                ; addr MsgBoxName,
+                ; WS_OVERLAPPEDWINDOW,
+                ; 470, 280, 300, 200,
+                ; NULL, NULL, hInst, NULL
+				
 
-	; waits for message
-    .while TRUE
-                invoke GetMessage, addr msg,NULL,0,0
-                .break .if (!eax)
-                invoke TranslateMessage, addr msg
-                invoke DispatchMessage, addr msg
-   .endw
-   ; code returns in EAX register from Main Function.
-    mov     eax,msg.wParam
-	; return
-    ret 
-	;The ENDP directive defines the end of the procedure
-	;and has the same name as in the PROC directive
+	; ; write window handle in eax
+    ; mov   hwnd,eax
+	
+	; ; Show window
+    ; invoke ShowWindow, hwnd,CmdShow
+	; ; update screen
+    ; invoke UpdateWindow, hwnd
+
+	; ; waits for message
+    ; .while TRUE
+				; ;returns FALSE if WM_QUIT message is received and will kill the loop
+                ; invoke GetMessage, addr msg,NULL,0,0
+                ; .break .if (!eax)
+				; ;takes raw keyboard input and generates a new message
+                ; invoke TranslateMessage, addr msg
+				; ;sends the message data to the window procedure responsible for the specific window the message is for
+                ; invoke DispatchMessage, addr msg
+	; ; end while
+   ; .endw
+   ; ; code returns in EAX register from Main Function.
+    ; mov     eax,msg.wParam
+	; ; return
+    ; ret 
+	; ;The ENDP directive defines the end of the procedure
+	; ;and has the same name as in the PROC directive
 WinMain endp
 
 WndProc proc hWnd:HWND, uMsg:UINT, wParam:WPARAM, lParam:LPARAM
@@ -138,8 +142,8 @@ WndProc proc hWnd:HWND, uMsg:UINT, wParam:WPARAM, lParam:LPARAM
 		 ; process the message
         invoke DefWindowProc,hWnd,uMsg,wParam,lParam
         ret
-    .endif
-    xor eax,eax
+    .ENDIF
+    xor    eax,eax
     ret
 WndProc endp
 		; mov ah, 0Ah
