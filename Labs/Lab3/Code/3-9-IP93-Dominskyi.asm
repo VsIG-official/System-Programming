@@ -3,7 +3,7 @@
 .model flat, stdcall
 option  CaseMap:None
 
-WinMain proto :DWORD,:DWORD,:DWORD
+WinMain proto :dword,:dword,:dword
 
 ; Libraries And Macroses
 include /masm32/include/windows.inc
@@ -39,58 +39,61 @@ hInstance HINSTANCE ?        ; Handle of our program
 		 "Дата Народження = 22.02.2002", 13,
 		 "Номер Залiковки книжки = 9311", 0
 		 
-	NameOfTheStartingClass db "Window with starting text",0        ; the name of our window class
+	NameOfTheStartingWindows DB "Window with starting text",0        ; the name of our window class
 	
 ;constant data (constants)
 .const
-;The EQU directive assigns a value to the label, which is determined as the 
-;result of the integer expression on the right-hand side. The result of this 
-;expression can be an integer, an address, or any string of characters:
-;BUT
-;The EQU directive is most often used to introduce parameters common;
-; to the entire program, similar to the #define command of the C preprocessor
-IDC_START equ 3000
-IDC_FAILURE equ 3001
-IDC_INFORMATION equ 3002
+	;The EQU directive assigns a value to the label, which is determined as the 
+	;result of the integer expression on the right-hand side. The result of this 
+	;expression can be an integer, an address, or any string of characters:
+	;BUT
+	;The EQU directive is most often used to introduce parameters common;
+	; to the entire program, similar to the #define command of the C preprocessor
+	IDC_START equ 3000
+	IDC_FAILURE equ 3001
+	IDC_INFORMATION equ 3002
 
 ; Code Segment
 .code
 start: ; Generates program start-up code
 	InvitePoint:	; Starting Code
-		
+
 	invoke GetModuleHandle, NULL
-	mov hInstance,eax
+	mov hInstance, eax
 
-	invoke WinMain, hInstance,NULL, SW_SHOWDEFAULT        ; call the main function
-	invoke ExitProcess, eax                           ; quit our program. The exit code is returned in eax from WinMain.
-		
-		;jmp InputOfTheUser ; Unconditional jump
+	invoke WinMain, hInstance,NULL, SW_SHOWDEFAULT ;invoke function
+	invoke ExitProcess, eax ; quit program. code returns in EAX register from Main Function.
 
-	; ; Responsible For Input
-	WinMain  proc hInst:HINSTANCE,hPrevInst:HINSTANCE,CmdShow:DWORD
- LOCAL wc:WNDCLASSEX                                            ; create local variables on stack
-    LOCAL msg:MSG
-    LOCAL hwnd:HWND
+	;jmp InputOfTheUser ; Unconditional jump
 
-    mov   wc.cbSize,SIZEOF WNDCLASSEX                   ; fill values in members of wc
+	; Responsible For Input
+	WinMain  proc hInst:HINSTANCE,hPrevInst:HINSTANCE,CmdShow:dword
+	 ; there we need local variables
+	local wc:WNDCLASSEX
+    local msg:MSG
+    local hwnd:HWND
+
+	; assign variables of WNDCLASSEX
+    mov   wc.cbSize, sizeof WNDCLASSEX
     mov   wc.style, CS_HREDRAW or CS_VREDRAW
-    mov   wc.lpfnWndProc, OFFSET WndProc
-    mov   wc.cbClsExtra,NULL
-    mov   wc.cbWndExtra,NULL
+    mov   wc.lpfnWndProc, offset WndProc
+    mov   wc.cbClsExtra, NULL
+    mov   wc.cbWndExtra, NULL
     push  hInstance
     pop   wc.hInstance
     mov   wc.hbrBackground, COLOR_WINDOW+1
     mov   wc.lpszMenuName, NULL
-    mov   wc.lpszClassName, OFFSET NameOfTheStartingClass
-    invoke LoadIcon,NULL,IDI_APPLICATION
-    mov   wc.hIcon,eax
-    mov   wc.hIconSm,eax
-    invoke LoadCursor,NULL,IDC_ARROW
-    mov   wc.hCursor,eax
-    invoke RegisterClassEx, addr wc                       ; register our window class
-    invoke CreateWindowEx,NULL,\
-                ADDR NameOfTheStartingClass,\
-                ADDR MsgBoxName,\
+    mov   wc.lpszClassName, offset NameOfTheStartingWindows
+    invoke LoadIcon, NULL, IDI_APPLICATION
+    mov   wc.hIcon, eax
+    mov   wc.hIconSm, eax
+    invoke LoadCursor, NULL, IDC_ARROW
+    mov   wc.hCursor, eax
+	; create class of the window
+    invoke RegisterClassEx, addr wc                       
+    invoke CreateWindowEx, NULL,\
+                addr NameOfTheStartingWindows,\
+                addr MsgBoxName,\
                 WS_OVERLAPPEDWINDOW,\
                 CW_USEDEFAULT,\
                 CW_USEDEFAULT,\
@@ -101,26 +104,36 @@ start: ; Generates program start-up code
                 hInst,\
                 NULL
     mov   hwnd,eax
-    invoke ShowWindow, hwnd,CmdShow               ; display our window on desktop
-    invoke UpdateWindow, hwnd                                 ; refresh the client area
+	; Show window
+    invoke ShowWindow, hwnd,CmdShow
+	; update screen
+    invoke UpdateWindow, hwnd
 
-    .WHILE TRUE                                                         ; Enter message loop
-                invoke GetMessage, ADDR msg,NULL,0,0
-                .BREAK .IF (!eax)
-                invoke TranslateMessage, ADDR msg
-                invoke DispatchMessage, ADDR msg
-   .ENDW
-    mov     eax,msg.wParam                                            ; return exit code in eax
-    ret
+	; waits for message
+    .while TRUE
+                invoke GetMessage, addr msg,NULL,0,0
+                .break .if (!eax)
+                invoke TranslateMessage, addr msg
+                invoke DispatchMessage, addr msg
+   .endw
+   ; code returns in EAX register from Main Function.
+    mov     eax,msg.wParam
+	; return
+    ret 
+	;The ENDP directive defines the end of the procedure
+	;and has the same name as in the PROC directive
 WinMain endp
 
 WndProc proc hWnd:HWND, uMsg:UINT, wParam:WPARAM, lParam:LPARAM
-    .IF uMsg==WM_DESTROY                           ; if the user closes our window
-        invoke PostQuitMessage,NULL             ; quit our application
-    .ELSE
-        invoke DefWindowProc,hWnd,uMsg,wParam,lParam     ; Default message processing
+	; on window close
+    .if uMsg==WM_DESTROY               
+		; exit program
+        invoke PostQuitMessage,NULL 
+    .else
+		 ; process the message
+        invoke DefWindowProc,hWnd,uMsg,wParam,lParam
         ret
-    .ENDIF
+    .endif
     xor eax,eax
     ret
 WndProc endp
