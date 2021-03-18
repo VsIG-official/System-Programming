@@ -64,7 +64,6 @@ start: ; Generates program start-up code
 
 	; assign variables of WNDCLASSEX
 	; window class is a specification of a window
-	
     mov   wc.cbSize, sizeof WNDCLASSEX
     mov   wc.style, CS_HREDRAW or CS_VREDRAW
     mov   wc.lpfnWndProc, offset WndProc
@@ -120,7 +119,7 @@ WinMainProto endp
 
 WndProc proc hWnd:HWND, uMsg:UINT, wParam:WPARAM, lParam:LPARAM
 	; on window close
-    .if uMsg==WM_DESTROY               
+    .if uMsg==WM_DESTROY
 		; exit program
         invoke PostQuitMessage,NULL 
     .else
