@@ -66,7 +66,6 @@ DataDlgProc PROTO :DWORD, :DWORD, :DWORD, :DWORD
         "ДАТА НАРОДЖЕННЯ - 12.09.2001", 10,\
         "НОМЕР ЗАЛІКОВКИ - 8410", 0
     msg_error  EQU 10, "Неправильний пароль, спробуйте ще раз!", 0
-    passLen    DWORD 6
 
 ; Code Segment
 .code
@@ -97,7 +96,7 @@ start: ; Generates program start-up code
         .IF uMsg == WM_COMMAND
             .IF wParam == IDOK
                 MOV count, FUNC(GetDlgItemText, hWin, IDC_EDIT, ADDR usrInput, 512)
-                MOV EAX, passLen
+                MOV EAX, PasswordCount
                 .IF count != EAX
                     JMP error
                 .ENDIF
