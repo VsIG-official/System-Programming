@@ -17,7 +17,7 @@ WinMainProto proto :dword,:dword,:dword
 
 .data?
 	hInstance HINSTANCE ?        ; Handle of our program
-	
+			hEditText 		HWND ?
 	StringFromUser DB 128 dup(?)
 
 ; Data Segment
@@ -43,6 +43,8 @@ WinMainProto proto :dword,:dword,:dword
 		 "Номер Залiковки книжки = 9311", 0
 		 
 	NameOfTheStartingWindows DB "Window with starting text",0        ; the name of our window class
+	
+			classEdit db "edit",0
 
 ; Code Segment
 .code
@@ -98,28 +100,47 @@ start: ; Generates program start-up code
 	; update screen
     invoke UpdateWindow, hwnd
 
-	; waits for message
-    .while TRUE
-				;returns FALSE if WM_QUIT message is received and will kill the loop
-                invoke GetMessage, addr msg,NULL,0,0
-                .break .if (!eax)
-				;takes raw keyboard input and generates a new message
-                invoke TranslateMessage, addr msg
-				;sends the message data to the window procedure responsible for the specific window the message is for
-                invoke DispatchMessage, addr msg
-	; end while
-   .endw
+
+	MessagePump:
+
+		invoke 	GetMessage, addr msg, NULL, 0, 0
+
+		cmp 	eax, 0
+		je 	MessagePumpEnd
+
+		invoke	TranslateMessage, addr msg
+		invoke	DispatchMessage, addr msg
+
+		jmp 	MessagePump
+
+	MessagePumpEnd:
+
    ; code returns in EAX register from Main Function.
-    mov     eax,msg.wParam
-	; return
-    ret 
+	mov	eax, msg.wParam
+		; return
+	ret
+   
 	;The ENDP directive defines the end of the procedure
 	;and has the same name as in the PROC directive
 WinMainProto endp
 
 WndProc proc hWnd:HWND, uMsg:UINT, wParam:WPARAM, lParam:LPARAM
 	; on window close
-    .if uMsg==WM_DESTROY
+	.if uMsg==WM_CREATE
+		invoke CreateWindowEx,NULL,
+                addr classEdit,
+                NULL,
+                WS_VISIBLE or WS_CHILD or ES_LEFT or ES_AUTOHSCROLL or ES_AUTOVSCROLL or WS_BORDER,
+                120,
+                120,
+                150,
+                20,
+                hWnd,
+                2000,
+                hInstance,
+                NULL 
+        mov hEditText, eax
+    .elseif uMsg==WM_DESTROY
 		; exit program
         invoke PostQuitMessage,NULL 
     .else
