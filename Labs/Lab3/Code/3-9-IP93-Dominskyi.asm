@@ -66,8 +66,6 @@ DataDlgProc PROTO :DWORD, :DWORD, :DWORD, :DWORD
         "ДАТА НАРОДЖЕННЯ - 12.09.2001", 10,\
         "НОМЕР ЗАЛІКОВКИ - 8410", 0
     msg_error  EQU 10, "Неправильний пароль, спробуйте ще раз!", 0
-    password   DB "bsd~}d"
-    passKey	   DB 12h
     passLen    DWORD 6
 
 ; Code Segment
@@ -106,9 +104,8 @@ start: ; Generates program start-up code
 
                 MOV EDI, 0
                 validation:
-                MOV DL, password[EDI]
+                MOV DL, Password[EDI]
                 MOV DH, usrInput[EDI]
-                XOR DH, passKey
                 .IF DL != DH
                     JMP error
                 .ENDIF
