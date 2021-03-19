@@ -28,13 +28,13 @@ WinMainProto proto :dword,:dword,:dword
 	MsgBoxName  DB "3-9-IP93-Dominskyi", 0
 	
 	; We can write password in two ways:
-	Password  DB "fMOKLQI[K"
+	Password  DB "Mfd`gzbp`"
 	
 	; And another one is:
 	; Password  DB 31h 32h 33h
 	
 	PasswordCount = $-Password
-	XORKey DB 22h
+	XORKey DB 9h
 	
 	; Text To Show
 	InformationText DB "ПIБ = Домiнський Валентин Олексiйович", 13, 
