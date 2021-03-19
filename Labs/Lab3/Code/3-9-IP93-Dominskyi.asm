@@ -45,6 +45,9 @@ WinMainProto proto :dword,:dword,:dword
 	NameOfTheStartingWindows DB "Window with starting text",0        ; the name of our window class
 	
 			classEdit db "edit",0
+			
+					classButton db "button",0
+							buttonText db "Log in",0
 
 ; Code Segment
 .code
@@ -73,7 +76,7 @@ start: ; Generates program start-up code
     mov   wc.cbWndExtra, NULL
     push  hInstance
     pop   wc.hInstance
-    mov   wc.hbrBackground, COLOR_WINDOW
+    mov   wc.hbrBackground, COLOR_WINDOW+2
     mov   wc.lpszMenuName, NULL
     mov   wc.lpszClassName, offset NameOfTheStartingWindows
     invoke LoadIcon, NULL, IDI_APPLICATION
@@ -85,13 +88,12 @@ start: ; Generates program start-up code
 	; create class of the window
     invoke RegisterClassEx, addr wc
     invoke CreateWindowEx, NULL,
-                addr NameOfTheStartingWindows,
-                addr MsgBoxName,
-                WS_OVERLAPPEDWINDOW,
+                offset NameOfTheStartingWindows,
+                offset MsgBoxName,
+                WS_OVERLAPPEDWINDOW or DS_CENTER,
                 470, 280, 300, 200,
                 NULL, NULL, hInst, NULL
 				
-
 	; write window handle in eax
     mov   hwnd,eax
 	
@@ -99,7 +101,6 @@ start: ; Generates program start-up code
     invoke ShowWindow, hwnd,CmdShow
 	; update screen
     invoke UpdateWindow, hwnd
-
 
 	MessagePump:
 
@@ -128,18 +129,23 @@ WndProc proc hWnd:HWND, uMsg:UINT, wParam:WPARAM, lParam:LPARAM
 	; on window close
 	.if uMsg==WM_CREATE
 		invoke CreateWindowEx,NULL,
-                addr classEdit,
+                offset classEdit,
                 NULL,
-                WS_VISIBLE or WS_CHILD or ES_LEFT or ES_AUTOHSCROLL or ES_AUTOVSCROLL or WS_BORDER,
-                120,
-                120,
-                150,
-                20,
-                hWnd,
-                2000,
+                WS_VISIBLE or WS_CHILD or ES_LEFT or ES_AUTOHSCROLL or ES_AUTOVSCROLL,
+                65,20,150, 30,
+                hWnd, 2000,
                 hInstance,
                 NULL 
         mov hEditText, eax
+		
+		 invoke CreateWindowEx,NULL,
+                offset classButton,
+                offset buttonText,
+                WS_VISIBLE or WS_CHILD or DS_CENTER,
+                90, 90, 100, 30,
+                hWnd, 2002,
+                hInstance,
+                NULL
     .elseif uMsg==WM_DESTROY
 		; exit program
         invoke PostQuitMessage,NULL 
