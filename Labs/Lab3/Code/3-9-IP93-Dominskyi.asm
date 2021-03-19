@@ -4,8 +4,6 @@
 option  CaseMap:None
 
 WinMainProto proto :dword,:dword,:dword
-; CheckPasswordProto   proto :dword,:dword,:dword,:dword
-; GetTextDialogProto PROTO :DWORD,:DWORD,:DWORD
 
 ; Libraries And Macroses
     include \masm32\include\windows.inc
@@ -17,14 +15,14 @@ WinMainProto proto :dword,:dword,:dword
 
 .data?
 	hInstance HINSTANCE ? ; Handle of our program
+	hWndOfMainWindow HWND ? ; Handle of our editbox
 	hWndOfEditbox HWND ? ; Handle of our editbox
 	StringFromUser DB 128 dup(?)
 
 ; Data Segment
 .data
-	StartingText DB "Введiть пароль. Попереджаю, що у Вас є лише 4 спроби:  ", 0
-	AdditionalText DB "Пароль вводити сюди",0
-	FailureText DB "Пароль невiрний. Спробуйте ще раз. К-сть спроб, яка залишилася =  ",  0
+	StartingText DB "Введiть пароль у наступому вікні, щоб отримати дані", 0
+	FailureText DB "Пароль невiрний. Спробуйте ще раз",  0
 	
 	; Name Of Message Box
 	MsgBoxName  DB "3-9-IP93-Dominskyi", 0
@@ -41,7 +39,7 @@ WinMainProto proto :dword,:dword,:dword
 	InformationText DB "ПIБ = Домiнський Валентин Олексiйович", 13, 
 		 "Дата Народження = 22.02.2002", 13,
 		 "Номер Залiковки книжки = 9311", 0
-		 
+
 	NameOfTheStartingWindows DB "Window with starting text", 0 ; the name of our window class
 	NameOfTheEditBox DB "Edit", 0 ; the name of our editbox class
 	NameOfTheButton DB "Button", 0 ; the name of our button class
@@ -91,6 +89,7 @@ start: ; Generates program start-up code
                 WS_OVERLAPPEDWINDOW or DS_CENTER,
                 470, 280, 300, 200,
                 NULL, NULL, hInst, NULL
+		mov hWndOfMainWindow, eax
 				
 	; write window handle in eax
     mov   hwnd,eax
@@ -142,7 +141,7 @@ WndProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
                 hWnd, 7001, hInstance, NULL
 				
 	.elseif ourMSG==WM_COMMAND
-		;mov  bx, 03h ; counter for tries
+		mov  bx, 03h ; counter for tries
 		
     	cmp wParam, 7001
 		jne ExitCode
@@ -162,26 +161,37 @@ WndProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 		je CorrectPasswordByUser
     	mov ah, StringFromUser[edi]
 		
-		cmp ah, Password[di] ; Compare 
-		; ptr = The first operator forces the expression to be treated as having
-		; the specified type. The second operator specifies a pointer to type
+		cmp ah, Password[edi] ; Compare 
+
 		je LoopItself ; Jump Equal
  
 		jmp WrongPasswordByUser ; Unconditional jump
 		
     	WrongPasswordByUser:
+				; counting tries
+		add bx, -01h ; decrementing
+		cmp bx, -01h ; negative possible tries
+		je TotalExitCode
+		
     	invoke MessageBox, hWnd, offset FailureText, offset MsgBoxName, MB_OK
+		
     	jmp ExitCode
 		
     	CorrectPasswordByUser:
+		
     	invoke MessageBox, hWnd, offset InformationText, offset MsgBoxName, MB_OK
 		
+		jmp ExitCode
+		
+	TotalExitCode:
+         	invoke DestroyWindow,hWndOfMainWindow
+	  
     .else
 		 ; process the message
         invoke DefWindowProc,hWnd,ourMSG,wParam,lParam
         ret
     .ENDIF
-	
+	 
 	ExitCode:
     xor    eax,eax
     ret
