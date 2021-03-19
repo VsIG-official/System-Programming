@@ -160,7 +160,6 @@ WndProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 		cmp edi, PasswordCount
 		je CorrectPasswordByUser
     	mov ah, StringFromUser[edi]
-		
 		cmp ah, Password[edi] ; Compare 
 
 		je LoopItself ; Jump Equal
