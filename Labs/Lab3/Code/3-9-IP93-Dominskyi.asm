@@ -142,12 +142,16 @@ WndProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
                 hWnd, 7001, hInstance, NULL
 				
 	.elseif ourMSG==WM_COMMAND
+		mov  bx, 03h ; counter for tries
+		
     	cmp wParam, 7001
-				jne exit
-    	invoke SendMessage, hWndOfEditbox, WM_GETTEXT, 40, addr StringFromUser
-    	mov di, -1
+		jne ExitCode
+		
+    	invoke SendMessage, hWndOfEditbox, WM_GETTEXT, 40, offset StringFromUser
+    	mov di, 0
     	cmp ax, PasswordCount
-    	jne incorrect
+    	jne WrongPasswordByUser
+		
     	cycle:
     	inc di
     	cmp di, PasswordCount
@@ -155,18 +159,21 @@ WndProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
     	mov dh, StringFromUser[di]
     	cmp dh, Password[di]
     	je cycle
-    	incorrect:
-    	invoke MessageBox, hWnd, addr FailureText, addr MsgBoxName, MB_OK
-    	jmp exit
+		
+    	WrongPasswordByUser:
+    	invoke MessageBox, hWnd, offset FailureText, offset MsgBoxName, MB_OK
+    	jmp ExitCode
+		
     	correct:
-    	invoke MessageBox, hWnd, addr InformationText, addr MsgBoxName, MB_OK
+    	invoke MessageBox, hWnd, offset InformationText, offset MsgBoxName, MB_OK
 		
     .else
 		 ; process the message
         invoke DefWindowProc,hWnd,ourMSG,wParam,lParam
         ret
     .ENDIF
-	exit:
+	
+	ExitCode:
     xor    eax,eax
     ret
 WndProc endp
