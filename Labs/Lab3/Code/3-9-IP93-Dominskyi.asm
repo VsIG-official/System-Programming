@@ -112,20 +112,6 @@ start: ; Generates program start-up code
 	; end while
    .endw
 
-	; MessagePump:
-
-		; invoke 	GetMessage, addr msg, NULL, 0, 0
-
-		; cmp 	eax, 0
-		; je 	MessagePumpEnd
-
-		; invoke	TranslateMessage, addr msg
-		; invoke	DispatchMessage, addr msg
-
-		; jmp 	MessagePump
-
-	; MessagePumpEnd:
-
    ; code returns in EAX register from Main Function.
 	mov	eax, msg.wParam
 		; return
@@ -137,7 +123,11 @@ WinMainProto endp
 
 WndProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 	; on window close
-	.if ourMSG==WM_CREATE
+	.if ourMSG==WM_DESTROY
+		; exit program
+        invoke PostQuitMessage,NULL 
+
+    .elseif ourMSG==WM_CREATE
 		invoke CreateWindowEx,NULL,
                 offset NameOfTheEditBox, NULL,
                 WS_VISIBLE or WS_CHILD or ES_LEFT or ES_AUTOHSCROLL or ES_AUTOVSCROLL ,
@@ -150,14 +140,33 @@ WndProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
                 WS_VISIBLE or WS_CHILD or BS_CENTER or BS_TEXT or BS_VCENTER,
                 60, 90, 170, 30,
                 hWnd, 7001, hInstance, NULL
-    .elseif ourMSG==WM_DESTROY
-		; exit program
-        invoke PostQuitMessage,NULL 
+				
+	.elseif ourMSG==WM_COMMAND
+    	cmp wParam, 7001
+				jne exit
+    	invoke SendMessage, hWndOfEditbox, WM_GETTEXT, 40, addr StringFromUser
+    	mov di, -1
+    	cmp ax, PasswordCount
+    	jne incorrect
+    	cycle:
+    	inc di
+    	cmp di, PasswordCount
+    	je correct
+    	mov dh, StringFromUser[di]
+    	cmp dh, Password[di]
+    	je cycle
+    	incorrect:
+    	invoke MessageBox, hWnd, addr FailureText, addr MsgBoxName, MB_OK
+    	jmp exit
+    	correct:
+    	invoke MessageBox, hWnd, addr InformationText, addr MsgBoxName, MB_OK
+		
     .else
 		 ; process the message
         invoke DefWindowProc,hWnd,ourMSG,wParam,lParam
         ret
     .ENDIF
+	exit:
     xor    eax,eax
     ret
 WndProc endp
