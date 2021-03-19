@@ -17,7 +17,7 @@ WinMainProto proto :dword,:dword,:dword
 
 .data?
 	hInstance HINSTANCE ?        ; Handle of our program
-			hEditText 		HWND ?
+	hEditText 		HWND ?
 	StringFromUser DB 128 dup(?)
 
 ; Data Segment
@@ -43,11 +43,9 @@ WinMainProto proto :dword,:dword,:dword
 		 "Номер Залiковки книжки = 9311", 0
 		 
 	NameOfTheStartingWindows DB "Window with starting text",0        ; the name of our window class
-	
-			classEdit db "edit",0
-			
-					classButton db "button",0
-							buttonText db "Log in",0
+	NameOfTheEditBox DB "Edit",0 ; the name of our editbox class
+	NameOfTheButton DB "Button",0 ;  the name of our button class
+	TextForButton DB "Перевірити пароль",0
 
 ; Code Segment
 .code
@@ -125,33 +123,27 @@ start: ; Generates program start-up code
 	;and has the same name as in the PROC directive
 WinMainProto endp
 
-WndProc proc hWnd:HWND, uMsg:UINT, wParam:WPARAM, lParam:LPARAM
+WndProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 	; on window close
-	.if uMsg==WM_CREATE
+	.if ourMSG==WM_CREATE
 		invoke CreateWindowEx,NULL,
-                offset classEdit,
-                NULL,
-                WS_VISIBLE or WS_CHILD or ES_LEFT or ES_AUTOHSCROLL or ES_AUTOVSCROLL,
+                offset NameOfTheEditBox, NULL,
+                WS_VISIBLE or WS_CHILD or ES_LEFT or ES_AUTOHSCROLL or ES_AUTOVSCROLL ,
                 65,20,150, 30,
-                hWnd, 2000,
-                hInstance,
-                NULL 
+                hWnd, 7000, hInstance, NULL 
         mov hEditText, eax
 		
 		 invoke CreateWindowEx,NULL,
-                offset classButton,
-                offset buttonText,
-                WS_VISIBLE or WS_CHILD or DS_CENTER,
-                90, 90, 100, 30,
-                hWnd, 2002,
-                hInstance,
-                NULL
-    .elseif uMsg==WM_DESTROY
+                offset NameOfTheButton, offset TextForButton,
+                WS_VISIBLE or WS_CHILD or BS_CENTER or BS_TEXT or BS_VCENTER,
+                60, 90, 170, 30,
+                hWnd, 7001, hInstance, NULL
+    .elseif ourMSG==WM_DESTROY
 		; exit program
         invoke PostQuitMessage,NULL 
     .else
 		 ; process the message
-        invoke DefWindowProc,hWnd,uMsg,wParam,lParam
+        invoke DefWindowProc,hWnd,ourMSG,wParam,lParam
         ret
     .ENDIF
     xor    eax,eax
