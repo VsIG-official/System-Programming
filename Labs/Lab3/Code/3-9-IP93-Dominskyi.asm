@@ -142,29 +142,38 @@ WndProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
                 hWnd, 7001, hInstance, NULL
 				
 	.elseif ourMSG==WM_COMMAND
-		mov  bx, 03h ; counter for tries
+		;mov  bx, 03h ; counter for tries
 		
     	cmp wParam, 7001
 		jne ExitCode
 		
     	invoke SendMessage, hWndOfEditbox, WM_GETTEXT, PasswordCount+2, offset StringFromUser
-    	mov di, 0
+		
+    	mov edi, 0
     	cmp ax, PasswordCount
     	jne WrongPasswordByUser
 		
-    	cycle:
-    	inc di
-    	cmp di, PasswordCount
-    	je correct
-    	mov dh, StringFromUser[di]
-    	cmp dh, Password[di]
-    	je cycle
+		LoopItself:
+		inc edi ; incrementing
+		loop IsPasswordCorrect
+		
+		IsPasswordCorrect:
+		cmp edi, PasswordCount
+		je CorrectPasswordByUser
+    	mov ah, StringFromUser[edi]
+		
+		cmp ah, Password[di] ; Compare 
+		; ptr = The first operator forces the expression to be treated as having
+		; the specified type. The second operator specifies a pointer to type
+		je LoopItself ; Jump Equal
+ 
+		jmp WrongPasswordByUser ; Unconditional jump
 		
     	WrongPasswordByUser:
     	invoke MessageBox, hWnd, offset FailureText, offset MsgBoxName, MB_OK
     	jmp ExitCode
 		
-    	correct:
+    	CorrectPasswordByUser:
     	invoke MessageBox, hWnd, offset InformationText, offset MsgBoxName, MB_OK
 		
     .else
