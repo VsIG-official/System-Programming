@@ -122,7 +122,7 @@ WinMainProto endp
 
 WndProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 	; on window close
-	.if ourMSG==WM_DESTROY
+	.if ourMSG==WM_CLOSE
 		; exit program
         invoke PostQuitMessage,NULL 
 
@@ -159,6 +159,7 @@ WndProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 		IsPasswordCorrect:
 		cmp edi, PasswordCount
 		je CorrectPasswordByUser
+		
     	mov ah, StringFromUser[edi]
 		cmp ah, Password[edi] ; Compare 
 
@@ -167,7 +168,7 @@ WndProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 		jmp WrongPasswordByUser ; Unconditional jump
 		
     	WrongPasswordByUser:
-				; counting tries
+		; counting tries
 		add bx, -01h ; decrementing
 		cmp bx, -01h ; negative possible tries
 		je TotalExitCode
