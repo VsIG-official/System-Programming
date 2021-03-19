@@ -16,8 +16,8 @@ WinMainProto proto :dword,:dword,:dword
     includelib \masm32\lib\kernel32.lib
 
 .data?
-	hInstance HINSTANCE ?        ; Handle of our program
-	hEditText 		HWND ?
+	hInstance HINSTANCE ? ; Handle of our program
+	hWndOfEditbox HWND ? ; Handle of our editbox
 	StringFromUser DB 128 dup(?)
 
 ; Data Segment
@@ -42,10 +42,10 @@ WinMainProto proto :dword,:dword,:dword
 		 "Дата Народження = 22.02.2002", 13,
 		 "Номер Залiковки книжки = 9311", 0
 		 
-	NameOfTheStartingWindows DB "Window with starting text",0        ; the name of our window class
-	NameOfTheEditBox DB "Edit",0 ; the name of our editbox class
-	NameOfTheButton DB "Button",0 ;  the name of our button class
-	TextForButton DB "Перевірити пароль",0
+	NameOfTheStartingWindows DB "Window with starting text", 0 ; the name of our window class
+	NameOfTheEditBox DB "Edit", 0 ; the name of our editbox class
+	NameOfTheButton DB "Button", 0 ; the name of our button class
+	TextForButton DB "Перевірити пароль", 0
 
 ; Code Segment
 .code
@@ -100,19 +100,31 @@ start: ; Generates program start-up code
 	; update screen
     invoke UpdateWindow, hwnd
 
-	MessagePump:
+	; waits for message
+    .while TRUE
+				;returns FALSE if WM_QUIT message is received and will kill the loop
+                invoke GetMessage, addr msg,NULL,0,0
+                .break .if (!eax)
+				;takes raw keyboard input and generates a new message
+                invoke TranslateMessage, addr msg
+				;sends the message data to the window procedure responsible for the specific window the message is for
+                invoke DispatchMessage, addr msg
+	; end while
+   .endw
 
-		invoke 	GetMessage, addr msg, NULL, 0, 0
+	; MessagePump:
 
-		cmp 	eax, 0
-		je 	MessagePumpEnd
+		; invoke 	GetMessage, addr msg, NULL, 0, 0
 
-		invoke	TranslateMessage, addr msg
-		invoke	DispatchMessage, addr msg
+		; cmp 	eax, 0
+		; je 	MessagePumpEnd
 
-		jmp 	MessagePump
+		; invoke	TranslateMessage, addr msg
+		; invoke	DispatchMessage, addr msg
 
-	MessagePumpEnd:
+		; jmp 	MessagePump
+
+	; MessagePumpEnd:
 
    ; code returns in EAX register from Main Function.
 	mov	eax, msg.wParam
@@ -131,8 +143,8 @@ WndProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
                 WS_VISIBLE or WS_CHILD or ES_LEFT or ES_AUTOHSCROLL or ES_AUTOVSCROLL ,
                 65,20,150, 30,
                 hWnd, 7000, hInstance, NULL 
-        mov hEditText, eax
-		
+        mov hWndOfEditbox, eax
+
 		 invoke CreateWindowEx,NULL,
                 offset NameOfTheButton, offset TextForButton,
                 WS_VISIBLE or WS_CHILD or BS_CENTER or BS_TEXT or BS_VCENTER,
