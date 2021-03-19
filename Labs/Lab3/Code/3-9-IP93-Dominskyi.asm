@@ -114,7 +114,7 @@ start: ; Generates program start-up code
 
    ; code returns in EAX register from Main Function.
 	mov	eax, msg.wParam
-		; return
+	; return
 	ret
    
 	;The ENDP directive defines the end of the procedure
@@ -147,7 +147,7 @@ WndProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
     	cmp wParam, 7001
 		jne ExitCode
 		
-    	invoke SendMessage, hWndOfEditbox, WM_GETTEXT, 40, offset StringFromUser
+    	invoke SendMessage, hWndOfEditbox, WM_GETTEXT, PasswordCount+2, offset StringFromUser
     	mov di, 0
     	cmp ax, PasswordCount
     	jne WrongPasswordByUser
