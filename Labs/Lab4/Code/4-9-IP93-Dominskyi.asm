@@ -4,6 +4,8 @@
 option  CaseMap:None
 
 WinMainProto proto :dword,:dword,:dword
+WinSuccessProto proto :dword,:dword,:dword
+WinFailureProto proto :dword,:dword,:dword
 
 ; Libraries And Macroses
     include \masm32\include\windows.inc
@@ -13,9 +15,14 @@ WinMainProto proto :dword,:dword,:dword
     includelib \masm32\lib\user32.lib
     includelib \masm32\lib\kernel32.lib
 
+; Our Macroses
+; We place them here, 'cause it won't degrade the readability of the code
+
+
 .data?
 	hInstance HINSTANCE ? ; Handle of our program
-	hWndOfMainWindow HWND ? ; Handle of our editbox
+	hWndOfMainWindow HWND ? ; Handle of our main window
+	hWndOfSuccessWindow HWND ? ; Handle of our main window
 	hWndOfEditbox HWND ? ; Handle of our editbox
 	StringFromUser DB 128 dup(?)
 
@@ -28,12 +35,13 @@ WinMainProto proto :dword,:dword,:dword
 	MsgBoxName  DB "3-9-IP93-Dominskyi", 0
 	
 	; We can write password in two ways:
-	Password  DB "Dominskyi"
+	Password  DB "Mfd`gzbp`"
 	
 	; And another one is:
 	; Password  DB 31h 32h 33h
 	
 	PasswordCount = $-Password
+	XORKey DB 9h
 	
 	; Text To Show
 	InformationText DB "ПIБ = Домiнський Валентин Олексiйович", 13, 
@@ -41,9 +49,16 @@ WinMainProto proto :dword,:dword,:dword
 		 "Номер Залiковки книжки = 9311", 0
 
 	NameOfTheStartingWindows DB "Window with starting text", 0 ; the name of our window class
+	NameOfTheSuccessWindows DB "Window with success text", 0 ; the name of our success window class
 	NameOfTheEditBox DB "Edit", 0 ; the name of our editbox class
 	NameOfTheButton DB "Button", 0 ; the name of our button class
 	TextForButton DB "Перевірити пароль", 0
+
+; Constants
+.const
+	InformationTextSNP EQU "ПIБ = Домiнський Валентин Олексiйович", 0
+	InformationTextBirth EQU "Дата Народження = 22.02.2002", 0
+	InformationTextZalikova EQU "Номер Залiковки книжки = 9311", 0
 
 ; Code Segment
 .code
@@ -54,6 +69,7 @@ start: ; Generates program start-up code
 	mov hInstance, eax
 
 	invoke WinMainProto, hInstance,NULL, SW_SHOWDEFAULT ;invoke function
+	invoke WinSuccessProto, hInstance,NULL, SW_SHOWDEFAULT ;invoke function
 	invoke ExitProcess, eax ; quit program. code returns in EAX register from Main Function.
 
 	; function declaration of WinMain
@@ -90,7 +106,86 @@ start: ; Generates program start-up code
                 470, 280, 300, 200,
                 NULL, NULL, hInst, NULL
 		mov hWndOfMainWindow, eax
-				
+
+	; write window handle in eax
+    mov   hwnd,eax
+	
+		; ; create class of the window
+    ; invoke RegisterClassEx, addr wc
+    ; invoke CreateWindowEx, NULL,
+                ; offset NameOfTheSuccessWindows,
+                ; offset MsgBoxName,
+                ; WS_OVERLAPPEDWINDOW or DS_CENTER,
+                ; 400, 200, 300, 200,
+                ; NULL, NULL, hInst, NULL
+		; mov hWndOfSuccessWindow, eax
+
+	; ; write window handle in eax
+    ; mov   hwndSuccess,eax
+	
+	; Show window
+    invoke ShowWindow, hwnd,CmdShow
+	; update screen
+    invoke UpdateWindow, hwnd
+
+	; waits for message
+    .while TRUE
+				;returns FALSE if WM_QUIT message is received and will kill the loop
+                invoke GetMessage, addr msg,NULL,0,0
+                .break .if (!eax)
+				;takes raw keyboard input and generates a new message
+                invoke TranslateMessage, addr msg
+				;sends the message data to the window procedure responsible for the specific window the message is for
+                invoke DispatchMessage, addr msg
+	; end while
+   .endw
+
+   ; code returns in EAX register from Main Function.
+	mov	eax, msg.wParam
+	; return
+	ret
+   
+	;The ENDP directive defines the end of the procedure
+	;and has the same name as in the PROC directive
+WinMainProto endp
+
+
+
+; function declaration of WinSuccess
+	WinSuccessProto  proc hInst:HINSTANCE,hPrevInst:HINSTANCE,CmdShow:dword
+	 ; there we need local variables
+	local wc:WNDCLASSEX
+    local msg:MSG
+    local hwnd:HWND
+
+	; assign variables of WNDCLASSEX
+	; window class is a specification of a window
+    mov   wc.cbSize, sizeof WNDCLASSEX
+    mov   wc.style, CS_HREDRAW or CS_VREDRAW
+    mov   wc.lpfnWndProc, offset WndProc
+    mov   wc.cbClsExtra, NULL
+    mov   wc.cbWndExtra, NULL
+    push  hInstance
+    pop   wc.hInstance
+    mov   wc.hbrBackground, COLOR_WINDOW+2
+    mov   wc.lpszMenuName, NULL
+    mov   wc.lpszClassName, offset NameOfTheSuccessWindows
+    invoke LoadIcon, NULL, IDI_APPLICATION
+    mov   wc.hIcon, eax
+    mov   wc.hIconSm, eax
+    invoke LoadCursor, NULL, IDC_ARROW
+    mov   wc.hCursor, eax
+	
+	; create class of the window
+    invoke RegisterClassEx, addr wc
+    invoke CreateWindowEx, NULL,
+                offset NameOfTheSuccessWindows,
+                offset MsgBoxName,
+                WS_OVERLAPPEDWINDOW or DS_CENTER,
+                400, 200, 300, 200,
+                NULL, NULL, hInst, NULL
+		mov hWndOfSuccessWindow, eax
+
 	; write window handle in eax
     mov   hwnd,eax
 	
@@ -118,7 +213,9 @@ start: ; Generates program start-up code
    
 	;The ENDP directive defines the end of the procedure
 	;and has the same name as in the PROC directive
-WinMainProto endp
+WinSuccessProto endp
+
+
 
 WndProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 	; on window close
@@ -159,8 +256,8 @@ WndProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 		IsPasswordCorrect:
 		cmp edi, PasswordCount
 		je CorrectPasswordByUser
-		
     	mov ah, StringFromUser[edi]
+		xor ah, XORKey
 		cmp ah, Password[edi] ; Compare 
 
 		je LoopItself ; Jump Equal
