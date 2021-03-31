@@ -63,13 +63,13 @@ WinFailureProto proto :dword,:dword,:dword
 ; Code Segment
 .code
 start: ; Generates program start-up code
-	invoke MessageBox, 0, offset StartingText, offset MsgBoxName, MB_OK
+	invoke WinSuccessProto, hInstance,NULL, SW_SHOWDEFAULT ;invoke function
 
 	invoke GetModuleHandle, NULL
 	mov hInstance, eax
 
 	invoke WinMainProto, hInstance,NULL, SW_SHOWDEFAULT ;invoke function
-	invoke WinSuccessProto, hInstance,NULL, SW_SHOWDEFAULT ;invoke function
+
 	invoke ExitProcess, eax ; quit program. code returns in EAX register from Main Function.
 
 	; function declaration of WinMain
@@ -109,19 +109,6 @@ start: ; Generates program start-up code
 
 	; write window handle in eax
     mov   hwnd,eax
-	
-		; ; create class of the window
-    ; invoke RegisterClassEx, addr wc
-    ; invoke CreateWindowEx, NULL,
-                ; offset NameOfTheSuccessWindows,
-                ; offset MsgBoxName,
-                ; WS_OVERLAPPEDWINDOW or DS_CENTER,
-                ; 400, 200, 300, 200,
-                ; NULL, NULL, hInst, NULL
-		; mov hWndOfSuccessWindow, eax
-
-	; ; write window handle in eax
-    ; mov   hwndSuccess,eax
 	
 	; Show window
     invoke ShowWindow, hwnd,CmdShow
@@ -208,6 +195,7 @@ WinMainProto endp
 
    ; code returns in EAX register from Main Function.
 	mov	eax, msg.wParam
+	
 	; return
 	ret
    
@@ -221,6 +209,7 @@ WndProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 	; on window close
 	.if ourMSG==WM_CLOSE
 		; exit program
+		INVOKE DestroyWindow,hWnd
         invoke PostQuitMessage,NULL 
 
     .elseif ourMSG==WM_CREATE
