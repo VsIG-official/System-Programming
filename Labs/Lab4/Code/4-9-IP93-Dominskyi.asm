@@ -172,7 +172,7 @@ WinMainProto endp
                 offset NameOfTheWarnWindows,
                 offset MsgBoxName,
                 WS_OVERLAPPEDWINDOW or DS_CENTER,
-                520, 330, 200, 100,
+                520, 310, 200, 150,
                 NULL, NULL, hInst, NULL
 		mov hWndOfWarnWindow, eax
 
@@ -299,12 +299,12 @@ WndWarnProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 		invoke CreateWindowEx,NULL,
                 offset NameOfTheButton, offset TextForWarnButton,
                 WS_VISIBLE or WS_CHILD or BS_CENTER or BS_TEXT or BS_VCENTER,
-                60, 30, 70, 30,
+                55, 65, 70, 30,
                 hWnd, 7003, hInstance, NULL
 		invoke CreateWindowEx,NULL,
                 offset NameOfTheText, offset StartingText,
-                WS_VISIBLE or WS_CHILD or SS_CENTER,
-                125, 100, 150, 20,
+                WS_VISIBLE or WS_CHILD or SS_CENTER or BS_TEXT,
+                16, 10, 150, 50,
                 hWnd, 7004, hInstance, NULL
 				
 	.elseif ourMSG==WM_COMMAND
