@@ -5,7 +5,7 @@ option CaseMap:None
 
 WinMainProto proto :dword,:dword,:dword
 WinWarningProto proto :dword,:dword,:dword
-;WinFailureProto proto :dword,:dword,:dword
+WinFailureProto proto :dword,:dword,:dword
 WinSuccessProto proto :dword,:dword,:dword
 
 ; Libraries And Macroses
@@ -20,7 +20,12 @@ WinSuccessProto proto :dword,:dword,:dword
 ; We place them here, 'cause it won't degrade the readability of the code
 
 ; Macros #1 for printing some text
-PrintInformationInWindow macro heightPosition, infoToShow 
+PrintInformationInWindow macro heightPosition, infoToShow
+	; for example, this commentary is included into macroexpansion
+	;; but this - not
+	
+	; just pass position of the text on vertical
+	; and text, that We want to show
 	invoke CreateWindowEx,NULL,
             offset NameOfTheText, offset infoToShow,
             WS_VISIBLE or WS_CHILD or BS_TEXT or SS_CENTER  or BS_VCENTER,
@@ -30,42 +35,67 @@ endm
 
 ; Macros #2 for decrypting string from user
 DecryptStringFromUser macro StringFromUserInput
-	local LoopItself
+	; for example, this commentary is included into macroexpansion
+	;; but this - not
+
+	; create a local mark, to so that there won't be confusion,
+	;; when invoking macros more then 1 time
+	LOCAL LoopItself
 	
+	; creating a loop, to check all letters
     LoopItself:
 	
+	;; incrementing counter edi
 	inc edi
 	
+	; write one letter from input to ah register
 	mov ah, StringFromUser[edi]
+	;; decrypt one letter
 	xor ah, XORKey
 
+	; compare password length and counter
     cmp edi, PasswordCount
 	
+	;; if they are not equal, then continue the loop
 	jne LoopItself
 endm
 
 ; Macros #3 for checking string from user
 IsPasswordLegit macro StringFromUserInput
-	local WrongPassword
+	; for example, this commentary is included into macroexpansion
+	;; but this - not
+
+	; create a local mark, to so that there won't be confusion,
+	;; when invoking macros more then 1 time
+	LOCAL WrongPassword
 	
-	local LoopItself
+	; create a local mark, to so that there won't be confusion,
+	;; when invoking macros more then 1 time
+	LOCAL LoopItself
 
     LoopItself:
 	
+	; incrementing counter edi
 	inc edi
+	
+	;; compare password length and register
     cmp ax, PasswordCount
 	
+	; if they are the same, then quit macros
 	je WrongPassword
 	
+	;; write one letter from input to ah register
 	mov ah, StringFromUser[edi]
+	; check ah register and one letter from user's input
     cmp ah, StringFromUserInput[edi]
 	
+	;; if they are the same, then continue the loop
     je LoopItself
 	
 	WrongPassword:
 	
 	; set some value, so our checks 
-	; will pass, IF password is legit
+	;; will pass, IF password is legit
 	mov ecx, -10
 endm
 
@@ -131,10 +161,10 @@ start: ; Generates program start-up code
 
 	; function declaration of WinMain
 	WinMainProto  proc hInst:HINSTANCE,hPrevInst:HINSTANCE,CmdShow:dword
-	 ; there we need local variables
-	local wc:WNDCLASSEX
-    local msg:MSG
-    local hwnd:HWND
+	 ; there we need LOCAL variables
+	LOCAL wc:WNDCLASSEX
+    LOCAL msg:MSG
+    LOCAL hwnd:HWND
 
 	; assign variables of WNDCLASSEX
 	; window class is a specification of a window
@@ -195,10 +225,10 @@ WinMainProto endp
 
 ; function declaration of WinWarn
 	WinWarningProto  proc hInst:HINSTANCE,hPrevInst:HINSTANCE,CmdShow:dword
-	 ; there we need local variables
-	local wc:WNDCLASSEX
-    local msg:MSG
-    local hwnd:HWND
+	 ; there we need LOCAL variables
+	LOCAL wc:WNDCLASSEX
+    LOCAL msg:MSG
+    LOCAL hwnd:HWND
 
 	; assign variables of WNDCLASSEX
 	; window class is a specification of a window
@@ -260,10 +290,10 @@ WinWarningProto endp
 
 ; function declaration of WinSuccess
 WinSuccessProto  proc hInst:HINSTANCE,hPrevInst:HINSTANCE,CmdShow:dword
-	; there we need local variables
-	local wc:WNDCLASSEX
-    local msg:MSG
-    local hwnd:HWND
+	; there we need LOCAL variables
+	LOCAL wc:WNDCLASSEX
+    LOCAL msg:MSG
+    LOCAL hwnd:HWND
 
 	; assign variables of WNDCLASSEX
 	; window class is a specification of a window
@@ -325,10 +355,10 @@ WinSuccessProto endp
 
 ; function declaration of WinSuccess
 WinFailureProto  proc hInst:HINSTANCE,hPrevInst:HINSTANCE,CmdShow:dword
-	; there we need local variables
-	local wc:WNDCLASSEX
-    local msg:MSG
-    local hwnd:HWND
+	; there we need LOCAL variables
+	LOCAL wc:WNDCLASSEX
+    LOCAL msg:MSG
+    LOCAL hwnd:HWND
 
 	; assign variables of WNDCLASSEX
 	; window class is a specification of a window
@@ -483,11 +513,14 @@ WndProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
     	cmp wParam, 7001
 		jne ExitCode
 		
+		; get text from editbox
     	invoke SendMessage, hWndOfEditbox, WM_GETTEXT, PasswordCount+2, offset StringFromUser
 		
 		; check password's length
 		mov edi, 0
+		; compare and if password's length is not the same, as origin...
 		cmp ax, PasswordCount
+		; ... jump to bad end
     	jne WrongPasswordByUser
 
 		; if length is equal to original password, then start checks
@@ -501,9 +534,11 @@ WndProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 		cmp ecx, 10
 		jne LegitPasswordByUser
 		
-		jmp WrongPasswordByUser ; Unconditional jump
+		; Unconditional jump to end
+		jmp WrongPasswordByUser
 		
     	WrongPasswordByUser:
+		
 		; counting tries
 		add bx, -01h ; decrementing
 		cmp bx, -01h ; negative possible tries
