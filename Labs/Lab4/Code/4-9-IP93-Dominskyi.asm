@@ -52,6 +52,8 @@ WinFailureProto proto :dword,:dword,:dword
 	NameOfTheWarnWindows DB "Window with success text", 0 ; the name of our success window class
 	NameOfTheEditBox DB "Edit", 0 ; the name of our editbox class
 	NameOfTheButton DB "Button", 0 ; the name of our button class
+	NameOfTheText DB "Static", 0 ; the name of our text class
+	
 	TextForButton DB "Перевірити пароль", 0
 	TextForWarnButton DB "ОК", 0
 
@@ -170,7 +172,7 @@ WinMainProto endp
                 offset NameOfTheWarnWindows,
                 offset MsgBoxName,
                 WS_OVERLAPPEDWINDOW or DS_CENTER,
-                570, 380, 200, 100,
+                520, 330, 200, 100,
                 NULL, NULL, hInst, NULL
 		mov hWndOfWarnWindow, eax
 
@@ -294,21 +296,21 @@ WndWarnProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
         invoke PostQuitMessage,NULL 
 
     .elseif ourMSG==WM_CREATE
-
-		 invoke CreateWindowEx,NULL,
+		invoke CreateWindowEx,NULL,
                 offset NameOfTheButton, offset TextForWarnButton,
                 WS_VISIBLE or WS_CHILD or BS_CENTER or BS_TEXT or BS_VCENTER,
-                60, 90, 170, 30,
+                60, 30, 70, 30,
                 hWnd, 7003, hInstance, NULL
+		invoke CreateWindowEx,NULL,
+                offset NameOfTheText, offset StartingText,
+                WS_VISIBLE or WS_CHILD or SS_CENTER,
+                125, 100, 150, 20,
+                hWnd, 7004, hInstance, NULL
 				
 	.elseif ourMSG==WM_COMMAND
-		
-    			; exit program
+		; exit program
 		invoke DestroyWindow,hWnd
         invoke PostQuitMessage,NULL 
-		
-	TotalExitCode:
-         	invoke DestroyWindow,hWndOfMainWindow
 	  
     .else
 		 ; process the message
