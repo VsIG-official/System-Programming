@@ -1,10 +1,11 @@
 ; Processors
 .386
 .model flat, stdcall
-option  CaseMap:None
+option CaseMap:None
 
 WinMainProto proto :dword,:dword,:dword
 WinWarningProto proto :dword,:dword,:dword
+;WinFailureProto proto :dword,:dword,:dword
 WinSuccessProto proto :dword,:dword,:dword
 
 ; Libraries And Macroses
@@ -26,6 +27,58 @@ PrintInformationInWindow macro widthPosition, heightPosition, infoToShow
             widthPosition, heightPosition, 170, 50,
             hWnd, 7044, hInstance, NULL
 endm
+
+; Macros for decypting string from user
+DecryptStringFromUser macro StringFromUser
+	local LoopItself
+	
+	mov edi, 0
+	
+    LoopItself:
+	mov ah, XORKey
+    xor StringFromUser[edi], ah
+    inc edi
+    cmp edi, PasswordCount
+	jne LoopItself
+endm
+
+; Macros for checking string from user
+IsPasswordLegit macro StringFromUser
+	local LoopItself
+	local WrongPasswordByUser
+
+	mov edi, 0
+
+    LoopItself:
+	inc edi
+    cmp ax, PasswordCount
+	je WrongPasswordByUser
+	mov ah, StringFromUser[edi]
+    cmp ah, StringFromUser[edi]
+    je LoopItself
+	mov bl, 0
+	WrongPasswordByUser:
+endm
+	
+    	;mov edi, 0
+    	;cmp ax, PasswordCount
+    	;jne WrongPasswordByUser
+		
+		;LoopItself:
+		;inc edi ; incrementing
+		;loop IsPasswordCorrect
+		
+		;IsPasswordCorrect:
+		;cmp edi, PasswordCount
+		;je CorrectPasswordByUser
+    	;mov ah, StringFromUser[edi]
+		;xor ah, XORKey
+		;cmp ah, Password[edi] ; Compare 
+
+		;je LoopItself ; Jump Equal
+
+
+
 
 
 .data?
@@ -54,9 +107,9 @@ endm
 	
 	; Text To Show
 	InformationText DB "ПIБ = Домiнський Валентин Олексiйович", 13, 
-		 "Дата Народження = 22.02.2002", 13,
-		 "Номер Залiковки = 9311", 0
-		 
+		"Дата Народження = 22.02.2002", 13,
+		"Номер Залiковки = 9311", 0
+
 	InformationTextSNP DB "ПIБ = Домiнський Валентин Олексiйович", 0
 	InformationTextBirth DB "Дата Народження = 22.02.2002", 0
 	InformationTextZalikova DB 13, "Номер Залiковки = 9311", 0
@@ -147,8 +200,6 @@ start: ; Generates program start-up code
 	;The ENDP directive defines the end of the procedure
 	;and has the same name as in the PROC directive
 WinMainProto endp
-
-
 
 ; function declaration of WinWarn
 	WinWarningProto  proc hInst:HINSTANCE,hPrevInst:HINSTANCE,CmdShow:dword
@@ -442,23 +493,16 @@ WndProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 		
     	invoke SendMessage, hWndOfEditbox, WM_GETTEXT, PasswordCount+2, offset StringFromUser
 		
-    	mov edi, 0
-    	cmp ax, PasswordCount
+		cmp ax, PasswordCount
     	jne WrongPasswordByUser
-		
-		LoopItself:
-		inc edi ; incrementing
-		loop IsPasswordCorrect
-		
-		IsPasswordCorrect:
-		cmp edi, PasswordCount
-		je CorrectPasswordByUser
-    	mov ah, StringFromUser[edi]
-		xor ah, XORKey
-		cmp ah, Password[edi] ; Compare 
 
-		je LoopItself ; Jump Equal
- 
+		DecryptStringFromUser StringFromUser
+		
+		IsPasswordLegit StringFromUser
+		
+		cmp bl, 0
+		jne CorrectPasswordByUser
+		
 		jmp WrongPasswordByUser ; Unconditional jump
 		
     	WrongPasswordByUser:
@@ -467,15 +511,11 @@ WndProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 		cmp bx, -01h ; negative possible tries
 		je TotalExitCode
 		
-    	;invoke MessageBox, hWnd, offset FailureText, offset MsgBoxName, MB_OK
-		
 		invoke WinFailureProto, hInstance,NULL, SW_SHOWDEFAULT ;invoke function
 		
     	jmp ExitCode
 		
     	CorrectPasswordByUser:
-		
-    	;invoke MessageBox, hWnd, offset InformationText, offset MsgBoxName, MB_OK
 		
 		invoke WinSuccessProto, hInstance,NULL, SW_SHOWDEFAULT ;invoke function
 		
