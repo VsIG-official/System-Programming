@@ -5,7 +5,7 @@ option  CaseMap:None
 
 WinMainProto proto :dword,:dword,:dword
 WinWarningProto proto :dword,:dword,:dword
-WinWithTextProto proto :dword,:dword,:dword
+WinSuccessProto proto :dword,:dword,:dword
 
 ; Libraries And Macroses
     include \masm32\include\windows.inc
@@ -17,6 +17,8 @@ WinWithTextProto proto :dword,:dword,:dword
 
 ; Our Macroses
 ; We place them here, 'cause it won't degrade the readability of the code
+
+; Macros for printing some text
 PrintInformationInWindow macro widthPosition, heightPosition, infoToShow 
 	invoke CreateWindowEx,NULL,
             offset NameOfTheText, offset infoToShow,
@@ -24,6 +26,7 @@ PrintInformationInWindow macro widthPosition, heightPosition, infoToShow
             widthPosition, heightPosition, 170, 50,
             hWnd, 7044, hInstance, NULL
 endm
+
 
 .data?
 	hInstance HINSTANCE ? ; Handle of our program
@@ -38,7 +41,7 @@ endm
 	FailureText DB "Пароль невiрний. Спробуйте ще раз",  0
 	
 	; Name Of Message Box
-	MsgBoxName  DB "3-9-IP93-Dominskyi", 0
+	MsgBoxName  DB "4-9-IP93-Dominskyi", 0
 	
 	; We can write password in two ways:
 	Password  DB "Mfd`gzbp`"
@@ -60,7 +63,8 @@ endm
 
 	NameOfTheStartingWindows DB "Window with starting text", 0 ; the name of our window class
 	NameOfTheWarnWindows DB "Window with warn text", 0 ; the name of our success window class
-	NameOfSomeTextWindows DB "Window with some text", 0 ; the name of our success window class
+	NameOfFailureWindows DB "Window with failure text", 0 ; the name of our success window class
+	NameOfSuccessWindows DB "Window with some text", 0 ; the name of our success window class
 	NameOfTheEditBox DB "Edit", 0 ; the name of our editbox class
 	NameOfTheButton DB "Button", 0 ; the name of our button class
 	NameOfTheText DB "Static", 0 ; the name of our text class
@@ -211,9 +215,8 @@ WinMainProto endp
 	;and has the same name as in the PROC directive
 WinWarningProto endp
 
-
-; function declaration of WinWarn
-WinWithTextProto  proc hInst:HINSTANCE,hPrevInst:HINSTANCE,CmdShow:dword
+; function declaration of WinSuccess
+WinSuccessProto  proc hInst:HINSTANCE,hPrevInst:HINSTANCE,CmdShow:dword
 	; there we need local variables
 	local wc:WNDCLASSEX
     local msg:MSG
@@ -223,14 +226,14 @@ WinWithTextProto  proc hInst:HINSTANCE,hPrevInst:HINSTANCE,CmdShow:dword
 	; window class is a specification of a window
     mov   wc.cbSize, sizeof WNDCLASSEX
     mov   wc.style, CS_HREDRAW or CS_VREDRAW
-    mov   wc.lpfnWndProc, offset WndWithTextProc
+    mov   wc.lpfnWndProc, offset WndSuccessProc
     mov   wc.cbClsExtra, NULL
     mov   wc.cbWndExtra, NULL
     push  hInstance
     pop   wc.hInstance
     mov   wc.hbrBackground, COLOR_WINDOW+1
     mov   wc.lpszMenuName, NULL
-    mov   wc.lpszClassName, offset NameOfSomeTextWindows
+    mov   wc.lpszClassName, offset NameOfSuccessWindows
     invoke LoadIcon, NULL, IDI_APPLICATION
     mov   wc.hIcon, eax
     mov   wc.hIconSm, eax
@@ -240,7 +243,7 @@ WinWithTextProto  proc hInst:HINSTANCE,hPrevInst:HINSTANCE,CmdShow:dword
 	; create class of the window
     invoke RegisterClassEx, addr wc
     invoke CreateWindowEx, NULL,
-                offset NameOfSomeTextWindows,
+                offset NameOfSuccessWindows,
                 offset MsgBoxName,
                 WS_OVERLAPPEDWINDOW or DS_CENTER,
                 510, 280, 220, 200,
@@ -275,9 +278,74 @@ WinWithTextProto  proc hInst:HINSTANCE,hPrevInst:HINSTANCE,CmdShow:dword
    
 	;The ENDP directive defines the end of the procedure
 	;and has the same name as in the PROC directive
-WinWithTextProto endp
+WinSuccessProto endp
 
-WndWithTextProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
+; function declaration of WinSuccess
+WinFailureProto  proc hInst:HINSTANCE,hPrevInst:HINSTANCE,CmdShow:dword
+	; there we need local variables
+	local wc:WNDCLASSEX
+    local msg:MSG
+    local hwnd:HWND
+
+	; assign variables of WNDCLASSEX
+	; window class is a specification of a window
+    mov   wc.cbSize, sizeof WNDCLASSEX
+    mov   wc.style, CS_HREDRAW or CS_VREDRAW
+    mov   wc.lpfnWndProc, offset WndFailureProc
+    mov   wc.cbClsExtra, NULL
+    mov   wc.cbWndExtra, NULL
+    push  hInstance
+    pop   wc.hInstance
+    mov   wc.hbrBackground, COLOR_WINDOW+1
+    mov   wc.lpszMenuName, NULL
+    mov   wc.lpszClassName, offset NameOfFailureWindows
+    invoke LoadIcon, NULL, IDI_APPLICATION
+    mov   wc.hIcon, eax
+    mov   wc.hIconSm, eax
+    invoke LoadCursor, NULL, IDC_ARROW
+    mov   wc.hCursor, eax
+	
+	; create class of the window
+    invoke RegisterClassEx, addr wc
+    invoke CreateWindowEx, NULL,
+                offset NameOfFailureWindows,
+                offset MsgBoxName,
+                WS_OVERLAPPEDWINDOW or DS_CENTER,
+                510, 280, 220, 200,
+                NULL, NULL, hInst, NULL
+		mov hWndOfWarnWindow, eax
+
+	; write window handle in eax
+    mov   hwnd,eax
+	
+	; Show window
+    invoke ShowWindow, hwnd,CmdShow
+	; update screen
+    invoke UpdateWindow, hwnd
+
+	; waits for message
+    .while TRUE
+				;returns FALSE if WM_QUIT message is received and will kill the loop
+                invoke GetMessage, addr msg,NULL,0,0
+                .break .if (!eax)
+				;takes raw keyboard input and generates a new message
+                invoke TranslateMessage, addr msg
+				;sends the message data to the window procedure responsible for the specific window the message is for
+                invoke DispatchMessage, addr msg
+	; end while
+   .endw
+
+   ; code returns in EAX register from Main Function.
+	mov	eax, msg.wParam
+	
+	; return
+	ret
+   
+	;The ENDP directive defines the end of the procedure
+	;and has the same name as in the PROC directive
+WinFailureProto endp
+
+WndSuccessProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 	; on window close
 	.if ourMSG==WM_CLOSE
 		; exit program
@@ -311,8 +379,39 @@ WndWithTextProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 	ExitCode:
     xor    eax,eax
     ret
-WndWithTextProc endp
+WndSuccessProc endp
 
+WndFailureProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
+	; on window close
+	.if ourMSG==WM_CLOSE
+		; exit program
+		invoke DestroyWindow,hWnd
+        invoke PostQuitMessage,NULL 
+
+    .elseif ourMSG==WM_CREATE
+		PrintInformationInWindow 16, 10, offset FailureText
+				
+		invoke CreateWindowEx,NULL,
+                offset NameOfTheButton, offset TextForWarnButton,
+                WS_VISIBLE or WS_CHILD or BS_CENTER or BS_TEXT or BS_VCENTER,
+                65, 125, 70, 30,
+                hWnd, 7033, hInstance, NULL
+				
+	.elseif ourMSG==WM_COMMAND
+		; exit program
+		invoke DestroyWindow,hWnd
+        invoke PostQuitMessage,NULL 
+	
+    .else
+		 ; process the message
+        invoke DefWindowProc,hWnd,ourMSG,wParam,lParam
+        ret
+    .ENDIF
+	 
+	ExitCode:
+    xor    eax,eax
+    ret
+WndFailureProc endp
 
 WndProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 	; on window close
@@ -370,7 +469,7 @@ WndProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 		
     	;invoke MessageBox, hWnd, offset FailureText, offset MsgBoxName, MB_OK
 		
-		invoke WinWithTextProto, hInstance,NULL, SW_SHOWDEFAULT ;invoke function
+		invoke WinFailureProto, hInstance,NULL, SW_SHOWDEFAULT ;invoke function
 		
     	jmp ExitCode
 		
@@ -378,7 +477,7 @@ WndProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 		
     	;invoke MessageBox, hWnd, offset InformationText, offset MsgBoxName, MB_OK
 		
-		invoke WinWithTextProto, hInstance,NULL, SW_SHOWDEFAULT ;invoke function
+		invoke WinSuccessProto, hInstance,NULL, SW_SHOWDEFAULT ;invoke function
 		
 		jmp ExitCode
 		
