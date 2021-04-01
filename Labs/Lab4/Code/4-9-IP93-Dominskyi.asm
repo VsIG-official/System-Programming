@@ -5,7 +5,7 @@ option  CaseMap:None
 
 WinMainProto proto :dword,:dword,:dword
 WinWarningProto proto :dword,:dword,:dword
-WinFailureProto proto :dword,:dword,:dword
+WinWithTextProto proto :dword,:dword,:dword
 
 ; Libraries And Macroses
     include \masm32\include\windows.inc
@@ -207,6 +207,71 @@ WinMainProto endp
 WinWarningProto endp
 
 
+; function declaration of WinWarn
+	WinWithTextProto  proc hInst:HINSTANCE,hPrevInst:HINSTANCE,CmdShow:dword
+	 ; there we need local variables
+	local wc:WNDCLASSEX
+    local msg:MSG
+    local hwnd:HWND
+
+	; assign variables of WNDCLASSEX
+	; window class is a specification of a window
+    mov   wc.cbSize, sizeof WNDCLASSEX
+    mov   wc.style, CS_HREDRAW or CS_VREDRAW
+    mov   wc.lpfnWndProc, offset WndWarnProc
+    mov   wc.cbClsExtra, NULL
+    mov   wc.cbWndExtra, NULL
+    push  hInstance
+    pop   wc.hInstance
+    mov   wc.hbrBackground, COLOR_WINDOW+1
+    mov   wc.lpszMenuName, NULL
+    mov   wc.lpszClassName, offset NameOfTheWarnWindows
+    invoke LoadIcon, NULL, IDI_APPLICATION
+    mov   wc.hIcon, eax
+    mov   wc.hIconSm, eax
+    invoke LoadCursor, NULL, IDC_ARROW
+    mov   wc.hCursor, eax
+	
+	; create class of the window
+    invoke RegisterClassEx, addr wc
+    invoke CreateWindowEx, NULL,
+                offset NameOfTheWarnWindows,
+                offset MsgBoxName,
+                WS_OVERLAPPEDWINDOW or DS_CENTER,
+                520, 310, 200, 150,
+                NULL, NULL, hInst, NULL
+		mov hWndOfWarnWindow, eax
+
+	; write window handle in eax
+    mov   hwnd,eax
+	
+	; Show window
+    invoke ShowWindow, hwnd,CmdShow
+	; update screen
+    invoke UpdateWindow, hwnd
+
+	; waits for message
+    .while TRUE
+				;returns FALSE if WM_QUIT message is received and will kill the loop
+                invoke GetMessage, addr msg,NULL,0,0
+                .break .if (!eax)
+				;takes raw keyboard input and generates a new message
+                invoke TranslateMessage, addr msg
+				;sends the message data to the window procedure responsible for the specific window the message is for
+                invoke DispatchMessage, addr msg
+	; end while
+   .endw
+
+   ; code returns in EAX register from Main Function.
+	mov	eax, msg.wParam
+	
+	; return
+	ret
+   
+	;The ENDP directive defines the end of the procedure
+	;and has the same name as in the PROC directive
+WinWithTextProto endp
+
 
 WndProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 	; on window close
@@ -262,13 +327,17 @@ WndProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 		cmp bx, -01h ; negative possible tries
 		je TotalExitCode
 		
-    	invoke MessageBox, hWnd, offset FailureText, offset MsgBoxName, MB_OK
+    	;invoke MessageBox, hWnd, offset FailureText, offset MsgBoxName, MB_OK
+		
+		invoke WinWithTextProto, hInstance,NULL, SW_SHOWDEFAULT ;invoke function
 		
     	jmp ExitCode
 		
     	CorrectPasswordByUser:
 		
-    	invoke MessageBox, hWnd, offset InformationText, offset MsgBoxName, MB_OK
+    	;invoke MessageBox, hWnd, offset InformationText, offset MsgBoxName, MB_OK
+		
+		invoke WinWithTextProto, hInstance,NULL, SW_SHOWDEFAULT ;invoke function
 		
 		jmp ExitCode
 		
