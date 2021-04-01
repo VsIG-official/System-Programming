@@ -426,12 +426,14 @@ WndSuccessProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
         invoke PostQuitMessage,NULL 
 
     .ELSEIF ourMSG==WM_CREATE
+	; invoke macros #1 three times to create text
 		PrintInformationInWindow 10, offset InformationTextSNP
 				
 		PrintInformationInWindow 40, offset InformationTextBirth
 				
 		PrintInformationInWindow 70, offset InformationTextZalikova
-				
+	
+	; create button
 		invoke CreateWindowEx,NULL,
                 offset NameOfTheButton, offset TextForOKButton,
                 WS_VISIBLE or WS_CHILD or BS_CENTER or BS_TEXT or BS_VCENTER,
@@ -462,8 +464,9 @@ WndFailureProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
         invoke PostQuitMessage,NULL 
 
     .ELSEIF ourMSG==WM_CREATE
+		; invoke macros #1 one time to create text
 		PrintInformationInWindow 10, offset FailureText
-				
+		; create button
 		invoke CreateWindowEx,NULL,
                 offset NameOfTheButton, offset TextForOKButton,
                 WS_VISIBLE or WS_CHILD or BS_CENTER or BS_TEXT or BS_VCENTER,
@@ -494,13 +497,15 @@ WndProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
         invoke PostQuitMessage,NULL 
 
     .ELSEIF ourMSG==WM_CREATE
+		; create editbox
 		invoke CreateWindowEx,NULL,
                 offset NameOfTheEditBox, NULL,
                 WS_CHILD or WS_VISIBLE or ES_LEFT or ES_AUTOHSCROLL or ES_AUTOVSCROLL ,
                 65,20,150, 30,
                 hWnd, 7000, hInstance, NULL 
         mov hWndOfEditbox, eax
-
+		
+		; create button
 		 invoke CreateWindowEx,NULL,
                 offset NameOfTheButton, offset TextForButton,
                 WS_VISIBLE or WS_CHILD or BS_CENTER or BS_TEXT or BS_VCENTER,
