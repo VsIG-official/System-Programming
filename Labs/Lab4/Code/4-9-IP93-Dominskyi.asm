@@ -311,7 +311,7 @@ WinFailureProto  proc hInst:HINSTANCE,hPrevInst:HINSTANCE,CmdShow:dword
                 offset NameOfFailureWindows,
                 offset MsgBoxName,
                 WS_OVERLAPPEDWINDOW or DS_CENTER,
-                510, 280, 220, 200,
+                510, 280, 220, 150,
                 NULL, NULL, hInst, NULL
 		mov hWndOfWarnWindow, eax
 
@@ -394,7 +394,7 @@ WndFailureProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 		invoke CreateWindowEx,NULL,
                 offset NameOfTheButton, offset TextForWarnButton,
                 WS_VISIBLE or WS_CHILD or BS_CENTER or BS_TEXT or BS_VCENTER,
-                65, 125, 70, 30,
+                65, 65, 70, 30,
                 hWnd, 7033, hInstance, NULL
 				
 	.elseif ourMSG==WM_COMMAND
