@@ -271,7 +271,6 @@ WinWithTextProto  proc hInst:HINSTANCE,hPrevInst:HINSTANCE,CmdShow:dword
 	;and has the same name as in the PROC directive
 WinWithTextProto endp
 
-
 WndWithTextProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 	; on window close
 	.if ourMSG==WM_CLOSE
@@ -285,6 +284,7 @@ WndWithTextProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
                 WS_VISIBLE or WS_CHILD or BS_CENTER or BS_TEXT or BS_VCENTER,
                 55, 65, 70, 30,
                 hWnd, 7033, hInstance, NULL
+				
 		invoke CreateWindowEx,NULL,
                 offset NameOfTheText, offset InformationTextSNP,
                 WS_VISIBLE or WS_CHILD or BS_TEXT or SS_CENTER  or BS_VCENTER,
@@ -294,13 +294,13 @@ WndWithTextProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 		invoke CreateWindowEx,NULL,
                 offset NameOfTheText, offset InformationTextBirth,
                 WS_VISIBLE or WS_CHILD or BS_TEXT or SS_CENTER  or BS_VCENTER,
-                16, 10, 150, 50,
+                16, 40, 150, 50,
                 hWnd, 7055, hInstance, NULL
 				
 		invoke CreateWindowEx,NULL,
                 offset NameOfTheText, offset InformationTextZalikova,
                 WS_VISIBLE or WS_CHILD or BS_TEXT or SS_CENTER  or BS_VCENTER,
-                16, 10, 150, 50,
+                16, 70, 150, 50,
                 hWnd, 7066, hInstance, NULL
 				
 	.elseif ourMSG==WM_COMMAND
