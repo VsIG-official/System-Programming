@@ -4,7 +4,7 @@
 option  CaseMap:None
 
 WinMainProto proto :dword,:dword,:dword
-WinSuccessProto proto :dword,:dword,:dword
+WinWarningProto proto :dword,:dword,:dword
 WinFailureProto proto :dword,:dword,:dword
 
 ; Libraries And Macroses
@@ -22,7 +22,7 @@ WinFailureProto proto :dword,:dword,:dword
 .data?
 	hInstance HINSTANCE ? ; Handle of our program
 	hWndOfMainWindow HWND ? ; Handle of our main window
-	hWndOfSuccessWindow HWND ? ; Handle of our main window
+	hWndOfWarnWindow HWND ? ; Handle of our main window
 	hWndOfEditbox HWND ? ; Handle of our editbox
 	StringFromUser DB 128 dup(?)
 
@@ -49,10 +49,11 @@ WinFailureProto proto :dword,:dword,:dword
 		 "Номер Залiковки книжки = 9311", 0
 
 	NameOfTheStartingWindows DB "Window with starting text", 0 ; the name of our window class
-	NameOfTheSuccessWindows DB "Window with success text", 0 ; the name of our success window class
+	NameOfTheWarnWindows DB "Window with success text", 0 ; the name of our success window class
 	NameOfTheEditBox DB "Edit", 0 ; the name of our editbox class
 	NameOfTheButton DB "Button", 0 ; the name of our button class
 	TextForButton DB "Перевірити пароль", 0
+	TextForWarnButton DB "ОК", 0
 
 ; Constants
 .const
@@ -63,7 +64,7 @@ WinFailureProto proto :dword,:dword,:dword
 ; Code Segment
 .code
 start: ; Generates program start-up code
-	invoke WinSuccessProto, hInstance,NULL, SW_SHOWDEFAULT ;invoke function
+	invoke WinWarningProto, hInstance,NULL, SW_SHOWDEFAULT ;invoke function
 
 	invoke GetModuleHandle, NULL
 	mov hInstance, eax
@@ -138,8 +139,8 @@ WinMainProto endp
 
 
 
-; function declaration of WinSuccess
-	WinSuccessProto  proc hInst:HINSTANCE,hPrevInst:HINSTANCE,CmdShow:dword
+; function declaration of WinWarn
+	WinWarningProto  proc hInst:HINSTANCE,hPrevInst:HINSTANCE,CmdShow:dword
 	 ; there we need local variables
 	local wc:WNDCLASSEX
     local msg:MSG
@@ -149,14 +150,14 @@ WinMainProto endp
 	; window class is a specification of a window
     mov   wc.cbSize, sizeof WNDCLASSEX
     mov   wc.style, CS_HREDRAW or CS_VREDRAW
-    mov   wc.lpfnWndProc, offset WndProc
+    mov   wc.lpfnWndProc, offset WndWarnProc
     mov   wc.cbClsExtra, NULL
     mov   wc.cbWndExtra, NULL
     push  hInstance
     pop   wc.hInstance
-    mov   wc.hbrBackground, COLOR_WINDOW+2
+    mov   wc.hbrBackground, COLOR_WINDOW+1
     mov   wc.lpszMenuName, NULL
-    mov   wc.lpszClassName, offset NameOfTheSuccessWindows
+    mov   wc.lpszClassName, offset NameOfTheWarnWindows
     invoke LoadIcon, NULL, IDI_APPLICATION
     mov   wc.hIcon, eax
     mov   wc.hIconSm, eax
@@ -166,12 +167,12 @@ WinMainProto endp
 	; create class of the window
     invoke RegisterClassEx, addr wc
     invoke CreateWindowEx, NULL,
-                offset NameOfTheSuccessWindows,
+                offset NameOfTheWarnWindows,
                 offset MsgBoxName,
                 WS_OVERLAPPEDWINDOW or DS_CENTER,
-                400, 200, 300, 200,
+                570, 380, 200, 100,
                 NULL, NULL, hInst, NULL
-		mov hWndOfSuccessWindow, eax
+		mov hWndOfWarnWindow, eax
 
 	; write window handle in eax
     mov   hwnd,eax
@@ -201,7 +202,7 @@ WinMainProto endp
    
 	;The ENDP directive defines the end of the procedure
 	;and has the same name as in the PROC directive
-WinSuccessProto endp
+WinWarningProto endp
 
 
 
@@ -209,7 +210,7 @@ WndProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 	; on window close
 	.if ourMSG==WM_CLOSE
 		; exit program
-		INVOKE DestroyWindow,hWnd
+		invoke DestroyWindow,hWnd
         invoke PostQuitMessage,NULL 
 
     .elseif ourMSG==WM_CREATE
@@ -282,4 +283,44 @@ WndProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
     xor    eax,eax
     ret
 WndProc endp
+
+
+
+WndWarnProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
+	; on window close
+	.if ourMSG==WM_CLOSE
+		; exit program
+		invoke DestroyWindow,hWnd
+        invoke PostQuitMessage,NULL 
+
+    .elseif ourMSG==WM_CREATE
+
+		 invoke CreateWindowEx,NULL,
+                offset NameOfTheButton, offset TextForWarnButton,
+                WS_VISIBLE or WS_CHILD or BS_CENTER or BS_TEXT or BS_VCENTER,
+                60, 90, 170, 30,
+                hWnd, 7003, hInstance, NULL
+				
+	.elseif ourMSG==WM_COMMAND
+		
+    			; exit program
+		invoke DestroyWindow,hWnd
+        invoke PostQuitMessage,NULL 
+		
+	TotalExitCode:
+         	invoke DestroyWindow,hWndOfMainWindow
+	  
+    .else
+		 ; process the message
+        invoke DefWindowProc,hWnd,ourMSG,wParam,lParam
+        ret
+    .ENDIF
+	 
+	ExitCode:
+    xor    eax,eax
+    ret
+WndWarnProc endp
+
+
+
 end start
