@@ -17,12 +17,18 @@ WinWithTextProto proto :dword,:dword,:dword
 
 ; Our Macroses
 ; We place them here, 'cause it won't degrade the readability of the code
-
+PrintInformationInWindow macro widthPosition, heightPosition, infoToShow 
+	invoke CreateWindowEx,NULL,
+            offset NameOfTheText, offset infoToShow,
+            WS_VISIBLE or WS_CHILD or BS_TEXT or SS_CENTER  or BS_VCENTER,
+            widthPosition, heightPosition, 170, 50,
+            hWnd, 7044, hInstance, NULL
+endm
 
 .data?
 	hInstance HINSTANCE ? ; Handle of our program
 	hWndOfMainWindow HWND ? ; Handle of our main window
-	hWndOfWarnWindow HWND ? ; Handle of our main window
+	hWndOfWarnWindow HWND ? ; Handle of our warn window
 	hWndOfEditbox HWND ? ; Handle of our editbox
 	StringFromUser DB 128 dup(?)
 
@@ -279,23 +285,11 @@ WndWithTextProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
         invoke PostQuitMessage,NULL 
 
     .elseif ourMSG==WM_CREATE
-		invoke CreateWindowEx,NULL,
-                offset NameOfTheText, offset InformationTextSNP,
-                WS_VISIBLE or WS_CHILD or BS_TEXT or SS_CENTER  or BS_VCENTER,
-                16, 10, 170, 50,
-                hWnd, 7044, hInstance, NULL
+		PrintInformationInWindow 16, 10, offset InformationTextSNP
 				
-		invoke CreateWindowEx,NULL,
-                offset NameOfTheText, offset InformationTextBirth,
-                WS_VISIBLE or WS_CHILD or BS_TEXT or SS_CENTER  or BS_VCENTER,
-                16, 40, 170, 50,
-                hWnd, 7055, hInstance, NULL
+		PrintInformationInWindow 16, 40, offset InformationTextBirth
 				
-		invoke CreateWindowEx,NULL,
-                offset NameOfTheText, offset InformationTextZalikova,
-                WS_VISIBLE or WS_CHILD or BS_TEXT or SS_CENTER  or BS_VCENTER,
-                16, 70, 170, 50,
-                hWnd, 7066, hInstance, NULL
+		PrintInformationInWindow 16, 70, offset InformationTextZalikova
 				
 		invoke CreateWindowEx,NULL,
                 offset NameOfTheButton, offset TextForWarnButton,
