@@ -29,63 +29,54 @@ PrintInformationInWindow macro widthPosition, heightPosition, infoToShow
 endm
 
 ; Macros for decypting string from user
-DecryptStringFromUser macro StringFromUser
+DecryptStringFromUser macro StringFromUserInput
 	local LoopItself
 	
-	mov edi, 0
-	
     LoopItself:
-	mov ah, XORKey
-    xor StringFromUser[edi], ah
-    inc edi
+	
+	inc edi
+	
+	mov ah, StringFromUser[edi]
+	xor ah, XORKey
+
     cmp edi, PasswordCount
+	
 	jne LoopItself
 endm
 
 ; Macros for checking string from user
-IsPasswordLegit macro StringFromUser
+IsPasswordLegit macro StringFromUserInput
+	local WrongPassword
+	
 	local LoopItself
-	local WrongPasswordByUser
-
-	mov edi, 0
 
     LoopItself:
+	
 	inc edi
     cmp ax, PasswordCount
-	je WrongPasswordByUser
-	mov ah, StringFromUser[edi]
-    cmp ah, StringFromUser[edi]
-    je LoopItself
-	mov bl, 0
-	WrongPasswordByUser:
-endm
 	
-    	;mov edi, 0
-    	;cmp ax, PasswordCount
-    	;jne WrongPasswordByUser
-		
-		;LoopItself:
-		;inc edi ; incrementing
-		;loop IsPasswordCorrect
-		
-		;IsPasswordCorrect:
-		;cmp edi, PasswordCount
-		;je CorrectPasswordByUser
-    	;mov ah, StringFromUser[edi]
-		;xor ah, XORKey
-		;cmp ah, Password[edi] ; Compare 
-
-		;je LoopItself ; Jump Equal
-
-
-
-
+	je WrongPassword
+	
+	mov ah, StringFromUserInput[edi]
+    cmp ah, StringFromUser[edi]
+	
+    je LoopItself
+	
+	WrongPassword:
+	
+	; set some value, so our checks 
+	; will pass, if password is legit
+	mov ecx, -10
+endm
 
 .data?
 	hInstance HINSTANCE ? ; Handle of our program
 	hWndOfMainWindow HWND ? ; Handle of our main window
 	hWndOfWarnWindow HWND ? ; Handle of our warn window
+	hWndOfSuccessWindow HWND ? ; Handle of our success window
+	hWndOfFailureWindow HWND ? ; Handle of our failure window
 	hWndOfEditbox HWND ? ; Handle of our editbox
+	
 	StringFromUser DB 128 dup(?)
 
 ; Data Segment
@@ -118,12 +109,13 @@ endm
 	NameOfTheWarnWindows DB "Window with warn text", 0 ; the name of our success window class
 	NameOfFailureWindows DB "Window with failure text", 0 ; the name of our success window class
 	NameOfSuccessWindows DB "Window with some text", 0 ; the name of our success window class
+	
 	NameOfTheEditBox DB "Edit", 0 ; the name of our editbox class
 	NameOfTheButton DB "Button", 0 ; the name of our button class
 	NameOfTheText DB "Static", 0 ; the name of our text class
 	
 	TextForButton DB "Перевірити пароль", 0
-	TextForWarnButton DB "ОК", 0
+	TextForOKButton DB "ОК", 0
 
 ; Code Segment
 .code
@@ -258,10 +250,10 @@ WinMainProto endp
 
    ; code returns in EAX register from Main Function.
 	mov	eax, msg.wParam
-	
+
 	; return
 	ret
-   
+
 	;The ENDP directive defines the end of the procedure
 	;and has the same name as in the PROC directive
 WinWarningProto endp
@@ -299,7 +291,7 @@ WinSuccessProto  proc hInst:HINSTANCE,hPrevInst:HINSTANCE,CmdShow:dword
                 WS_OVERLAPPEDWINDOW or DS_CENTER,
                 510, 280, 220, 200,
                 NULL, NULL, hInst, NULL
-		mov hWndOfWarnWindow, eax
+		mov hWndOfSuccessWindow, eax
 
 	; write window handle in eax
     mov   hwnd,eax
@@ -364,7 +356,7 @@ WinFailureProto  proc hInst:HINSTANCE,hPrevInst:HINSTANCE,CmdShow:dword
                 WS_OVERLAPPEDWINDOW or DS_CENTER,
                 510, 280, 220, 150,
                 NULL, NULL, hInst, NULL
-		mov hWndOfWarnWindow, eax
+		mov hWndOfFailureWindow, eax
 
 	; write window handle in eax
     mov   hwnd,eax
@@ -411,7 +403,7 @@ WndSuccessProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 		PrintInformationInWindow 16, 70, offset InformationTextZalikova
 				
 		invoke CreateWindowEx,NULL,
-                offset NameOfTheButton, offset TextForWarnButton,
+                offset NameOfTheButton, offset TextForOKButton,
                 WS_VISIBLE or WS_CHILD or BS_CENTER or BS_TEXT or BS_VCENTER,
                 65, 125, 70, 30,
                 hWnd, 7033, hInstance, NULL
@@ -443,7 +435,7 @@ WndFailureProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 		PrintInformationInWindow 16, 10, offset FailureText
 				
 		invoke CreateWindowEx,NULL,
-                offset NameOfTheButton, offset TextForWarnButton,
+                offset NameOfTheButton, offset TextForOKButton,
                 WS_VISIBLE or WS_CHILD or BS_CENTER or BS_TEXT or BS_VCENTER,
                 65, 65, 70, 30,
                 hWnd, 7033, hInstance, NULL
@@ -493,6 +485,7 @@ WndProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 		
     	invoke SendMessage, hWndOfEditbox, WM_GETTEXT, PasswordCount+2, offset StringFromUser
 		
+		mov edi, 0
 		cmp ax, PasswordCount
     	jne WrongPasswordByUser
 
@@ -500,7 +493,7 @@ WndProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 		
 		IsPasswordLegit StringFromUser
 		
-		cmp bl, 0
+		cmp ecx, 0
 		jne CorrectPasswordByUser
 		
 		jmp WrongPasswordByUser ; Unconditional jump
@@ -544,7 +537,7 @@ WndWarnProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 
     .elseif ourMSG==WM_CREATE
 		invoke CreateWindowEx,NULL,
-                offset NameOfTheButton, offset TextForWarnButton,
+                offset NameOfTheButton, offset TextForOKButton,
                 WS_VISIBLE or WS_CHILD or BS_CENTER or BS_TEXT or BS_VCENTER,
                 55, 65, 70, 30,
                 hWnd, 7003, hInstance, NULL
