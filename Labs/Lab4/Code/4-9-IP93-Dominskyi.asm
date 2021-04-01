@@ -65,7 +65,7 @@ IsPasswordLegit macro StringFromUserInput
 	WrongPassword:
 	
 	; set some value, so our checks 
-	; will pass, if password is legit
+	; will pass, IF password is legit
 	mov ecx, -10
 endm
 
@@ -174,9 +174,9 @@ start: ; Generates program start-up code
 
 	; waits for message
     .while TRUE
-				;returns FALSE if WM_QUIT message is received and will kill the loop
+				;returns FALSE IF WM_QUIT message is received and will kill the loop
                 invoke GetMessage, addr msg,NULL,0,0
-                .break .if (!eax)
+                .break .IF (!eax)
 				;takes raw keyboard input and generates a new message
                 invoke TranslateMessage, addr msg
 				;sends the message data to the window procedure responsible for the specific window the message is for
@@ -238,9 +238,9 @@ WinMainProto endp
 
 	; waits for message
     .while TRUE
-				;returns FALSE if WM_QUIT message is received and will kill the loop
+				;returns FALSE IF WM_QUIT message is received and will kill the loop
                 invoke GetMessage, addr msg,NULL,0,0
-                .break .if (!eax)
+                .break .IF (!eax)
 				;takes raw keyboard input and generates a new message
                 invoke TranslateMessage, addr msg
 				;sends the message data to the window procedure responsible for the specific window the message is for
@@ -303,9 +303,9 @@ WinSuccessProto  proc hInst:HINSTANCE,hPrevInst:HINSTANCE,CmdShow:dword
 
 	; waits for message
     .while TRUE
-				;returns FALSE if WM_QUIT message is received and will kill the loop
+				;returns FALSE IF WM_QUIT message is received and will kill the loop
                 invoke GetMessage, addr msg,NULL,0,0
-                .break .if (!eax)
+                .break .IF (!eax)
 				;takes raw keyboard input and generates a new message
                 invoke TranslateMessage, addr msg
 				;sends the message data to the window procedure responsible for the specific window the message is for
@@ -368,9 +368,9 @@ WinFailureProto  proc hInst:HINSTANCE,hPrevInst:HINSTANCE,CmdShow:dword
 
 	; waits for message
     .while TRUE
-				;returns FALSE if WM_QUIT message is received and will kill the loop
+				;returns FALSE IF WM_QUIT message is received and will kill the loop
                 invoke GetMessage, addr msg,NULL,0,0
-                .break .if (!eax)
+                .break .IF (!eax)
 				;takes raw keyboard input and generates a new message
                 invoke TranslateMessage, addr msg
 				;sends the message data to the window procedure responsible for the specific window the message is for
@@ -390,12 +390,12 @@ WinFailureProto endp
 
 WndSuccessProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 	; on window close
-	.if ourMSG==WM_CLOSE
+	.IF ourMSG==WM_CLOSE
 		; exit program
 		invoke DestroyWindow,hWnd
         invoke PostQuitMessage,NULL 
 
-    .elseif ourMSG==WM_CREATE
+    .ELSEIF ourMSG==WM_CREATE
 		PrintInformationInWindow 16, 10, offset InformationTextSNP
 				
 		PrintInformationInWindow 16, 40, offset InformationTextBirth
@@ -408,12 +408,12 @@ WndSuccessProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
                 65, 125, 70, 30,
                 hWnd, 7033, hInstance, NULL
 				
-	.elseif ourMSG==WM_COMMAND
+	.ELSEIF ourMSG==WM_COMMAND
 		; exit program
 		invoke DestroyWindow,hWnd
         invoke PostQuitMessage,NULL 
 	  
-    .else
+    .ELSE
 		 ; process the message
         invoke DefWindowProc,hWnd,ourMSG,wParam,lParam
         ret
@@ -426,12 +426,12 @@ WndSuccessProc endp
 
 WndFailureProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 	; on window close
-	.if ourMSG==WM_CLOSE
+	.IF ourMSG==WM_CLOSE
 		; exit program
 		invoke DestroyWindow,hWnd
         invoke PostQuitMessage,NULL 
 
-    .elseif ourMSG==WM_CREATE
+    .ELSEIF ourMSG==WM_CREATE
 		PrintInformationInWindow 16, 10, offset FailureText
 				
 		invoke CreateWindowEx,NULL,
@@ -440,12 +440,12 @@ WndFailureProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
                 65, 65, 70, 30,
                 hWnd, 7033, hInstance, NULL
 				
-	.elseif ourMSG==WM_COMMAND
+	.ELSEIF ourMSG==WM_COMMAND
 		; exit program
 		invoke DestroyWindow,hWnd
         invoke PostQuitMessage,NULL 
 	
-    .else
+    .ELSE
 		 ; process the message
         invoke DefWindowProc,hWnd,ourMSG,wParam,lParam
         ret
@@ -458,12 +458,12 @@ WndFailureProc endp
 
 WndProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 	; on window close
-	.if ourMSG==WM_CLOSE
+	.IF ourMSG==WM_CLOSE
 		; exit program
 		invoke DestroyWindow,hWnd
         invoke PostQuitMessage,NULL 
 
-    .elseif ourMSG==WM_CREATE
+    .ELSEIF ourMSG==WM_CREATE
 		invoke CreateWindowEx,NULL,
                 offset NameOfTheEditBox, NULL,
                 WS_VISIBLE or WS_CHILD or ES_LEFT or ES_AUTOHSCROLL or ES_AUTOVSCROLL ,
@@ -477,7 +477,7 @@ WndProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
                 60, 90, 170, 30,
                 hWnd, 7001, hInstance, NULL
 				
-	.elseif ourMSG==WM_COMMAND
+	.ELSEIF ourMSG==WM_COMMAND
 		mov  bx, 03h ; counter for tries
 		
     	cmp wParam, 7001
@@ -493,8 +493,9 @@ WndProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 		
 		IsPasswordLegit StringFromUser
 		
-		cmp ecx, 0
-		jne CorrectPasswordByUser
+		; if it's not equal, then password is legit
+		cmp ecx, 10
+		jne LegitPasswordByUser
 		
 		jmp WrongPasswordByUser ; Unconditional jump
 		
@@ -508,7 +509,7 @@ WndProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 		
     	jmp ExitCode
 		
-    	CorrectPasswordByUser:
+    	LegitPasswordByUser:
 		
 		invoke WinSuccessProto, hInstance,NULL, SW_SHOWDEFAULT ;invoke function
 		
@@ -517,7 +518,7 @@ WndProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 	TotalExitCode:
          	invoke DestroyWindow,hWndOfMainWindow
 	  
-    .else
+    .ELSE
 		 ; process the message
         invoke DefWindowProc,hWnd,ourMSG,wParam,lParam
         ret
@@ -530,12 +531,12 @@ WndProc endp
 
 WndWarnProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 	; on window close
-	.if ourMSG==WM_CLOSE
+	.IF ourMSG==WM_CLOSE
 		; exit program
 		invoke DestroyWindow,hWnd
         invoke PostQuitMessage,NULL 
 
-    .elseif ourMSG==WM_CREATE
+    .ELSEIF ourMSG==WM_CREATE
 		invoke CreateWindowEx,NULL,
                 offset NameOfTheButton, offset TextForOKButton,
                 WS_VISIBLE or WS_CHILD or BS_CENTER or BS_TEXT or BS_VCENTER,
@@ -547,12 +548,12 @@ WndWarnProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
                 16, 10, 150, 50,
                 hWnd, 7004, hInstance, NULL
 				
-	.elseif ourMSG==WM_COMMAND
+	.ELSEIF ourMSG==WM_COMMAND
 		; exit program
 		invoke DestroyWindow,hWnd
         invoke PostQuitMessage,NULL 
 	  
-    .else
+    .ELSE
 		 ; process the message
         invoke DefWindowProc,hWnd,ourMSG,wParam,lParam
         ret
