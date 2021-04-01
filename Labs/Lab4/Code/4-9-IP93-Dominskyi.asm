@@ -444,7 +444,7 @@ WndSuccessProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 		; exit program
 		invoke DestroyWindow,hWnd
         invoke PostQuitMessage,NULL 
-	  
+	
     .ELSE
 		; process the message
         invoke DefWindowProc,hWnd,ourMSG,wParam,lParam
