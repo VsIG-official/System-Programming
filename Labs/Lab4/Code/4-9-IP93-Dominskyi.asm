@@ -19,16 +19,16 @@ WinSuccessProto proto :dword,:dword,:dword
 ; Our Macroses
 ; We place them here, 'cause it won't degrade the readability of the code
 
-; Macros for printing some text
-PrintInformationInWindow macro widthPosition, heightPosition, infoToShow 
+; Macros #1 for printing some text
+PrintInformationInWindow macro heightPosition, infoToShow 
 	invoke CreateWindowEx,NULL,
             offset NameOfTheText, offset infoToShow,
             WS_VISIBLE or WS_CHILD or BS_TEXT or SS_CENTER  or BS_VCENTER,
-            widthPosition, heightPosition, 170, 50,
+            16, heightPosition, 170, 50,
             hWnd, 7044, hInstance, NULL
 endm
 
-; Macros for decypting string from user
+; Macros #2 for decrypting string from user
 DecryptStringFromUser macro StringFromUserInput
 	local LoopItself
 	
@@ -44,7 +44,7 @@ DecryptStringFromUser macro StringFromUserInput
 	jne LoopItself
 endm
 
-; Macros for checking string from user
+; Macros #3 for checking string from user
 IsPasswordLegit macro StringFromUserInput
 	local WrongPassword
 	
@@ -57,8 +57,8 @@ IsPasswordLegit macro StringFromUserInput
 	
 	je WrongPassword
 	
-	mov ah, StringFromUserInput[edi]
-    cmp ah, StringFromUser[edi]
+	mov ah, StringFromUser[edi]
+    cmp ah, StringFromUserInput[edi]
 	
     je LoopItself
 	
@@ -396,11 +396,11 @@ WndSuccessProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
         invoke PostQuitMessage,NULL 
 
     .ELSEIF ourMSG==WM_CREATE
-		PrintInformationInWindow 16, 10, offset InformationTextSNP
+		PrintInformationInWindow 10, offset InformationTextSNP
 				
-		PrintInformationInWindow 16, 40, offset InformationTextBirth
+		PrintInformationInWindow 40, offset InformationTextBirth
 				
-		PrintInformationInWindow 16, 70, offset InformationTextZalikova
+		PrintInformationInWindow 70, offset InformationTextZalikova
 				
 		invoke CreateWindowEx,NULL,
                 offset NameOfTheButton, offset TextForOKButton,
@@ -414,7 +414,7 @@ WndSuccessProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
         invoke PostQuitMessage,NULL 
 	  
     .ELSE
-		 ; process the message
+		; process the message
         invoke DefWindowProc,hWnd,ourMSG,wParam,lParam
         ret
     .ENDIF
@@ -432,7 +432,7 @@ WndFailureProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
         invoke PostQuitMessage,NULL 
 
     .ELSEIF ourMSG==WM_CREATE
-		PrintInformationInWindow 16, 10, offset FailureText
+		PrintInformationInWindow 10, offset FailureText
 				
 		invoke CreateWindowEx,NULL,
                 offset NameOfTheButton, offset TextForOKButton,
@@ -446,13 +446,13 @@ WndFailureProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
         invoke PostQuitMessage,NULL 
 	
     .ELSE
-		 ; process the message
+		; process the message
         invoke DefWindowProc,hWnd,ourMSG,wParam,lParam
         ret
     .ENDIF
-	 
+	
 	ExitCode:
-    xor    eax,eax
+    xor eax, eax
     ret
 WndFailureProc endp
 
@@ -466,7 +466,7 @@ WndProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
     .ELSEIF ourMSG==WM_CREATE
 		invoke CreateWindowEx,NULL,
                 offset NameOfTheEditBox, NULL,
-                WS_VISIBLE or WS_CHILD or ES_LEFT or ES_AUTOHSCROLL or ES_AUTOVSCROLL ,
+                WS_CHILD or WS_VISIBLE or ES_LEFT or ES_AUTOHSCROLL or ES_AUTOVSCROLL ,
                 65,20,150, 30,
                 hWnd, 7000, hInstance, NULL 
         mov hWndOfEditbox, eax
@@ -485,12 +485,16 @@ WndProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 		
     	invoke SendMessage, hWndOfEditbox, WM_GETTEXT, PasswordCount+2, offset StringFromUser
 		
+		; check password's length
 		mov edi, 0
 		cmp ax, PasswordCount
     	jne WrongPasswordByUser
 
+		; if length is equal to original password, then start checks
+		; there We have macros #2, which uses XOR to decrypt Our password 
 		DecryptStringFromUser StringFromUser
 		
+		; macros #3, where We check Our password
 		IsPasswordLegit StringFromUser
 		
 		; if it's not equal, then password is legit
@@ -539,7 +543,7 @@ WndWarnProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
     .ELSEIF ourMSG==WM_CREATE
 		invoke CreateWindowEx,NULL,
                 offset NameOfTheButton, offset TextForOKButton,
-                WS_VISIBLE or WS_CHILD or BS_CENTER or BS_TEXT or BS_VCENTER,
+                WS_CHILD or WS_VISIBLE or BS_CENTER or BS_TEXT or BS_VCENTER,
                 55, 65, 70, 30,
                 hWnd, 7003, hInstance, NULL
 		invoke CreateWindowEx,NULL,
