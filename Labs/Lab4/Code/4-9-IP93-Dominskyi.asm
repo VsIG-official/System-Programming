@@ -237,7 +237,7 @@ WinWithTextProto  proc hInst:HINSTANCE,hPrevInst:HINSTANCE,CmdShow:dword
                 offset NameOfSomeTextWindows,
                 offset MsgBoxName,
                 WS_OVERLAPPEDWINDOW or DS_CENTER,
-                520, 310, 200, 150,
+                510, 280, 220, 200,
                 NULL, NULL, hInst, NULL
 		mov hWndOfWarnWindow, eax
 
@@ -280,28 +280,28 @@ WndWithTextProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 
     .elseif ourMSG==WM_CREATE
 		invoke CreateWindowEx,NULL,
-                offset NameOfTheButton, offset TextForWarnButton,
-                WS_VISIBLE or WS_CHILD or BS_CENTER or BS_TEXT or BS_VCENTER,
-                55, 65, 70, 30,
-                hWnd, 7033, hInstance, NULL
-				
-		invoke CreateWindowEx,NULL,
                 offset NameOfTheText, offset InformationTextSNP,
                 WS_VISIBLE or WS_CHILD or BS_TEXT or SS_CENTER  or BS_VCENTER,
-                16, 10, 150, 50,
+                16, 10, 170, 50,
                 hWnd, 7044, hInstance, NULL
 				
 		invoke CreateWindowEx,NULL,
                 offset NameOfTheText, offset InformationTextBirth,
                 WS_VISIBLE or WS_CHILD or BS_TEXT or SS_CENTER  or BS_VCENTER,
-                16, 40, 150, 50,
+                16, 40, 170, 50,
                 hWnd, 7055, hInstance, NULL
 				
 		invoke CreateWindowEx,NULL,
                 offset NameOfTheText, offset InformationTextZalikova,
                 WS_VISIBLE or WS_CHILD or BS_TEXT or SS_CENTER  or BS_VCENTER,
-                16, 70, 150, 50,
+                16, 70, 170, 50,
                 hWnd, 7066, hInstance, NULL
+				
+		invoke CreateWindowEx,NULL,
+                offset NameOfTheButton, offset TextForWarnButton,
+                WS_VISIBLE or WS_CHILD or BS_CENTER or BS_TEXT or BS_VCENTER,
+                65, 125, 70, 30,
+                hWnd, 7033, hInstance, NULL
 				
 	.elseif ourMSG==WM_COMMAND
 		; exit program
