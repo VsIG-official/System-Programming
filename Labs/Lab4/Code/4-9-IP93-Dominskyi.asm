@@ -47,21 +47,20 @@ WinWithTextProto proto :dword,:dword,:dword
 	InformationText DB "ПIБ = Домiнський Валентин Олексiйович", 13, 
 		 "Дата Народження = 22.02.2002", 13,
 		 "Номер Залiковки книжки = 9311", 0
+		 
+	InformationTextSNP DB "ПIБ = Домiнський Валентин Олексiйович", 0
+	InformationTextBirth DB "Дата Народження = 22.02.2002", 0
+	InformationTextZalikova DB "Номер Залiковки книжки = 9311", 0
 
 	NameOfTheStartingWindows DB "Window with starting text", 0 ; the name of our window class
-	NameOfTheWarnWindows DB "Window with success text", 0 ; the name of our success window class
+	NameOfTheWarnWindows DB "Window with warn text", 0 ; the name of our success window class
+	NameOfSomeTextWindows DB "Window with some text", 0 ; the name of our success window class
 	NameOfTheEditBox DB "Edit", 0 ; the name of our editbox class
 	NameOfTheButton DB "Button", 0 ; the name of our button class
 	NameOfTheText DB "Static", 0 ; the name of our text class
 	
 	TextForButton DB "Перевірити пароль", 0
 	TextForWarnButton DB "ОК", 0
-
-; Constants
-.const
-	InformationTextSNP EQU "ПIБ = Домiнський Валентин Олексiйович", 0
-	InformationTextBirth EQU "Дата Народження = 22.02.2002", 0
-	InformationTextZalikova EQU "Номер Залiковки книжки = 9311", 0
 
 ; Code Segment
 .code
@@ -208,8 +207,8 @@ WinWarningProto endp
 
 
 ; function declaration of WinWarn
-	WinWithTextProto  proc hInst:HINSTANCE,hPrevInst:HINSTANCE,CmdShow:dword
-	 ; there we need local variables
+WinWithTextProto  proc hInst:HINSTANCE,hPrevInst:HINSTANCE,CmdShow:dword
+	; there we need local variables
 	local wc:WNDCLASSEX
     local msg:MSG
     local hwnd:HWND
@@ -218,14 +217,14 @@ WinWarningProto endp
 	; window class is a specification of a window
     mov   wc.cbSize, sizeof WNDCLASSEX
     mov   wc.style, CS_HREDRAW or CS_VREDRAW
-    mov   wc.lpfnWndProc, offset WndWarnProc
+    mov   wc.lpfnWndProc, offset WndWithTextProc
     mov   wc.cbClsExtra, NULL
     mov   wc.cbWndExtra, NULL
     push  hInstance
     pop   wc.hInstance
     mov   wc.hbrBackground, COLOR_WINDOW+1
     mov   wc.lpszMenuName, NULL
-    mov   wc.lpszClassName, offset NameOfTheWarnWindows
+    mov   wc.lpszClassName, offset NameOfSomeTextWindows
     invoke LoadIcon, NULL, IDI_APPLICATION
     mov   wc.hIcon, eax
     mov   wc.hIconSm, eax
@@ -235,7 +234,7 @@ WinWarningProto endp
 	; create class of the window
     invoke RegisterClassEx, addr wc
     invoke CreateWindowEx, NULL,
-                offset NameOfTheWarnWindows,
+                offset NameOfSomeTextWindows,
                 offset MsgBoxName,
                 WS_OVERLAPPEDWINDOW or DS_CENTER,
                 520, 310, 200, 150,
@@ -271,6 +270,54 @@ WinWarningProto endp
 	;The ENDP directive defines the end of the procedure
 	;and has the same name as in the PROC directive
 WinWithTextProto endp
+
+
+WndWithTextProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
+	; on window close
+	.if ourMSG==WM_CLOSE
+		; exit program
+		invoke DestroyWindow,hWnd
+        invoke PostQuitMessage,NULL 
+
+    .elseif ourMSG==WM_CREATE
+		invoke CreateWindowEx,NULL,
+                offset NameOfTheButton, offset TextForWarnButton,
+                WS_VISIBLE or WS_CHILD or BS_CENTER or BS_TEXT or BS_VCENTER,
+                55, 65, 70, 30,
+                hWnd, 7033, hInstance, NULL
+		invoke CreateWindowEx,NULL,
+                offset NameOfTheText, offset InformationTextSNP,
+                WS_VISIBLE or WS_CHILD or BS_TEXT or SS_CENTER  or BS_VCENTER,
+                16, 10, 150, 50,
+                hWnd, 7044, hInstance, NULL
+				
+		invoke CreateWindowEx,NULL,
+                offset NameOfTheText, offset InformationTextBirth,
+                WS_VISIBLE or WS_CHILD or BS_TEXT or SS_CENTER  or BS_VCENTER,
+                16, 10, 150, 50,
+                hWnd, 7055, hInstance, NULL
+				
+		invoke CreateWindowEx,NULL,
+                offset NameOfTheText, offset InformationTextZalikova,
+                WS_VISIBLE or WS_CHILD or BS_TEXT or SS_CENTER  or BS_VCENTER,
+                16, 10, 150, 50,
+                hWnd, 7066, hInstance, NULL
+				
+	.elseif ourMSG==WM_COMMAND
+		; exit program
+		invoke DestroyWindow,hWnd
+        invoke PostQuitMessage,NULL 
+	  
+    .else
+		 ; process the message
+        invoke DefWindowProc,hWnd,ourMSG,wParam,lParam
+        ret
+    .ENDIF
+	 
+	ExitCode:
+    xor    eax,eax
+    ret
+WndWithTextProc endp
 
 
 WndProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
@@ -355,8 +402,6 @@ WndProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
     ret
 WndProc endp
 
-
-
 WndWarnProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 	; on window close
 	.if ourMSG==WM_CLOSE
@@ -391,7 +436,5 @@ WndWarnProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
     xor    eax,eax
     ret
 WndWarnProc endp
-
-
 
 end start
