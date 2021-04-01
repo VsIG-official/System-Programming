@@ -55,11 +55,11 @@ endm
 	; Text To Show
 	InformationText DB "ПIБ = Домiнський Валентин Олексiйович", 13, 
 		 "Дата Народження = 22.02.2002", 13,
-		 "Номер Залiковки книжки = 9311", 0
+		 "Номер Залiковки = 9311", 0
 		 
 	InformationTextSNP DB "ПIБ = Домiнський Валентин Олексiйович", 0
 	InformationTextBirth DB "Дата Народження = 22.02.2002", 0
-	InformationTextZalikova DB "Номер Залiковки книжки = 9311", 0
+	InformationTextZalikova DB 13, "Номер Залiковки = 9311", 0
 
 	NameOfTheStartingWindows DB "Window with starting text", 0 ; the name of our window class
 	NameOfTheWarnWindows DB "Window with warn text", 0 ; the name of our success window class
