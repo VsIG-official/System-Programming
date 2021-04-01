@@ -303,7 +303,7 @@ WndWarnProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
                 hWnd, 7003, hInstance, NULL
 		invoke CreateWindowEx,NULL,
                 offset NameOfTheText, offset StartingText,
-                WS_VISIBLE or WS_CHILD or SS_CENTER or BS_TEXT,
+                WS_VISIBLE or WS_CHILD or BS_TEXT or SS_CENTER  or BS_VCENTER,
                 16, 10, 150, 50,
                 hWnd, 7004, hInstance, NULL
 				
