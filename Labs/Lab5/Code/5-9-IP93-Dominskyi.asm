@@ -97,7 +97,7 @@ start: ; Generates program start-up code
                 offset NameOfTheWarnWindows,
                 offset MsgBoxName,
                 WS_OVERLAPPEDWINDOW or DS_CENTER,
-                520, 310, 200, 150,
+                470, 310, 300, 150,
                 NULL, NULL, hInst, NULL
 		mov hWndOfWarnWindow, eax
 
@@ -240,12 +240,13 @@ WndWarnProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 		invoke CreateWindowEx,NULL,
                 offset NameOfTheButton, offset TextForOKButton,
                 WS_CHILD or WS_VISIBLE or BS_CENTER or BS_TEXT or BS_VCENTER,
-                55, 65, 70, 30,
+                65, 65, 150, 30,
                 hWnd, 7003, hInstance, NULL
+				
 		invoke CreateWindowEx,NULL,
                 offset NameOfTheText, offset StartingText,
                 WS_VISIBLE or WS_CHILD or BS_TEXT or SS_CENTER  or BS_VCENTER,
-                16, 10, 150, 50,
+                16, 10, 250, 50,
                 hWnd, 7004, hInstance, NULL
 				
 	.ELSEIF ourMSG==WM_COMMAND
