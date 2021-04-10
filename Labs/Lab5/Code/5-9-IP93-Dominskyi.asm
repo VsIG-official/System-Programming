@@ -31,6 +31,8 @@ PrintInformationInWindow macro heightPosition, infoToShow
             hWnd, 7044, hInstance, NULL
 endm
 
+DoArithmeticOperations macro 
+
 .data?
 	hInstance HINSTANCE ? ; Handle of our program
 	hWndOfWarnWindow HWND ? ; Handle of our warn window
@@ -41,7 +43,6 @@ endm
 ; Data Segment
 .data
 	StartingText DB "У наступному вікні Ви побачите 5 різних арифметичних виразів", 0
-	FailureText DB "Пароль невiрний. Спробуйте ще раз",  0
 	
 	; Name Of Message Box
 	MsgBoxName  DB "5-9-IP93-Dominskyi", 0
@@ -53,6 +54,18 @@ endm
 	NameOfTheText DB "Static", 0 ; the name of our text class
 	
 	TextForOKButton DB "ОК", 0
+	
+	; can't be 1 or 0
+	; first way of declaring array
+	IntegersA = DB 7, 9 , 13, -2, 70
+	IntegersB = DB -32, 2, -2, 4, 5
+	
+	; and the second one
+	IntegersC = DB 67
+							  DB 3
+							  DB 121
+							  DB -54
+							  DB 4
 
 ; Code Segment
 .code
@@ -205,14 +218,15 @@ WndFailureProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 
     .ELSEIF ourMSG==WM_CREATE
 		; invoke macros #1 one time to create text
-		PrintInformationInWindow 10, offset FailureText
+		;DoArithmeticOperations 
+		PrintInformationInWindow 10, offset MsgBoxName
 		; create button
 		invoke CreateWindowEx,NULL,
                 offset NameOfTheButton, offset TextForOKButton,
                 WS_VISIBLE or WS_CHILD or BS_CENTER or BS_TEXT or BS_VCENTER,
                 65, 65, 70, 30,
                 hWnd, 7033, hInstance, NULL
-				
+
 	.ELSEIF ourMSG==WM_COMMAND
 		; exit program
 		invoke DestroyWindow,hWnd
