@@ -107,12 +107,6 @@ endm
 	
 	BufferForText DB 256 DUP(?)
 	
-	; We need these buffers for printing
-	; because printing numbers from array directly is 
-	BufferForTextA DB 256 DUP(?)
-	BufferForTextB  DB 256 DUP(?)
-	BufferForTextC  DB 256 DUP(?)
-	
 ; Data Segment
 .data
 	StartingText DB "У наступному вікні Ви побачите 5 різних арифметичних виразів", 0
@@ -130,15 +124,15 @@ endm
 	
 	; can't be 1 or 0
 	; first way of declaring array
-	IntegersA DB 2, 8 , 13, -2, 70
-	IntegersB DB -33, 23, -2, 4, 5
+	IntegersA DB 2, 8 , 2, 8 , 2
+	IntegersB DB -33, 23, -33, 23, -33
 	
 	; and the second one
 	IntegersC 	DB 66
 							DB 24
-							DB 121
-							DB -54
-							DB 4
+							DB 66
+							DB 24
+							DB 66
 	
 	intA dd 0
 	intB dd 0
@@ -315,7 +309,7 @@ WndMainProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 		movsx eax,  IntegersC[edi]
 		mov intC, eax
 		
-		DoArithmeticOperations IntegersA[0], IntegersB[0], IntegersC[0]
+		DoArithmeticOperations IntegersA[edi], IntegersB[edi], IntegersC[edi]
 		
 		invoke wsprintf, addr BufferForText, addr equationVariables, 
         intA, intB,intC, intFinal
