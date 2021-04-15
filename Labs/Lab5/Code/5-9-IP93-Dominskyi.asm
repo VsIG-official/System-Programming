@@ -131,12 +131,6 @@ endm
 	; can't be 1 or 0
 	; first way of declaring array
 	IntegersA DB 2, 8 , 13, -2, 70
-	
-	intA dd 0
-	intB dd 0
-	intC dd 0
-	intFinal dd 0
-	
 	IntegersB DB -33, 23, -2, 4, 5
 	
 	; and the second one
@@ -145,6 +139,13 @@ endm
 							DB 121
 							DB -54
 							DB 4
+	
+	intA dd 0
+	intB dd 0
+	intC dd 0
+	intFinal dd 0
+	
+	possibleHeight dd 12
 
 	variantToShow DB "My equation = (21 - a*c/4)/( 1 + c/a + b)", 13, 0
 	equationVariables DB "For a = %d, b = %d and c = %d and result = %d", 13, 0
@@ -300,24 +301,40 @@ WndMainProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 
     .ELSEIF ourMSG==WM_CREATE
 
-		movsx eax,  IntegersA[0]
+		mov edi, 0
+		; invoke macros #1 one time to create text
+		PrintInformationInWindow  possibleHeight, offset variantToShow
+
+		LoopItself:
+		movsx eax,  IntegersA[edi]
 		mov intA, eax
 		
-		movsx eax,  IntegersB[0]
+		movsx eax,  IntegersB[edi]
 		mov intB, eax
 		
-		movsx eax,  IntegersC[0]
+		movsx eax,  IntegersC[edi]
 		mov intC, eax
 		
 		DoArithmeticOperations IntegersA[0], IntegersB[0], IntegersC[0]
 		
 		invoke wsprintf, addr BufferForText, addr equationVariables, 
         intA, intB,intC, intFinal
-	
-		; invoke macros #1 one time to create text
-		PrintInformationInWindow 10, offset variantToShow
 		
-		PrintInformationInWindow 30, offset BufferForText
+		mov eax, possibleHeight  ; â al a
+		cbw
+		add eax,  possibleHeight
+		add eax,  possibleHeight
+		add eax,  possibleHeight
+		imul esi ;a * c       -> AL
+		
+		PrintInformationInWindow eax, offset BufferForText
+		
+		inc edi
+		inc esi
+		
+		cmp edi, 5
+		jne LoopItself
+		
 		; create button
 		invoke CreateWindowEx,NULL,
                 offset NameOfTheButton, offset TextForOKButton,
