@@ -298,10 +298,17 @@ WndMainProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 	
 			DoArithmeticOperations IntegersA[0], IntegersB[0], IntegersC[0]
 	
-	mov intA, IntegersA[0]
+			movsx eax,  IntegersA[0]
+			mov intA, eax
+			
+			movsx eax,  IntegersB[0]
+			mov intB, eax
+			
+			movsx eax,  IntegersC[0]
+			mov intC, eax
 	
 			invoke wsprintf, addr BufferForText, addr equationVariables, 
-            intA, intB,intC
+            intA, intB,intC, al
 	
 		; invoke macros #1 one time to create text
 		;DoArithmeticOperations 
