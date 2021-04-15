@@ -103,19 +103,19 @@ endm
 .data?
 	hInstance HINSTANCE ? ; Handle of our program
 	hWndOfWarnWindow HWND ? ; Handle of our warn window
-	hWndOfFailureWindow HWND ? ; Handle of our failure window
+	hWndOfMainWindow HWND ? ; Handle of our main window
 	
 	BufferForText DB 256 DUP(?)
 	
 ; Data Segment
 .data
-	StartingText DB "У наступному вікні Ви побачите 5 різних арифметичних виразів", 0
+	StartingText DB "У наступному вікні Ви побачите 5 різних арифметичних виразів", 13, 0
 	
 	; Name Of Message Box
 	MsgBoxName  DB "5-9-IP93-Dominskyi", 0
 
-	NameOfTheWarnWindows DB "Window with warn text", 0 ; the name of our success window class
-	NameOfFailureWindows DB "Window with failure text", 0 ; the name of our success window class
+	NameOfTheWarnWindows DB "Window with warn text", 0 ; the name of our warn window class
+	NameOfMainWindows DB "Window with main text", 0 ; the name of our success window class
 	
 	NameOfTheButton DB "Button", 0 ; the name of our button class
 	NameOfTheText DB "Static", 0 ; the name of our text class
@@ -239,7 +239,7 @@ WinMainProto  proc hInst:HINSTANCE,hPrevInst:HINSTANCE,CmdShow:dword
     pop   wc.hInstance
     mov   wc.hbrBackground, COLOR_WINDOW+1
     mov   wc.lpszMenuName, NULL
-    mov   wc.lpszClassName, offset NameOfFailureWindows
+    mov   wc.lpszClassName, offset NameOfMainWindows
     invoke LoadIcon, NULL, IDI_APPLICATION
     mov   wc.hIcon, eax
     mov   wc.hIconSm, eax
@@ -249,12 +249,12 @@ WinMainProto  proc hInst:HINSTANCE,hPrevInst:HINSTANCE,CmdShow:dword
 	; create class of the window
     invoke RegisterClassEx, addr wc
     invoke CreateWindowEx, NULL,
-                offset NameOfFailureWindows,
+                offset NameOfMainWindows,
                 offset MsgBoxName,
                 WS_OVERLAPPEDWINDOW or DS_CENTER,
                 310, 230, 620, 200,
                 NULL, NULL, hInst, NULL
-		mov hWndOfFailureWindow, eax
+		mov hWndOfMainWindow, eax
 
 	; write window handle in eax
     mov   hwnd,eax
