@@ -66,6 +66,9 @@ DoArithmeticOperations macro aInt, bInt, cInt
     IDIV BufferForText ;  (21 - a*c/4)/( 1 + c/a + b) -> AL
 	cbw
 	
+	movsx eax,  al
+	mov intFinal, eax
+	
 	; ;  Перейти по парності 
 	; JPE IntIsEven
 	
@@ -132,6 +135,7 @@ endm
 	intA dd 0
 	intB dd 0
 	intC dd 0
+	intFinal dd 0
 	
 	IntegersB DB -33, 23, -2, 4, 5
 	
@@ -143,7 +147,7 @@ endm
 							DB 4
 
 	variantToShow DB "My equation = (21 - a*c/4)/( 1 + c/a + b)", 13, 0
-	equationVariables DB "For a = %d, b = %d and c = %d ", 13, 0
+	equationVariables DB "For a = %d, b = %d and c = %d and result = %d", 13, 0
 
 ; Code Segment
 .code
@@ -295,23 +299,22 @@ WndMainProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
         invoke PostQuitMessage,NULL 
 
     .ELSEIF ourMSG==WM_CREATE
-	
-			DoArithmeticOperations IntegersA[0], IntegersB[0], IntegersC[0]
-	
-			movsx eax,  IntegersA[0]
-			mov intA, eax
-			
-			movsx eax,  IntegersB[0]
-			mov intB, eax
-			
-			movsx eax,  IntegersC[0]
-			mov intC, eax
-	
-			invoke wsprintf, addr BufferForText, addr equationVariables, 
-            intA, intB,intC, al
+
+		movsx eax,  IntegersA[0]
+		mov intA, eax
+		
+		movsx eax,  IntegersB[0]
+		mov intB, eax
+		
+		movsx eax,  IntegersC[0]
+		mov intC, eax
+		
+		DoArithmeticOperations IntegersA[0], IntegersB[0], IntegersC[0]
+		
+		invoke wsprintf, addr BufferForText, addr equationVariables, 
+        intA, intB,intC, intFinal
 	
 		; invoke macros #1 one time to create text
-		;DoArithmeticOperations 
 		PrintInformationInWindow 10, offset variantToShow
 		
 		PrintInformationInWindow 30, offset BufferForText
