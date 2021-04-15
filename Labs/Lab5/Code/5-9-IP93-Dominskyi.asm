@@ -36,9 +36,9 @@ DoArithmeticOperations macro aInt, bInt, cInt
 	; мітка для непарних випадків
 	LOCAL IntIsOdd
 	; мітка для парних випадків
-	LOCAL IntIsEven
+	;LOCAL IntIsEven
 	; мітка для закінчення макросу
-	LOCAL EndMacro
+	;LOCAL EndMacro
 	
 	; My equation = (21 - a*c/4)/( 1 + c/a + b)
 	
@@ -104,6 +104,12 @@ endm
 	
 	BufferForText DB 256 DUP(?)
 	
+	; We need these buffers for printing
+	; because printing numbers from array directly is 
+	BufferForTextA DB 256 DUP(?)
+	BufferForTextB  DB 256 DUP(?)
+	BufferForTextC  DB 256 DUP(?)
+	
 ; Data Segment
 .data
 	StartingText DB "У наступному вікні Ви побачите 5 різних арифметичних виразів", 0
@@ -122,6 +128,11 @@ endm
 	; can't be 1 or 0
 	; first way of declaring array
 	IntegersA DB 2, 8 , 13, -2, 70
+	
+	inta1 dd 2
+	intb1 dd -33
+	intc1 dd 66
+	
 	IntegersB DB -33, 23, -2, 4, 5
 	
 	; and the second one
@@ -132,7 +143,7 @@ endm
 							DB 4
 
 	variantToShow DB "My equation = (21 - a*c/4)/( 1 + c/a + b)", 13, 0
-	equationVariables DB "For a = %i, b = %i and c = %i result = %i", 13, 0
+	equationVariables DB "For a = %d, b = %d and c = %d ", 13, 0
 
 ; Code Segment
 .code
@@ -288,8 +299,8 @@ WndMainProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 			DoArithmeticOperations IntegersA[0], IntegersB[0], IntegersC[0]
 	
 			invoke wsprintf, addr BufferForText, addr equationVariables, 
-            IntegersA[0], IntegersB[0],
-            IntegersC[0], al
+            inta1, intb1,
+            intc1
 	
 		; invoke macros #1 one time to create text
 		;DoArithmeticOperations 
