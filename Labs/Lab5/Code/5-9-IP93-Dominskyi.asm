@@ -4,7 +4,7 @@
 option CaseMap:None
 
 WinWarningProto proto :dword,:dword,:dword
-WinFailureProto proto :dword,:dword,:dword
+WinMainProto proto :dword,:dword,:dword
 
 ; Libraries And Macroses
     include \masm32\include\windows.inc
@@ -33,6 +33,13 @@ endm
 
 ; Macros #2 for calculating
 DoArithmeticOperations macro aInt, bInt, cInt
+	; мітка для непарних випадків
+	LOCAL IntIsOdd
+	; мітка для парних випадків
+	LOCAL IntIsEven
+	; мітка для закінчення макросу
+	LOCAL EndMacro
+	
 	; My equation = (21 - a*c/4)/( 1 + c/a + b)
 	
 	xor ax,ax          ; очистили регистр ax
@@ -58,6 +65,36 @@ DoArithmeticOperations macro aInt, bInt, cInt
 	
     IDIV res ;  (21 - a*c/4)/( 1 + c/a + b) -> AL
 	cbw
+	
+	;  Перейти по парності 
+	JPE IntIsEven
+	
+	;  Перейти по непарності 
+	jpo IntIsOdd
+
+	
+	
+	IntIsEven:
+	
+	mov bl, 2; 2 в bl
+	cbw
+	idiv bl ; al / 2
+	cbw
+	
+	jmp EndMacro
+	
+	
+	
+	IntIsOdd:
+	
+	mov bl, 5; 5 в bl
+	cbw
+	imul bl ; al * 5
+	cbw
+	
+	jmp EndMacro
+	
+	EndMacro:
 endm
 
 .data?
@@ -65,8 +102,8 @@ endm
 	hWndOfWarnWindow HWND ? ; Handle of our warn window
 	hWndOfFailureWindow HWND ? ; Handle of our failure window
 	
-	StringFromUser DB 128 dup(?)
-
+	BufferForText DB 256 DUP(?)
+	
 ; Data Segment
 .data
 	StartingText DB "У наступному вікні Ви побачите 5 різних арифметичних виразів", 0
@@ -105,7 +142,7 @@ start: ; Generates program start-up code
 	invoke GetModuleHandle, NULL
 	mov hInstance, eax
 
-	invoke WinFailureProto, hInstance,NULL, SW_SHOWDEFAULT ;invoke function
+	invoke WinMainProto, hInstance,NULL, SW_SHOWDEFAULT ;invoke function
 
 	invoke ExitProcess, eax ; quit program. code returns in EAX register from Main Function.
 
@@ -175,7 +212,7 @@ start: ; Generates program start-up code
 WinWarningProto endp
 
 ; function declaration of WinSuccess
-WinFailureProto  proc hInst:HINSTANCE,hPrevInst:HINSTANCE,CmdShow:dword
+WinMainProto  proc hInst:HINSTANCE,hPrevInst:HINSTANCE,CmdShow:dword
 	; there we need LOCAL variables
 	LOCAL wc:WNDCLASSEX
     LOCAL msg:MSG
@@ -185,7 +222,7 @@ WinFailureProto  proc hInst:HINSTANCE,hPrevInst:HINSTANCE,CmdShow:dword
 	; window class is a specification of a window
     mov   wc.cbSize, sizeof WNDCLASSEX
     mov   wc.style, CS_HREDRAW or CS_VREDRAW
-    mov   wc.lpfnWndProc, offset WndFailureProc
+    mov   wc.lpfnWndProc, offset WndMainProc
     mov   wc.cbClsExtra, NULL
     mov   wc.cbWndExtra, NULL
     push  hInstance
@@ -237,9 +274,9 @@ WinFailureProto  proc hInst:HINSTANCE,hPrevInst:HINSTANCE,CmdShow:dword
    
 	;The ENDP directive defines the end of the procedure
 	;and has the same name as in the PROC directive
-WinFailureProto endp
+WinMainProto endp
 
-WndFailureProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
+WndMainProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 	; on window close
 	.IF ourMSG==WM_CLOSE
 		; exit program
@@ -247,6 +284,13 @@ WndFailureProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
         invoke PostQuitMessage,NULL 
 
     .ELSEIF ourMSG==WM_CREATE
+	
+			invoke wsprintf, addr BufferForText, addr Form, 
+			addr Symbols,
+            APlusShortlnt, AMinusShortlnt,
+            BPlusShortlnt, BMinusShortlnt,
+			CPlusShortlnt, CMinusShortlnt,
+	
 		; invoke macros #1 one time to create text
 		;DoArithmeticOperations 
 		PrintInformationInWindow 10, offset MsgBoxName
@@ -271,7 +315,7 @@ WndFailureProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 	ExitCode:
     xor eax, eax
     ret
-WndFailureProc endp
+WndMainProc endp
 
 WndWarnProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 	; on window close
