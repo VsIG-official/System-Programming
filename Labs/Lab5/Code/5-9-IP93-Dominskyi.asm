@@ -129,17 +129,17 @@ endm
 	
 	; and the second one
 	IntegersC 	DB 66
-							DB 24
-							DB 66
-							DB 24
-							DB 66
+				DB 24
+				DB 66
+				DB 24
+				DB 66
 	
-	intA dd 0
-	intB dd 0
-	intC dd 0
-	intFinal dd 0
+	intA DD 0
+	intB DD 0
+	intC DD 0
+	intFinal DD 0
 	
-	possibleHeight dd 12
+	possibleHeight DD 12
 
 	variantToShow DB "My equation = (21 - a*c/4)/( 1 + c/a + b)", 13, 0
 	equationVariables DB "For a = %d, b = %d and c = %d and result = %d", 13, 0
@@ -316,9 +316,12 @@ WndMainProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 		
 		mov eax, possibleHeight  ; â al a
 		cbw
-		add eax,  possibleHeight
-		add eax,  possibleHeight
-		add eax,  possibleHeight
+		
+		mov ebx, 3
+		cbw
+		
+		imul ebx
+
 		imul esi ;a * c       -> AL
 		
 		PrintInformationInWindow eax, offset BufferForText
