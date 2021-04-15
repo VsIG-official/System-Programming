@@ -84,18 +84,18 @@ endm
 	
 	; can't be 1 or 0
 	; first way of declaring array
-	IntegersA = DB 2, 8 , 13, -2, 70
-	IntegersB = DB -33, 23, -2, 4, 5
+	IntegersA DB 2, 8 , 13, -2, 70
+	IntegersB DB -33, 23, -2, 4, 5
 	
 	; and the second one
-	IntegersC = DB 66
-							  DB 24
-							  DB 121
-							  DB -54
-							  DB 4
+	IntegersC 	DB 66
+							DB 24
+							DB 121
+							DB -54
+							DB 4
 
-	variantToShow DB "My equation = (21 - a*c/4)/( 1 + c/a + b)"
-	equation
+	variantToShow DB "My equation = (21 - a*c/4)/( 1 + c/a + b)", 13
+	equationVariables DB "For a = %d, b = %d and c = %d result = %d", 13
 
 ; Code Segment
 .code
