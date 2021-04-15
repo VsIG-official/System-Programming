@@ -27,7 +27,7 @@ PrintInformationInWindow macro heightPosition, infoToShow
 	invoke CreateWindowEx,NULL,
             offset NameOfTheText, offset infoToShow,
             WS_VISIBLE or WS_CHILD or BS_TEXT or SS_CENTER  or BS_VCENTER,
-            16, heightPosition, 170, 50,
+            16, heightPosition, 570, 50,
             hWnd, 7044, hInstance, NULL
 endm
 
@@ -44,16 +44,16 @@ DoArithmeticOperations macro aInt, bInt, cInt
 	
 	xor ax,ax          ; очистили регистр ax
 	
-	mov al, d; в al c
+	mov al, cInt; в al c
 	cbw
-	idiv a; c/a
+	idiv aInt; c/a
 	add al,1 ; 1+c/a 
-	add al, b; 1+c/a +b
-	MOV res, AL   ; 1+c/a +b -> res
+	add al, bInt; 1+c/a +b
+	MOV BufferForText, AL   ; 1+c/a +b -> BufferForText
 	
-	mov al, a  ; в al a
+	mov al, aInt  ; в al a
 	cbw
-	imul d ;a * c       -> AL
+	imul cInt ;a * c       -> AL
 	mov bl, 4
 	IDIV bl    ; a * c / 4     -> AL
 	mov bl, 21
@@ -63,36 +63,36 @@ DoArithmeticOperations macro aInt, bInt, cInt
 	mov al,bl
 	cbw
 	
-    IDIV res ;  (21 - a*c/4)/( 1 + c/a + b) -> AL
+    IDIV BufferForText ;  (21 - a*c/4)/( 1 + c/a + b) -> AL
 	cbw
 	
-	;  Перейти по парності 
-	JPE IntIsEven
+	; ;  Перейти по парності 
+	; JPE IntIsEven
 	
-	;  Перейти по непарності 
-	jpo IntIsOdd
+	; ;  Перейти по непарності 
+	; jpo IntIsOdd
 
 	
 	
-	IntIsEven:
+	; IntIsEven:
 	
-	mov bl, 2; 2 в bl
-	cbw
-	idiv bl ; al / 2
-	cbw
+	; mov bl, 2; 2 в bl
+	; cbw
+	; idiv bl ; al / 2
+	; cbw
 	
-	jmp EndMacro
+	; jmp EndMacro
 	
 	
 	
-	IntIsOdd:
+	; IntIsOdd:
 	
-	mov bl, 5; 5 в bl
-	cbw
-	imul bl ; al * 5
-	cbw
+	; mov bl, 5; 5 в bl
+	; cbw
+	; imul bl ; al * 5
+	; cbw
 	
-	jmp EndMacro
+	; jmp EndMacro
 	
 	EndMacro:
 endm
@@ -131,8 +131,8 @@ endm
 							DB -54
 							DB 4
 
-	variantToShow DB "My equation = (21 - a*c/4)/( 1 + c/a + b)", 13
-	equationVariables DB "For a = %d, b = %d and c = %d result = %d", 13
+	variantToShow DB "My equation = (21 - a*c/4)/( 1 + c/a + b)", 13, 0
+	equationVariables DB "For a = %i, b = %i and c = %i result = %i", 13, 0
 
 ; Code Segment
 .code
@@ -242,7 +242,7 @@ WinMainProto  proc hInst:HINSTANCE,hPrevInst:HINSTANCE,CmdShow:dword
                 offset NameOfFailureWindows,
                 offset MsgBoxName,
                 WS_OVERLAPPEDWINDOW or DS_CENTER,
-                510, 280, 220, 150,
+                310, 230, 620, 200,
                 NULL, NULL, hInst, NULL
 		mov hWndOfFailureWindow, eax
 
@@ -285,15 +285,17 @@ WndMainProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 
     .ELSEIF ourMSG==WM_CREATE
 	
-			invoke wsprintf, addr BufferForText, addr Form, 
-			addr Symbols,
-            APlusShortlnt, AMinusShortlnt,
-            BPlusShortlnt, BMinusShortlnt,
-			CPlusShortlnt, CMinusShortlnt,
+			DoArithmeticOperations IntegersA[0], IntegersB[0], IntegersC[0]
+	
+			invoke wsprintf, addr BufferForText, addr equationVariables, 
+            IntegersA[0], IntegersB[0],
+            IntegersC[0], al
 	
 		; invoke macros #1 one time to create text
 		;DoArithmeticOperations 
-		PrintInformationInWindow 10, offset MsgBoxName
+		PrintInformationInWindow 10, offset variantToShow
+		
+		PrintInformationInWindow 30, offset BufferForText
 		; create button
 		invoke CreateWindowEx,NULL,
                 offset NameOfTheButton, offset TextForOKButton,
