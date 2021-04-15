@@ -27,14 +27,14 @@ PrintInformationInWindow macro heightPosition, infoToShow
 	invoke CreateWindowEx,NULL,
             offset NameOfTheText, offset infoToShow,
             WS_VISIBLE or WS_CHILD or BS_TEXT or SS_CENTER  or BS_VCENTER,
-            16, heightPosition, 570, 50,
+            16, heightPosition, 490, 50,
             hWnd, 7044, hInstance, NULL
 endm
 
 ; Macros #2 for calculating
 DoArithmeticOperations macro aInt, bInt, cInt
 	; мітка для непарних випадків
-	LOCAL IntIsOdd
+	;LOCAL IntIsOdd
 	; мітка для парних випадків
 	;LOCAL IntIsEven
 	; мітка для закінчення макросу
@@ -140,8 +140,9 @@ endm
 	intFinal DD 0
 	
 	possibleHeight DD 12
+	coefficientOfMultiplyingForTextHeight DD 3
 
-	variantToShow DB "My equation = (21 - a*c/4)/( 1 + c/a + b)", 13, 0
+	variantToShow DB "My equation = (21 - a * c / 4) / (1 + c / a + b)", 13, 0
 	equationVariables DB "For a = %d, b = %d and c = %d and result = %d", 13, 0
 
 ; Code Segment
@@ -158,7 +159,7 @@ start: ; Generates program start-up code
 
 	; function declaration of WinWarn
 	WinWarningProto  proc hInst:HINSTANCE,hPrevInst:HINSTANCE,CmdShow:dword
-	 ; there we need LOCAL variables
+	; there we need LOCAL variables
 	LOCAL wc:WNDCLASSEX
     LOCAL msg:MSG
     LOCAL hwnd:HWND
@@ -252,7 +253,7 @@ WinMainProto  proc hInst:HINSTANCE,hPrevInst:HINSTANCE,CmdShow:dword
                 offset NameOfMainWindows,
                 offset MsgBoxName,
                 WS_OVERLAPPEDWINDOW or DS_CENTER,
-                310, 230, 620, 200,
+                350, 200, 540, 300,
                 NULL, NULL, hInst, NULL
 		mov hWndOfMainWindow, eax
 
@@ -317,7 +318,7 @@ WndMainProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 		mov eax, possibleHeight  ; в al a
 		cbw
 		
-		mov ebx, 3
+		mov ebx, coefficientOfMultiplyingForTextHeight
 		cbw
 		
 		imul ebx
@@ -336,7 +337,7 @@ WndMainProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 		invoke CreateWindowEx,NULL,
                 offset NameOfTheButton, offset TextForOKButton,
                 WS_VISIBLE or WS_CHILD or BS_CENTER or BS_TEXT or BS_VCENTER,
-                65, 65, 70, 30,
+                175, 215, 150, 30,
                 hWnd, 7033, hInstance, NULL
 
 	.ELSEIF ourMSG==WM_COMMAND
