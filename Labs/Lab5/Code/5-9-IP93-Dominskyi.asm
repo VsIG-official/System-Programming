@@ -31,7 +31,34 @@ PrintInformationInWindow macro heightPosition, infoToShow
             hWnd, 7044, hInstance, NULL
 endm
 
-DoArithmeticOperations macro 
+; Macros #2 for calculating
+DoArithmeticOperations macro aInt, bInt, cInt
+	; My equation = (21 - a*c/4)/( 1 + c/a + b)
+	
+	xor ax,ax          ; очистили регистр ax
+	
+	mov al, d; в al c
+	cbw
+	idiv a; c/a
+	add al,1 ; 1+c/a 
+	add al, b; 1+c/a +b
+	MOV res, AL   ; 1+c/a +b -> res
+	
+	mov al, a  ; в al a
+	cbw
+	imul d ;a * c       -> AL
+	mov bl, 4
+	IDIV bl    ; a * c / 4     -> AL
+	mov bl, 21
+	; mov al, 21; в al 21
+	sub bl, al ; 21 -(a * c / 4)  -> AL
+	cbw
+	mov al,bl
+	cbw
+	
+    IDIV res ;  (21 - a*c/4)/( 1 + c/a + b) -> AL
+	cbw
+endm
 
 .data?
 	hInstance HINSTANCE ? ; Handle of our program
@@ -57,15 +84,18 @@ DoArithmeticOperations macro
 	
 	; can't be 1 or 0
 	; first way of declaring array
-	IntegersA = DB 7, 9 , 13, -2, 70
-	IntegersB = DB -32, 2, -2, 4, 5
+	IntegersA = DB 2, 8 , 13, -2, 70
+	IntegersB = DB -33, 23, -2, 4, 5
 	
 	; and the second one
-	IntegersC = DB 67
-							  DB 3
+	IntegersC = DB 66
+							  DB 24
 							  DB 121
 							  DB -54
 							  DB 4
+
+	variantToShow DB "My equation = (21 - a*c/4)/( 1 + c/a + b)"
+	equation
 
 ; Code Segment
 .code
