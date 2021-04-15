@@ -129,9 +129,9 @@ endm
 	; first way of declaring array
 	IntegersA DB 2, 8 , 13, -2, 70
 	
-	inta1 dd 2
-	intb1 dd -33
-	intc1 dd 66
+	intA dd 0
+	intB dd 0
+	intC dd 0
 	
 	IntegersB DB -33, 23, -2, 4, 5
 	
@@ -298,9 +298,10 @@ WndMainProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 	
 			DoArithmeticOperations IntegersA[0], IntegersB[0], IntegersC[0]
 	
+	mov intA, IntegersA[0]
+	
 			invoke wsprintf, addr BufferForText, addr equationVariables, 
-            inta1, intb1,
-            intc1
+            intA, intB,intC
 	
 		; invoke macros #1 one time to create text
 		;DoArithmeticOperations 
