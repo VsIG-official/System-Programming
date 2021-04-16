@@ -76,6 +76,12 @@ DoArithmeticOperations macro aInt, bInt, cInt
 	; Convert byte to word
 	cbw
 	
+	; Copies the contents of the source operand (register or memory location)
+	; to the destination operand (register) and sign extends the value to 16 or 32 bits
+	movsx eax,  al
+	; move eax into intFinal
+	mov intAlmostFinal, eax
+	
 	; Computes the bit-wise logical AND of first operand
 	; (source 1 operand) and the second operand (source 2 operand)
 	; and sets the SF, ZF, and PF status flags according to the result.
@@ -155,6 +161,7 @@ endm
 	intA DD 0
 	intB DD 0
 	intC DD 0
+	intAlmostFinal DD 0
 	intFinal DD 0
 	
 	; for automating 
@@ -164,7 +171,7 @@ endm
 	; first text to show
 	variantToShow DB "My equation = (21 - a * c / 4) / (1 + c / a + b)", 13, 0
 	; form, which I will be filling with variables
-	equationVariables DB "For a = %d, b = %d and c = %d and result = %d", 13, 0
+	equationVariables DB "For a = (%d), b = (%d) and c = (%d) We have (21 - (%d) * (%d) / 4) / (1 + (%d) / (%d) + (%d)) = (%d)", 13, 0
 
 ; Code Segment
 .code
@@ -341,9 +348,12 @@ WndMainProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 		;; start macros with ints from arrays
 		DoArithmeticOperations IntegersA[edi], IntegersB[edi], IntegersC[edi]
 		
+		; (21 - a * c / 4) / (1 + c / a + b)
 		;; parsing variables into TempPlaceForText
 		invoke wsprintf, addr TempPlaceForText, addr equationVariables, 
-        intA, intB, intC, intFinal
+        intA, intB, intC, intA, intC, intC, intA, intB, intAlmostFinal
+		
+
 		
 		; mov possibleHeight into eax
 		mov eax, possibleHeight
