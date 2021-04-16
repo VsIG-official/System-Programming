@@ -319,31 +319,47 @@ WndMainProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 		; invoke macros #1 one time to create text
 		PrintInformationInWindow possibleHeight, offset variantToShow
 
+		;; do the loop
 		LoopItself:
+		;; mov int with sign extending from first array into eax
 		movsx eax,  IntegersA[edi]
+		;; mov eax with sign extending into global variable
 		mov intA, eax
 		
+		;; mov int with sign extending from second array into eax
 		movsx eax,  IntegersB[edi]
+		;; mov eax with sign extending into global variable
 		mov intB, eax
 		
+		;; mov int with sign extending from third array into eax
 		movsx eax,  IntegersC[edi]
+		;; mov eax with sign extending into global variable
 		mov intC, eax
 		
+		;; start macros with ints from arrays
 		DoArithmeticOperations IntegersA[edi], IntegersB[edi], IntegersC[edi]
 		
+		;; parsing variables into BufferForText
 		invoke wsprintf, addr BufferForText, addr equationVariables, 
-        intA, intB,intC, intFinal
+        intA, intB, intC, intFinal
 		
-		mov eax, possibleHeight  ; â al a
+		; mov possibleHeight into eax
+		mov eax, possibleHeight
+		;; Convert byte to word
 		cbw
 		
+		; mov possibleHeight into ebx
 		mov ebx, coefficientOfMultiplyingForTextHeight
+		;; Convert byte to word
 		cbw
 		
+		;; coefficientOfMultiplyingForTextHeight * possibleHeight
+		;; eax * ebx
 		imul ebx
 
-		imul esi ;a * c       -> AL
+		imul esi
 		
+		; print text
 		PrintInformationInWindow eax, offset BufferForText
 		
 		inc edi
