@@ -27,7 +27,7 @@ PrintInformationInWindow macro heightPosition, infoToShow
 	invoke CreateWindowEx,NULL,
             offset NameOfTheText, offset infoToShow,
             WS_VISIBLE or WS_CHILD or BS_TEXT or SS_CENTER  or BS_VCENTER,
-            16, heightPosition, 490, 50,
+            16, heightPosition, 690, 50,
             hWnd, 7044, hInstance, NULL
 endm
 
@@ -98,7 +98,6 @@ DoArithmeticOperations macro aInt, bInt, cInt
 		imul bl
 		;; Convert byte to word
 		cbw
-		
 		
 		; Copies the contents of the source operand (register or memory location)
 		; to the destination operand (register) and sign extends the value to 16 or 32 bits
@@ -297,7 +296,7 @@ WinMainProto  proc hInst:HINSTANCE,hPrevInst:HINSTANCE,CmdShow:dword
                 offset NameOfMainWindows,
                 offset MsgBoxName,
                 WS_OVERLAPPEDWINDOW or DS_CENTER,
-                350, 200, 540, 300,
+                250, 200, 740, 300,
                 NULL, NULL, hInst, NULL
 		mov hWndOfMainWindow, eax
 
@@ -364,8 +363,6 @@ WndMainProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 		;; start macros with ints from arrays
 		DoArithmeticOperations IntegersA[edi], IntegersB[edi], IntegersC[edi]
 		
-
-		
 		; mov possibleHeight into eax
 		mov eax, possibleHeight
 		;; Convert byte to word
@@ -395,7 +392,7 @@ WndMainProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 		invoke CreateWindowEx,NULL,
                 offset NameOfTheButton, offset TextForOKButton,
                 WS_VISIBLE or WS_CHILD or BS_CENTER or BS_TEXT or BS_VCENTER,
-                175, 215, 150, 30,
+                295, 215, 150, 30,
                 hWnd, 7033, hInstance, NULL
 
 	.ELSEIF ourMSG==WM_COMMAND
