@@ -33,71 +33,83 @@ endm
 
 ; Macros #2 for calculating
 DoArithmeticOperations macro aInt, bInt, cInt
-	; мітка для непарних випадків
-	;LOCAL IntIsOdd
-	; мітка для парних випадків
-	;LOCAL IntIsEven
-	; мітка для закінчення макросу
-	;LOCAL EndMacro
+	; My equation = (21 - a * c / 4) / (1 + c / a + b)
 	
-	; My equation = (21 - a*c/4)/( 1 + c/a + b)
-	
-	xor ax,ax          ; очистили регистр ax
-	
-	mov al, cInt; в al c
+	; (1 + c / a + b)
+	; move cInt into al register
+	mov al, cInt
+	; Convert byte to word
 	cbw
-	idiv aInt; c/a
-	add al,1 ; 1+c/a 
-	add al, bInt; 1+c/a +b
-	MOV BufferForText, AL   ; 1+c/a +b -> BufferForText
+	; cInt / aInt
+	idiv aInt
+	; 1 + cInt / aInt 
+	add al,1 
+	; 1 + cInt / aInt + bInt
+	add al, bInt
+	; move (1 + cInt / aInt + bInt) into buffer BufferForText
+	mov BufferForText, al
 	
-	mov al, aInt  ; в al a
+	; (21 - a * c / 4)
+	; move aInt into al register
+	mov al, aInt
+	; Convert byte to word
 	cbw
-	imul cInt ;a * c       -> AL
+	; aInt * cInt
+	imul cInt
+	; move 4 into bl
 	mov bl, 4
-	IDIV bl    ; a * c / 4     -> AL
+	; aInt * cInt / 4
+	idiv bl
+	; move 21 into bl
 	mov bl, 21
-	; mov al, 21; в al 21
-	sub bl, al ; 21 -(a * c / 4)  -> AL
+	; 21 - (aInt * cInt / 4)
+	sub bl, al
+	; Convert byte to word
 	cbw
+	; move bl into al
 	mov al,bl
+	; Convert byte to word
 	cbw
 	
-    IDIV BufferForText ;  (21 - a*c/4)/( 1 + c/a + b) -> AL
+	; (21 - a * c / 4) / (1 + c / a + b)
+    idiv BufferForText
+	; Convert byte to word
 	cbw
 	
-	movsx eax,  al
-	mov intFinal, eax
-	
-	; ;  Перейти по парності 
-	; JPE IntIsEven
-	
-	; ;  Перейти по непарності 
-	; jpo IntIsOdd
+	; Computes the bit-wise logical AND of first operand
+	; (source 1 operand) and the second operand (source 2 operand)
+	; and sets the SF, ZF, and PF status flags according to the result.
+	; The result is then discarded.
+	test al, al
+	; Status of parity flag
+	; if odd, then multiply
+	.if parity?
+		;; move 5 into bl
+		mov bl, 5
+		;; Convert byte to word
+		cbw
+		;; al * 5
+		imul bl
+		;; Convert byte to word
+		cbw
 
-	
-	
-	; IntIsEven:
-	
-	; mov bl, 2; 2 в bl
-	; cbw
-	; idiv bl ; al / 2
-	; cbw
-	
-	; jmp EndMacro
-	
-	
-	
-	; IntIsOdd:
-	
-	; mov bl, 5; 5 в bl
-	; cbw
-	; imul bl ; al * 5
-	; cbw
-	
-	; jmp EndMacro
-	
-	EndMacro:
+	; if even, then divide
+	.else
+		;; move 2 into bl
+		mov bl, 2
+		;; Convert byte to word
+		cbw
+		; al / 2
+		idiv bl
+		;; Convert byte to word
+		cbw
+	.endif
+
+	; Copies the contents of the source operand (register or memory location)
+	; to the destination operand (register) and sign extends the value to 16 or 32 bits
+	movsx eax,  al
+	; move eax into intFinal
+	mov intFinal, eax
 endm
 
 .data?
@@ -105,6 +117,7 @@ endm
 	hWndOfWarnWindow HWND ? ; Handle of our warn window
 	hWndOfMainWindow HWND ? ; Handle of our main window
 	
+	;; Text, that We will show
 	BufferForText DB 256 DUP(?)
 	
 ; Data Segment
@@ -124,25 +137,31 @@ endm
 	
 	; can't be 1 or 0
 	; first way of declaring array
-	IntegersA DB 2, 8 , 2, 8 , 2
-	IntegersB DB -33, 23, -33, 23, -33
+	IntegersA DB 2, 8 , 2, 8 , 2 ;; first numbers
+	IntegersB DB -33, 23, -33, 23, -33 ;; second numbers
 	
 	; and the second one
-	IntegersC 	DB 66
+	IntegersC 	DB 66 ;; third numbers
 				DB 24
 				DB 66
 				DB 24
 				DB 66
 	
+	;; global variables for interpolating for main window
+	;; (I will put some int into them and show in main window)
+	;; mostly used for negative nums
 	intA DD 0
 	intB DD 0
 	intC DD 0
 	intFinal DD 0
 	
+	; for automating 
 	possibleHeight DD 12
 	coefficientOfMultiplyingForTextHeight DD 3
 
+	; first text to show
 	variantToShow DB "My equation = (21 - a * c / 4) / (1 + c / a + b)", 13, 0
+	; form, which I will be filling with variables
 	equationVariables DB "For a = %d, b = %d and c = %d and result = %d", 13, 0
 
 ; Code Segment
@@ -298,7 +317,7 @@ WndMainProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 
 		mov edi, 0
 		; invoke macros #1 one time to create text
-		PrintInformationInWindow  possibleHeight, offset variantToShow
+		PrintInformationInWindow possibleHeight, offset variantToShow
 
 		LoopItself:
 		movsx eax,  IntegersA[edi]
