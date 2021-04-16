@@ -7,12 +7,12 @@ WinWarningProto proto :dword,:dword,:dword
 WinMainProto proto :dword,:dword,:dword
 
 ; Libraries And Macroses
+    includelib \masm32\lib\user32.lib
+    includelib \masm32\lib\kernel32.lib
+	
     include \masm32\include\windows.inc
     include \masm32\include\user32.inc
     include \masm32\include\kernel32.inc
- 
-    includelib \masm32\lib\user32.lib
-    includelib \masm32\lib\kernel32.lib
 
 ; Our Macroses
 ; We place them here, 'cause it won't degrade the readability of the code
@@ -46,8 +46,8 @@ DoArithmeticOperations macro aInt, bInt, cInt
 	add al,1 
 	; 1 + cInt / aInt + bInt
 	add al, bInt
-	; move (1 + cInt / aInt + bInt) into buffer BufferForText
-	mov BufferForText, al
+	; move (1 + cInt / aInt + bInt) into buffer TempPlaceForText
+	mov TempPlaceForText, al
 	
 	; (21 - a * c / 4)
 	; move aInt into al register
@@ -72,7 +72,7 @@ DoArithmeticOperations macro aInt, bInt, cInt
 	cbw
 	
 	; (21 - a * c / 4) / (1 + c / a + b)
-    idiv BufferForText
+    idiv TempPlaceForText
 	; Convert byte to word
 	cbw
 	
@@ -118,7 +118,7 @@ endm
 	hWndOfMainWindow HWND ? ; Handle of our main window
 	
 	;; Text, that We will show
-	BufferForText DB 256 DUP(?)
+	TempPlaceForText DB 256 DUP(?)
 	
 ; Data Segment
 .data
@@ -339,8 +339,8 @@ WndMainProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 		;; start macros with ints from arrays
 		DoArithmeticOperations IntegersA[edi], IntegersB[edi], IntegersC[edi]
 		
-		;; parsing variables into BufferForText
-		invoke wsprintf, addr BufferForText, addr equationVariables, 
+		;; parsing variables into TempPlaceForText
+		invoke wsprintf, addr TempPlaceForText, addr equationVariables, 
         intA, intB, intC, intFinal
 		
 		; mov possibleHeight into eax
@@ -360,7 +360,7 @@ WndMainProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 		imul esi
 		
 		; print text
-		PrintInformationInWindow eax, offset BufferForText
+		PrintInformationInWindow eax, offset TempPlaceForText
 		
 		inc edi
 		inc esi
