@@ -139,15 +139,15 @@ endm
 	
 	; can't be 1 or 0
 	; first way of declaring array
-	IntegersA DB 2, 8 , -6, -8, 6 ;; first numbers
-	IntegersB DB -33, 23, -2, 8, 3 ;; second numbers
+	IntegersA DB 2, 8 , -6, -2, 10 ;; first numbers
+	IntegersB DB -33, 23, -2, 8, -3 ;; second numbers
 	
 	; and the second one
 	IntegersC 	DB 66 ;; third numbers
 				DB 24
 				DB -12
-				DB 6
-				DB -6
+				DB -2
+				DB 10
 	
 	;; global variables for interpolating for main window
 	;; (I will put some int into them and show in main window)
