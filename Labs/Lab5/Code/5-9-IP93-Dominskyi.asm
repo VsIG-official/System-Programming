@@ -98,7 +98,17 @@ DoArithmeticOperations macro aInt, bInt, cInt
 		imul bl
 		;; Convert byte to word
 		cbw
-
+		
+		
+		; Copies the contents of the source operand (register or memory location)
+		; to the destination operand (register) and sign extends the value to 16 or 32 bits
+		movsx eax,  al
+		; move eax into intFinal
+		mov intFinal, eax
+		
+		;; parsing variables into TempPlaceForText
+		invoke wsprintf, addr TempPlaceForText, addr equationVariablesForOdd, 
+        intA, intB, intC, intA, intC, intC, intA, intB, intAlmostFinal, intFinal
 	; if even, then divide
 	.else
 		;; move 2 into bl
@@ -109,13 +119,18 @@ DoArithmeticOperations macro aInt, bInt, cInt
 		idiv bl
 		;; Convert byte to word
 		cbw
+		
+		; Copies the contents of the source operand (register or memory location)
+		; to the destination operand (register) and sign extends the value to 16 or 32 bits
+		movsx eax,  al
+		; move eax into intFinal
+		mov intFinal, eax
+
+		;; parsing variables into TempPlaceForText
+		invoke wsprintf, addr TempPlaceForText, addr equationVariablesForEven, 
+        intA, intB, intC, intA, intC, intC, intA, intB, intAlmostFinal, intFinal
 	.endif
 
-	; Copies the contents of the source operand (register or memory location)
-	; to the destination operand (register) and sign extends the value to 16 or 32 bits
-	movsx eax,  al
-	; move eax into intFinal
-	mov intFinal, eax
 endm
 
 .data?
@@ -170,8 +185,9 @@ endm
 
 	; first text to show
 	variantToShow DB "My equation = (21 - a * c / 4) / (1 + c / a + b)", 13, 0
-	; form, which I will be filling with variables
-	equationVariables DB "For a = (%d), b = (%d) and c = (%d) We have (21 - (%d) * (%d) / 4) / (1 + (%d) / (%d) + (%d)) = (%d)", 13, 0
+	; forms, which I will be filling with variables
+	equationVariablesForOdd DB "For a = (%d), b = (%d) and c = (%d) We have (21 - (%d) * (%d) / 4) / (1 + (%d) / (%d) + (%d)) = (%d) * 5 = (%d)", 13, 0
+	equationVariablesForEven DB "For a = (%d), b = (%d) and c = (%d) We have (21 - (%d) * (%d) / 4) / (1 + (%d) / (%d) + (%d)) = (%d) / 2 = (%d)", 13, 0
 
 ; Code Segment
 .code
@@ -347,11 +363,6 @@ WndMainProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 		
 		;; start macros with ints from arrays
 		DoArithmeticOperations IntegersA[edi], IntegersB[edi], IntegersC[edi]
-		
-		; (21 - a * c / 4) / (1 + c / a + b)
-		;; parsing variables into TempPlaceForText
-		invoke wsprintf, addr TempPlaceForText, addr equationVariables, 
-        intA, intB, intC, intA, intC, intC, intA, intB, intAlmostFinal
 		
 
 		
