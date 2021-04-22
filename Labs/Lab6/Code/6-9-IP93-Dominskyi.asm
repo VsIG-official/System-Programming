@@ -36,7 +36,7 @@ DoArithmeticOperations macro aInt, bInt, cInt
 	; Label for ending macros
 	Local EndThisMacros
 	
-	; My equation = (21 - a * c / 4) / (1 + c / a + b)
+	; My equation = (2 * c - d / 23) / (ln( b - a / 4))
 	
 	; check, if numerator aInt != 0
 	.if aInt == 0
@@ -45,109 +45,59 @@ DoArithmeticOperations macro aInt, bInt, cInt
 		jmp EndThisMacros
 	.else
 		
-		; (1 + c / a + b)
-		; move cInt into al register
-		mov al, cInt
-		; Convert byte to word
-		cbw
-		; cInt / aInt
-		idiv aInt
-		; 1 + cInt / aInt 
-		add al,1 
-		; 1 + cInt / aInt + bInt
-		add al, bInt
-		; move (1 + cInt / aInt + bInt) into buffer TempPlaceForText
+		finit ; ініціювання співпроцесора
 		
-		; check, if numerator al ((1 + c / a + b)) != 0
-		.if al == 0
-			;; parsing variables into TempPlaceForText
-			invoke wsprintf, addr TempPlaceForText, addr ZeroDivisionText
-			jmp EndThisMacros
-		.endif
-		
-		mov TempPlaceForText, al
-	
-		; (21 - a * c / 4)
-		; move aInt into al register
-		mov al, aInt
-		; Convert byte to word
-		cbw
-		; aInt * cInt
-		imul cInt
-		; move 4 into bl
-		mov bl, 4
-		; aInt * cInt / 4
-		idiv bl
-		; move 21 into bl
-		mov bl, 21
-		; 21 - (aInt * cInt / 4)
-		sub bl, al
-		; Convert byte to word
-		cbw
-		; move bl into al
-		mov al,bl
-		; Convert byte to word
-		cbw
-	
-		; (21 - a * c / 4) / (1 + c / a + b)
-		idiv TempPlaceForText
-		; Convert byte to word
-		cbw
-	
-		; Copies the contents of the source operand (register or memory location)
-		; to the destination operand (register) and sign extends the value to 16 or 32 bits
-		movsx eax,  al
-		; move eax into intFinal
-		mov intAlmostFinal, eax
-		
-		; Computes the bit-wise logical AND of first operand
-		; (source 1 operand) and the second operand (source 2 operand)
-		; and sets the SF, ZF, and PF status flags according to the result.
-		; The result is then discarded.
-		test al, al
-		; Status of parity flag
-		; if odd, then multiply
-		.if parity?
-			;; move 5 into bl
-			mov bl, 5
-			;; Convert byte to word
-			cbw
-			;; al * 5
-			imul bl
-			;; Convert byte to word
-			cbw
-		
-			; Copies the contents of the source operand (register or memory location)
-			; to the destination operand (register) and sign extends the value to 16 or 32 bits
-			movsx eax,  al
-			; move eax into intFinal
-			mov intFinal, eax
-		
-			;; parsing variables into TempPlaceForText
-			invoke wsprintf, addr TempPlaceForText, addr equationVariablesForOdd, 
-			intA, intB, intC, intA, intC, intC, intA, intB, intAlmostFinal, intFinal
-		; if even, then divide
-		.else
-			;; move 2 into bl
-			mov bl, 2
-			;; Convert byte to word
-			cbw
-			; al / 2
-			idiv bl
-			;; Convert byte to word
-			cbw
-		
-			; Copies the contents of the source operand (register or memory location)
-			; to the destination operand (register) and sign extends the value to 16 or 32 bits
-			movsx eax,  al
-			; move eax into intFinal
-			mov intFinal, eax
+		fld constants[0] ; st(0) = 2
+		fld c_num		 ; st(0) = c, st(1) = 2
+		fmul 			 ; st(0) = st(1) * st(0)
 
-			;; parsing variables into TempPlaceForText
-			invoke wsprintf, addr TempPlaceForText, addr equationVariablesForEven, 
-			intA, intB, intC, intA, intC, intC, intA, intB, intAlmostFinal, intFinal
-		.endif
+		; 2*c
+		; ^ works
+		
+		fld d_num ; st(0) = d, st(1) = 2*c
+		fld constants[8] ; st(0) = 23, st(1) = d, st(2) = 2*c
+
+		fdiv ; st(0) = st(1)/st(0) = d/23, st(1) = 2*c
+		
+		; d/23
+		; ^ works
+		
+		fsub ; st(0) = st(1) - st(0) = 2*c - d/23
+		
+		; 2*c-d/23
+		; ^ works
+		
+		fld b_num ; st(0) = b, st(1) = 2*c-d/23
+		
+		fld a_num ; st(0) = a, st(1) = b, st(2) = 2*c-d/23
+		fld constants[16] ; st(0) = 4, st(1) = a, st(2) = b, st(3) = 2*c-d/23
+		
+		fdiv ; st(0) = st(1)/st(0) = a/4, st(1) = b, st(2) = 2*c-d/23
+		
+		; a/4
+		; ^ works
+		
+		fsub ; st(0) = st(1) - st(0) = b - a/4, st(1) = 2*c-d/23
+		
+		; b-a/4
+		; ^ works
+		
+		fstp res
+		
+	; check, if numerator al ((1 + c / a + b)) != 0
+	.if al == 0
+		;; parsing variables into TempPlaceForText
+		invoke wsprintf, addr TempPlaceForText, addr ZeroDivisionText
+		jmp EndThisMacros
 	.endif
+		
+		
+		
+		
+	;; parsing variables into TempPlaceForText
+	invoke wsprintf, addr TempPlaceForText, addr equationVariablesForEven, 
+	intA, intB, intC, intA, intC, intC, intA, intB, intAlmostFinal, intFinal
+
 	EndThisMacros:
 endm
 
