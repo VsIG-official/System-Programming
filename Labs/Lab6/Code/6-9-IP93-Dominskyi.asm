@@ -67,19 +67,32 @@ DoArithmeticOperations macro aInt, bInt, cInt
 		; 2*c-d/23
 		; ^ works
 		
-		fld b_num ; st(0) = b, st(1) = 2*c-d/23
+		fldln2 ; st(0) = ln(2), st(1) = 2*c-d/23
+		; st(0) = ln(2), st(1) =  ln(b - a/4), st(2) = 2*c-d/23
 		
-		fld a_num ; st(0) = a, st(1) = b, st(2) = 2*c-d/23
-		fld constants[16] ; st(0) = 4, st(1) = a, st(2) = b, st(3) = 2*c-d/23
+		fld b_num ; st(0) = b, st(1) = ln(2), st(2) = 2*c-d/23
 		
-		fdiv ; st(0) = st(1)/st(0) = a/4, st(1) = b, st(2) = 2*c-d/23
+		fld a_num ; st(0) = a, st(1) = b, st(2) = ln(2), st(3) = 2*c-d/23
+		fld constants[16] ; st(0) = 4, st(1) = a, st(2) = b, st(3) = ln(2), st(4) = 2*c-d/23
+		
+		fdiv ; st(0) = st(1)/st(0) = a/4, st(1) = b, st(2) = ln(2), st(3) = 2*c-d/23
 		
 		; a/4
 		; ^ works
 		
-		fsub ; st(0) = st(1) - st(0) = b - a/4, st(1) = 2*c-d/23
+		fsub ; st(0) = st(1) - st(0) = b - a/4, st(1) = ln(2), st(2) = 2*c-d/23
+		
+		; ln(b-a/4)
+		; ^ works
+		
+		fyl2x ; st(0) = st(1)(st(0)) = ln(b - a/4), st(1) = 2*c-d/23
 		
 		; b-a/4
+		; ^ works
+		
+		fdiv ; st(0) = st(1)/st(0) = (2*c-d/23)/(ln(b-a/4))
+		
+		; (2*c-d/23)/(ln(b-a/4))
 		; ^ works
 		
 		fstp res
