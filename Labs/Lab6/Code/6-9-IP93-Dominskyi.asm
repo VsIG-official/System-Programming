@@ -82,12 +82,12 @@ DoArithmeticOperations macro aInt, bInt, cInt
 		
 		fsub ; st(0) = st(1) - st(0) = b - a/4, st(1) = ln(2), st(2) = 2*c-d/23
 		
-		; ln(b-a/4)
+		; b-a/4
 		; ^ works
 		
 		fyl2x ; st(0) = st(1)(st(0)) = ln(b - a/4), st(1) = 2*c-d/23
 		
-		; b-a/4
+		; ln(b-a/4)
 		; ^ works
 		
 		fdiv ; st(0) = st(1)/st(0) = (2*c-d/23)/(ln(b-a/4))
