@@ -113,52 +113,53 @@ DoArithmeticOperations macro aInt, bInt, cInt
 		; Status of parity flag
 		; if odd, then multiply
 		sar al, 1
-		jg IfNumberIsOdd
+		jb IfNumberIsOdd
 		
-		IfNumberIsOdd:
-			;; move 5 into bl
-			mov bl, 5
-			;; Convert byte to word
-			cbw
-			;; al * 5
-			imul bl
-			;; Convert byte to word
-			cbw
-			
-			; Copies the contents of the source operand (register or memory location)
-			; to the destination operand (register) and sign extends the value to 16 or 32 bits
-			movsx eax,  al
-			; move eax into intFinal
-			mov intFinal, eax
-		
-			;; parsing variables into TempPlaceForText
-			invoke wsprintf, addr TempPlaceForText, addr equationVariablesForOdd, 
-			intA, intB, intC, intA, intC, intC, intA, intB, intAlmostFinal, intFinal
-			
-			jmp EndThisMacros
-
 		IfNumberIsEven:
 			;; move 2 into bl
-			mov bl, 2
+			;mov bl, 2
 			;; Convert byte to word
-			cbw
+			;cbw
 			; al / 2
-			idiv bl
+			;idiv bl
 			;; Convert byte to word
-			cbw
+			;cbw
 		
 			; Copies the contents of the source operand (register or memory location)
 			; to the destination operand (register) and sign extends the value to 16 or 32 bits
-			movsx eax,  al
+			;movsx eax,  al
 			; move eax into intFinal
-			mov intFinal, eax
+			;mov intFinal, eax
 
 			;; parsing variables into TempPlaceForText
 			invoke wsprintf, addr TempPlaceForText, addr equationVariablesForEven, 
 			intA, intB, intC, intA, intC, intC, intA, intB, intAlmostFinal, intFinal
 			
 			jmp EndThisMacros
+		
+		IfNumberIsOdd:
+			;; move 5 into bl
+			;mov bl, 5
+			;; Convert byte to word
+			;cbw
+			;; al * 5
+			;imul bl
+			;; Convert byte to word
+			;cbw
 			
+			; Copies the contents of the source operand (register or memory location)
+			; to the destination operand (register) and sign extends the value to 16 or 32 bits
+			;movsx eax,  al
+			; move eax into intFinal
+			;mov intFinal, eax
+		
+			;; parsing variables into TempPlaceForText
+			invoke wsprintf, addr TempPlaceForText, addr equationVariablesForOdd, 
+			intA, intB, intC, intA, intC, intC, intA, intB, intAlmostFinal, intFinal
+			
+			jmp EndThisMacros
+		
+	.endif
 	EndThisMacros:
 endm
 
@@ -190,14 +191,14 @@ endm
 	
 	; can't be 1 or 0
 	; first way of declaring array
-	IntegersA DB 2, 6 , 4, -2, 10 ;; first numbers
-	IntegersB DB -33, -2, -7, 8, -3 ;; second numbers
+	IntegersA DB -2, 6 , 4, 6, 10 ;; first numbers
+	IntegersB DB 2, -2, -7, -8, -3 ;; second numbers
 	
 	; and the second one
-	IntegersC 	DB 66 ;; third numbers
+	IntegersC 	DB -6 ;; third numbers
 				DB 24
 				DB 12
-				DB -2
+				DB 24
 				DB 10
 	
 	;; global variables for interpolating for main window
