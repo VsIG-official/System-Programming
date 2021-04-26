@@ -35,6 +35,10 @@ endm
 DoArithmeticOperations macro aInt, bInt, cInt
 	; Label for ending macros
 	Local EndThisMacros
+	; Label for odd numbers (5,7)
+	local IfNumberIsOdd
+	; Label for even numbers(4,6)
+    local IfNumberIsEven
 	
 	; My equation = (21 - a * c / 4) / (1 + c / a + b)
 	
@@ -105,9 +109,13 @@ DoArithmeticOperations macro aInt, bInt, cInt
 		; and sets the SF, ZF, and PF status flags according to the result.
 		; The result is then discarded.
 		test al, al
+		
 		; Status of parity flag
 		; if odd, then multiply
-		.if parity?
+		sar al, 1
+		jg IfNumberIsOdd
+		
+		IfNumberIsOdd:
 			;; move 5 into bl
 			mov bl, 5
 			;; Convert byte to word
@@ -116,7 +124,7 @@ DoArithmeticOperations macro aInt, bInt, cInt
 			imul bl
 			;; Convert byte to word
 			cbw
-		
+			
 			; Copies the contents of the source operand (register or memory location)
 			; to the destination operand (register) and sign extends the value to 16 or 32 bits
 			movsx eax,  al
@@ -126,8 +134,10 @@ DoArithmeticOperations macro aInt, bInt, cInt
 			;; parsing variables into TempPlaceForText
 			invoke wsprintf, addr TempPlaceForText, addr equationVariablesForOdd, 
 			intA, intB, intC, intA, intC, intC, intA, intB, intAlmostFinal, intFinal
-		; if even, then divide
-		.else
+			
+			jmp EndThisMacros
+
+		IfNumberIsEven:
 			;; move 2 into bl
 			mov bl, 2
 			;; Convert byte to word
@@ -146,8 +156,9 @@ DoArithmeticOperations macro aInt, bInt, cInt
 			;; parsing variables into TempPlaceForText
 			invoke wsprintf, addr TempPlaceForText, addr equationVariablesForEven, 
 			intA, intB, intC, intA, intC, intC, intA, intB, intAlmostFinal, intFinal
-		.endif
-	.endif
+			
+			jmp EndThisMacros
+			
 	EndThisMacros:
 endm
 
@@ -179,13 +190,13 @@ endm
 	
 	; can't be 1 or 0
 	; first way of declaring array
-	IntegersA DB 2, 8 , -6, -2, 10 ;; first numbers
-	IntegersB DB -33, 23, -2, 8, -3 ;; second numbers
+	IntegersA DB 2, 6 , 4, -2, 10 ;; first numbers
+	IntegersB DB -33, -2, -7, 8, -3 ;; second numbers
 	
 	; and the second one
 	IntegersC 	DB 66 ;; third numbers
 				DB 24
-				DB -12
+				DB 12
 				DB -2
 				DB 10
 	
