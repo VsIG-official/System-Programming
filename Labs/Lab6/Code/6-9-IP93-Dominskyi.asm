@@ -32,84 +32,69 @@ PrintInformationInWindow macro heightPosition, infoToShow
 endm
 
 ; Macros #2 for calculating
-DoArithmeticOperations macro aInt, bInt, cInt
+DoArithmeticOperations macro aInt, bInt, cInt, dInt
 	; Label for ending macros
 	Local EndThisMacros
 	
 	; My equation = (2 * c - d / 23) / (ln( b - a / 4))
 	
-	; check, if numerator aInt != 0
-	.if aInt == 0
-		;; parsing variables into TempPlaceForText
-		invoke wsprintf, addr TempPlaceForText, addr ZeroDivisionText
-		jmp EndThisMacros
-	.else
-		
-		finit ; ініціювання співпроцесора
-		
-		fld constants[0] ; st(0) = 2
-		fld c_num		 ; st(0) = c, st(1) = 2
-		fmul 			 ; st(0) = st(1) * st(0)
+	finit ; ініціювання співпроцесора
+	
+	fld numbersInEquation[0] ; st(0) = 2
+	fld cInt		 ; st(0) = c, st(1) = 2
+	fmul 			 ; st(0) = st(1) * st(0)
 
-		; 2*c
-		; ^ works
-		
-		fld d_num ; st(0) = d, st(1) = 2*c
-		fld constants[8] ; st(0) = 23, st(1) = d, st(2) = 2*c
+	; 2*c
+	; ^ works
+	
+	fld dInt ; st(0) = d, st(1) = 2*c
+	fld numbersInEquation[8] ; st(0) = 23, st(1) = d, st(2) = 2*c
 
-		fdiv ; st(0) = st(1)/st(0) = d/23, st(1) = 2*c
-		
-		; d/23
-		; ^ works
-		
-		fsub ; st(0) = st(1) - st(0) = 2*c - d/23
-		
-		; 2*c-d/23
-		; ^ works
-		
-		fldln2 ; st(0) = ln(2), st(1) = 2*c-d/23
-		; st(0) = ln(2), st(1) =  ln(b - a/4), st(2) = 2*c-d/23
-		
-		fld b_num ; st(0) = b, st(1) = ln(2), st(2) = 2*c-d/23
-		
-		fld a_num ; st(0) = a, st(1) = b, st(2) = ln(2), st(3) = 2*c-d/23
-		fld constants[16] ; st(0) = 4, st(1) = a, st(2) = b, st(3) = ln(2), st(4) = 2*c-d/23
-		
-		fdiv ; st(0) = st(1)/st(0) = a/4, st(1) = b, st(2) = ln(2), st(3) = 2*c-d/23
-		
-		; a/4
-		; ^ works
-		
-		fsub ; st(0) = st(1) - st(0) = b - a/4, st(1) = ln(2), st(2) = 2*c-d/23
-		
-		; b-a/4
-		; ^ works
-		
-		fyl2x ; st(0) = st(1)(st(0)) = ln(b - a/4), st(1) = 2*c-d/23
-		
-		; ln(b-a/4)
-		; ^ works
-		
-		fdiv ; st(0) = st(1)/st(0) = (2*c-d/23)/(ln(b-a/4))
-		
-		; (2*c-d/23)/(ln(b-a/4))
-		; ^ works
-		
-		fstp res
-		
-	; check, if numerator al ((1 + c / a + b)) != 0
-	.if al == 0
-		;; parsing variables into TempPlaceForText
-		invoke wsprintf, addr TempPlaceForText, addr ZeroDivisionText
-		jmp EndThisMacros
-	.endif
-		
-		
-		
-		
+	fdiv ; st(0) = st(1)/st(0) = d/23, st(1) = 2*c
+	
+	; d/23
+	; ^ work
+	
+	fsub ; st(0) = st(1) - st(0) = 2*c - d/23
+	
+	; 2*c-d/23
+	; ^ works
+	
+	fldln2 ; st(0) = ln(2), st(1) = 2*c-d/23
+	; st(0) = ln(2), st(1) =  ln(b - a/4), st(2) = 2*c-d/23
+	
+	fld bInt ; st(0) = b, st(1) = ln(2), st(2) = 2*c-d/23
+	
+	fld aInt ; st(0) = a, st(1) = b, st(2) = ln(2), st(3) = 2*c-d/23
+	fld numbersInEquation[16] ; st(0) = 4, st(1) = a, st(2) = b, st(3) = ln(2), st(4) = 2*c-d/23
+	
+	fdiv ; st(0) = st(1)/st(0) = a/4, st(1) = b, st(2) = ln(2), st(3) = 2*c-d/23
+	
+	; a/4
+	; ^ works
+	
+	fsub ; st(0) = st(1) - st(0) = b - a/4, st(1) = ln(2), st(2) = 2*c-d/23
+	
+	; b-a/4
+	; ^ works
+	
+	fyl2x ; st(0) = st(1)(st(0)) = ln(b - a/4), st(1) = 2*c-d/23
+	
+	; ln(b-a/4)
+	; ^ works
+	
+	fdiv ; st(0) = st(1)/st(0) = (2*c-d/23)/(ln(b-a/4))
+	
+	; (2*c-d/23)/(ln(b-a/4))
+	; ^ works
+	
+	fstp intFinal
+	
 	;; parsing variables into TempPlaceForText
-	invoke wsprintf, addr TempPlaceForText, addr equationVariablesForEven, 
-	intA, intB, intC, intA, intC, intC, intA, intB, intAlmostFinal, intFinal
+	invoke wsprintf, addr TempPlaceForText, addr equationVariables, 
+	aInt, bInt, cInt, dInt, cInt, dInt, bInt, aInt, intFinal
+	
+	;invoke _snprintf, 
 
 	EndThisMacros:
 endm
@@ -142,34 +127,36 @@ endm
 	
 	; can't be 1 or 0
 	; first way of declaring array
-	IntegersA DB 2, 8 , -6, -2, 10 ;; first numbers
-	IntegersB DB -33, 23, -2, 8, -3 ;; second numbers
+	IntegersA dq 0.3, 8 , -6, -2, 10 ;; first numbers
+	IntegersB dq 1.98, 23, -2, 8, -3 ;; second numbers
+	IntegersC dq 3.9, 23, -2, 8, -3 ;; third numbers
 	
 	; and the second one
-	IntegersC 	DB 66 ;; third numbers
-				DB 24
-				DB -12
-				DB -2
-				DB 10
+	IntegersD dq -4.1 ;; fourth numbers
+			  dq 24
+			  dq -12
+			  dq -2
+			  dq 10
+	
+	numbersInEquation   dq 2.0, 23.0, 4.0
 	
 	;; global variables for interpolating for main window
 	;; (I will put some int into them and show in main window)
 	;; mostly used for negative nums
-	intA DD 0
-	intB DD 0
-	intC DD 0
-	intAlmostFinal DD 0
-	intFinal DD 0
+	intA DQ 0
+	intB DQ 0
+	intC DQ 0
+	intD DQ 0
+	intFinal DQ 0
 	
 	; for automating 
 	possibleHeight DD 12
 	coefficientOfMultiplyingForTextHeight DD 3
 
 	; first text to show
-	variantToShow DB "My equation = (21 - a * c / 4) / (1 + c / a + b)", 13, 0
-	; forms, which I will be filling with variables
-	equationVariablesForOdd DB "For a = (%d), b = (%d) and c = (%d) We have (21 - (%d) * (%d) / 4) / (1 + (%d) / (%d) + (%d)) = (%d) * 5 = (%d)", 13, 0
-	equationVariablesForEven DB "For a = (%d), b = (%d) and c = (%d) We have (21 - (%d) * (%d) / 4) / (1 + (%d) / (%d) + (%d)) = (%d) / 2 = (%d)", 13, 0
+	variantToShow DB "My equation = (2 * c - d / 23) / (ln (b - a / 4))", 13, 0
+	; form, which I will be filling with variables
+	equationVariables DB "For a = (%.18f), b = (%.18f), c = (%.18f) and d = (%.18f) We have (2 * (%d) - (%d) / 23) / (ln( (%d) - (%d) / 4)) = (%d)", 13, 0
 
 ; Code Segment
 .code
@@ -328,23 +315,21 @@ WndMainProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 
 		;; do the loop
 		LoopItself:
-		;; mov int with sign extending from first array into eax
-		movsx eax,  IntegersA[edi]
-		;; mov eax with sign extending into global variable
-		mov intA, eax
+
+		; ;; mov int with sign extending into global variable
+		; mov intA, IntegersA[edi]
 		
-		;; mov int with sign extending from second array into eax
-		movsx eax,  IntegersB[edi]
-		;; mov eax with sign extending into global variable
-		mov intB, eax
+		; ;; mov int with sign extending into global variable
+		; mov intB, IntegersB[edi]
 		
-		;; mov int with sign extending from third array into eax
-		movsx eax,  IntegersC[edi]
-		;; mov eax with sign extending into global variable
-		mov intC, eax
+		; ;; mov int with sign extending into global variable
+		; mov intC, IntegersC[edi]
+		
+		; ;; mov int with sign extending into global variable
+		; mov intD, IntegersD[edi]
 		
 		;; start macros with ints from arrays
-		DoArithmeticOperations IntegersA[edi], IntegersB[edi], IntegersC[edi]
+		DoArithmeticOperations IntegersA[edi], IntegersB[edi], IntegersC[edi], IntegersD[edi]
 		
 		; mov possibleHeight into eax
 		mov eax, possibleHeight
