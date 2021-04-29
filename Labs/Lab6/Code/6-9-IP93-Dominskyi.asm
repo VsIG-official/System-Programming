@@ -6,15 +6,18 @@ option CaseMap:None
 WinWarningProto proto :dword,:dword,:dword
 WinMainProto proto :dword,:dword,:dword
 
-; Libraries And Macroses
-includelib \masm32\lib\user32.lib
-includelib \masm32\lib\kernel32.lib
+; ; Libraries And Macroses
+; includelib \masm32\lib\user32.lib
+; includelib \masm32\lib\kernel32.lib
 	
-include \masm32\include\windows.inc
-include \masm32\include\user32.inc
-include \masm32\include\kernel32.inc
-; For FloatToStr and FloatToStr2
-include \masm32\macros\macros.asm
+; include \masm32\include\windows.inc
+; include \masm32\include\user32.inc
+; include \masm32\include\kernel32.inc
+; ; For FloatToStr and FloatToStr2
+; include \masm32\macros\macros.asm
+
+; Libraries And Macroses
+include /masm32/include/masm32rt.inc
 
 ; Our Macroses
 ; We place them here, 'cause it won't degrade the readability of the code
@@ -92,9 +95,17 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	
 	fstp intFinal
 	
+	invoke FloatToStr2, aFloat, addr BufferFloatA
+	invoke FloatToStr2, bFloat, addr BufferFloatB
+	invoke FloatToStr2, cFloat, addr BufferFloatC
+	invoke FloatToStr2, dFloat, addr BufferFloatD
+	invoke FloatToStr2, intFinal, addr BufferFloatFinal
+	
 	;; parsing variables into TempPlaceForText
 	invoke wsprintf, addr TempPlaceForText, addr equationVariables, 
-	aFloat, bFloat, cFloat, dFloat, cFloat, dFloat, bFloat, aFloat, intFinal
+	addr BufferFloatA, addr BufferFloatB, addr BufferFloatC, addr BufferFloatD,
+	addr BufferFloatC, addr BufferFloatD, addr BufferFloatB, addr BufferFloatA,
+	addr BufferFloatFinal
 
 	EndThisMacros:
 endm
@@ -118,7 +129,7 @@ endm
 .data
 	StartingText DB "У наступному вікні Ви побачите 5 різних арифметичних виразів", 13, 0
 	ZeroDivisionText DB "Даний вираз має ділення на нуль. Перевірте Свої значення", 13, 0
-	DivisionText DB "Даний вираз має ділення на нуль. Перевірте Свої значення", 13, 0
+	NegativeLnText DB "Даний вираз має негативне число в (ln). Перевірте Свої значення", 13, 0
 	
 	; Name Of Message Box
 	MsgBoxName  DB "6-9-IP93-Dominskyi", 0
@@ -155,7 +166,7 @@ endm
 	;intB DQ 0
 	;intC DQ 0
 	;intD DQ 0
-	;intFinal DQ 0
+	intFinal DQ 0
 	
 	; for automating 
 	possibleHeight DD 12
@@ -325,7 +336,7 @@ WndMainProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 		LoopItself:
 
 		; ;; mov int with sign extending into global variable
-		FloatToStr2 BufferFloatA, FloatsA[edi]
+		;FloatToStr2 BufferFloatA, FloatsA[edi]
 		
 		; ;; mov int with sign extending into global variable
 		; mov intB, FloatsB[edi]
@@ -337,7 +348,7 @@ WndMainProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 		; mov intD, FloatsD[edi]
 		
 		;; start macros with ints from arrays
-		DoArithmeticOperations FloatsA[edi], FloatsB[edi], FloatsC[edi], FloatsD[edi]
+		DoArithmeticOperations FloatsA[edi*8], FloatsB[edi*8], FloatsC[edi*8], FloatsD[edi*8]
 		
 		; mov possibleHeight into eax
 		mov eax, possibleHeight
