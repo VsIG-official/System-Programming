@@ -7,12 +7,14 @@ WinWarningProto proto :dword,:dword,:dword
 WinMainProto proto :dword,:dword,:dword
 
 ; Libraries And Macroses
-    includelib \masm32\lib\user32.lib
-    includelib \masm32\lib\kernel32.lib
+includelib \masm32\lib\user32.lib
+includelib \masm32\lib\kernel32.lib
 	
-    include \masm32\include\windows.inc
-    include \masm32\include\user32.inc
-    include \masm32\include\kernel32.inc
+include \masm32\include\windows.inc
+include \masm32\include\user32.inc
+include \masm32\include\kernel32.inc
+; For FloatToStr and FloatToStr2
+include \masm32\macros\macros.asm
 
 ; Our Macroses
 ; We place them here, 'cause it won't degrade the readability of the code
@@ -32,22 +34,22 @@ PrintInformationInWindow macro heightPosition, infoToShow
 endm
 
 ; Macros #2 for calculating
-DoArithmeticOperations macro aInt, bInt, cInt, dInt
+DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	; Label for ending macros
 	Local EndThisMacros
 	
 	; My equation = (2 * c - d / 23) / (ln( b - a / 4))
 	
-	finit ; ініціювання співпроцесора
+	finit ; FPU Initialization
 	
 	fld numbersInEquation[0] ; st(0) = 2
-	fld cInt		 ; st(0) = c, st(1) = 2
+	fld cFloat		 ; st(0) = c, st(1) = 2
 	fmul 			 ; st(0) = st(1) * st(0)
 
 	; 2*c
 	; ^ works
 	
-	fld dInt ; st(0) = d, st(1) = 2*c
+	fld dFloat ; st(0) = d, st(1) = 2*c
 	fld numbersInEquation[8] ; st(0) = 23, st(1) = d, st(2) = 2*c
 
 	fdiv ; st(0) = st(1)/st(0) = d/23, st(1) = 2*c
@@ -63,9 +65,9 @@ DoArithmeticOperations macro aInt, bInt, cInt, dInt
 	fldln2 ; st(0) = ln(2), st(1) = 2*c-d/23
 	; st(0) = ln(2), st(1) =  ln(b - a/4), st(2) = 2*c-d/23
 	
-	fld bInt ; st(0) = b, st(1) = ln(2), st(2) = 2*c-d/23
+	fld bFloat ; st(0) = b, st(1) = ln(2), st(2) = 2*c-d/23
 	
-	fld aInt ; st(0) = a, st(1) = b, st(2) = ln(2), st(3) = 2*c-d/23
+	fld aFloat ; st(0) = a, st(1) = b, st(2) = ln(2), st(3) = 2*c-d/23
 	fld numbersInEquation[16] ; st(0) = 4, st(1) = a, st(2) = b, st(3) = ln(2), st(4) = 2*c-d/23
 	
 	fdiv ; st(0) = st(1)/st(0) = a/4, st(1) = b, st(2) = ln(2), st(3) = 2*c-d/23
@@ -85,16 +87,14 @@ DoArithmeticOperations macro aInt, bInt, cInt, dInt
 	
 	fdiv ; st(0) = st(1)/st(0) = (2*c-d/23)/(ln(b-a/4))
 	
-	; (2*c-d/23)/(ln(b-a/4))
+	; (2 * c - d / 23) / (ln( b - a / 4))
 	; ^ works
 	
 	fstp intFinal
 	
 	;; parsing variables into TempPlaceForText
 	invoke wsprintf, addr TempPlaceForText, addr equationVariables, 
-	aInt, bInt, cInt, dInt, cInt, dInt, bInt, aInt, intFinal
-	
-	;invoke _snprintf, 
+	aFloat, bFloat, cFloat, dFloat, cFloat, dFloat, bFloat, aFloat, intFinal
 
 	EndThisMacros:
 endm
@@ -107,13 +107,21 @@ endm
 	;; Text, that We will show
 	TempPlaceForText DB 256 DUP(?)
 	
+	; Buffers for float numbers
+	BufferFloatA DB 32 DUP(?)
+	BufferFloatB DB 32 DUP(?)
+	BufferFloatC DB 32 DUP(?)
+	BufferFloatD DB 32 DUP(?)
+	BufferFloatFinal DB 32 DUP(?)
+
 ; Data Segment
 .data
 	StartingText DB "У наступному вікні Ви побачите 5 різних арифметичних виразів", 13, 0
 	ZeroDivisionText DB "Даний вираз має ділення на нуль. Перевірте Свої значення", 13, 0
+	DivisionText DB "Даний вираз має ділення на нуль. Перевірте Свої значення", 13, 0
 	
 	; Name Of Message Box
-	MsgBoxName  DB "5-9-IP93-Dominskyi", 0
+	MsgBoxName  DB "6-9-IP93-Dominskyi", 0
 
 	NameOfTheWarnWindows DB "Window with warn text", 0 ; the name of our warn window class
 	NameOfMainWindows DB "Window with main text", 0 ; the name of our success window class
@@ -123,16 +131,16 @@ endm
 	
 	TextForOKButton DB "ОК", 0
 	
-	; My equation = (21 - a * c / 4) / (1 + c / a + b)
+	; My equation = (2 * c - d / 23) / (ln( b - a / 4))
 	
 	; can't be 1 or 0
 	; first way of declaring array
-	IntegersA dq 0.3, 8 , -6, -2, 10 ;; first numbers
-	IntegersB dq 1.98, 23, -2, 8, -3 ;; second numbers
-	IntegersC dq 3.9, 23, -2, 8, -3 ;; third numbers
+	FloatsA dq 0.3, 8 , -6, -2, 10 ;; first numbers
+	FloatsB dq 1.98, 23, -2, 8, -3 ;; second numbers
+	FloatsC dq 3.9, 23, -2, 8, -3 ;; third numbers
 	
 	; and the second one
-	IntegersD dq -4.1 ;; fourth numbers
+	FloatsD dq -4.1 ;; fourth numbers
 			  dq 24
 			  dq -12
 			  dq -2
@@ -143,11 +151,11 @@ endm
 	;; global variables for interpolating for main window
 	;; (I will put some int into them and show in main window)
 	;; mostly used for negative nums
-	intA DQ 0
-	intB DQ 0
-	intC DQ 0
-	intD DQ 0
-	intFinal DQ 0
+	;intA DQ 0
+	;intB DQ 0
+	;intC DQ 0
+	;intD DQ 0
+	;intFinal DQ 0
 	
 	; for automating 
 	possibleHeight DD 12
@@ -156,7 +164,7 @@ endm
 	; first text to show
 	variantToShow DB "My equation = (2 * c - d / 23) / (ln (b - a / 4))", 13, 0
 	; form, which I will be filling with variables
-	equationVariables DB "For a = (%.18f), b = (%.18f), c = (%.18f) and d = (%.18f) We have (2 * (%d) - (%d) / 23) / (ln( (%d) - (%d) / 4)) = (%d)", 13, 0
+	equationVariables DB "For a = (%s), b = (%s), c = (%s) and d = (%s) We have (2 * (%s) - (%s) / 23) / (ln( (%s) - (%s) / 4)) = (%s)", 13, 0
 
 ; Code Segment
 .code
@@ -317,19 +325,19 @@ WndMainProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 		LoopItself:
 
 		; ;; mov int with sign extending into global variable
-		; mov intA, IntegersA[edi]
+		FloatToStr2 BufferFloatA, FloatsA[edi]
 		
 		; ;; mov int with sign extending into global variable
-		; mov intB, IntegersB[edi]
+		; mov intB, FloatsB[edi]
 		
 		; ;; mov int with sign extending into global variable
-		; mov intC, IntegersC[edi]
+		; mov intC, FloatsC[edi]
 		
 		; ;; mov int with sign extending into global variable
-		; mov intD, IntegersD[edi]
+		; mov intD, FloatsD[edi]
 		
 		;; start macros with ints from arrays
-		DoArithmeticOperations IntegersA[edi], IntegersB[edi], IntegersC[edi], IntegersD[edi]
+		DoArithmeticOperations FloatsA[edi], FloatsB[edi], FloatsC[edi], FloatsD[edi]
 		
 		; mov possibleHeight into eax
 		mov eax, possibleHeight
