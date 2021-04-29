@@ -93,19 +93,7 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	; (2 * c - d / 23) / (ln( b - a / 4))
 	; ^ works
 	
-	fstp intFinal
-	
-	invoke FloatToStr2, aFloat, addr BufferFloatA
-	invoke FloatToStr2, bFloat, addr BufferFloatB
-	invoke FloatToStr2, cFloat, addr BufferFloatC
-	invoke FloatToStr2, dFloat, addr BufferFloatD
-	invoke FloatToStr2, intFinal, addr BufferFloatFinal
-	
-	;; parsing variables into TempPlaceForText
-	invoke wsprintf, addr TempPlaceForText, addr equationVariables, 
-	addr BufferFloatA, addr BufferFloatB, addr BufferFloatC, addr BufferFloatD,
-	addr BufferFloatC, addr BufferFloatD, addr BufferFloatB, addr BufferFloatA,
-	addr BufferFloatFinal
+	fstp floatFinal
 
 	EndThisMacros:
 endm
@@ -146,16 +134,16 @@ endm
 	
 	; can't be 1 or 0
 	; first way of declaring array
-	FloatsA dq 0.3, 8 , -6, -2, 10 ;; first numbers
-	FloatsB dq 1.98, 23, -2, 8, -3 ;; second numbers
-	FloatsC dq 3.9, 23, -2, 8, -3 ;; third numbers
+	FloatsA dq 0.3, 8.0, -6.0, -2.0, 10.0 ;; first numbers
+	FloatsB dq 1.98, 23.0, -2.0, 8.0, -3.0 ;; second numbers
+	FloatsC dq 3.9, 23.0, -2.0, 8.0, -3.0 ;; third numbers
 	
 	; and the second one
 	FloatsD dq -4.1 ;; fourth numbers
-			  dq 24
-			  dq -12
-			  dq -2
-			  dq 10
+			  dq 24.0
+			  dq -12.0
+			  dq -2.0
+			  dq 10.0
 	
 	numbersInEquation   dq 2.0, 23.0, 4.0
 	
@@ -166,7 +154,7 @@ endm
 	;intB DQ 0
 	;intC DQ 0
 	;intD DQ 0
-	intFinal DQ 0
+	floatFinal DQ 0
 	
 	; for automating 
 	possibleHeight DD 12
@@ -347,8 +335,20 @@ WndMainProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 		; ;; mov int with sign extending into global variable
 		; mov intD, FloatsD[edi]
 		
-		;; start macros with ints from arrays
+		;; start macros with floats from arrays
 		DoArithmeticOperations FloatsA[edi*8], FloatsB[edi*8], FloatsC[edi*8], FloatsD[edi*8]
+		
+	invoke FloatToStr2, FloatsA[edi*8], addr BufferFloatA
+	invoke FloatToStr2, FloatsB[edi*8], addr BufferFloatB
+	invoke FloatToStr2, FloatsC[edi*8], addr BufferFloatC
+	invoke FloatToStr2, FloatsD[edi*8], addr BufferFloatD
+	invoke FloatToStr2, floatFinal, addr BufferFloatFinal
+	
+	;; parsing variables into TempPlaceForText
+	invoke wsprintf, addr TempPlaceForText, addr equationVariables, 
+	addr BufferFloatA, addr BufferFloatB, addr BufferFloatC, addr BufferFloatD,
+	addr BufferFloatC, addr BufferFloatD, addr BufferFloatB, addr BufferFloatA,
+	addr BufferFloatFinal
 		
 		; mov possibleHeight into eax
 		mov eax, possibleHeight
