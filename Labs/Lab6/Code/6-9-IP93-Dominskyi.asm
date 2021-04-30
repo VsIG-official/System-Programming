@@ -198,8 +198,8 @@ endm
 	
 	; can't be 1 or 0
 	; first way of declaring array
-	FloatsA dq 0.3, 4.0, -6.0, -2.0, 10.0 ;; first numbers
-	FloatsB dq 1.98, 2.0, -2.0, 8.0, -3.0 ;; second numbers
+	FloatsA dq 0.3, 4.0, 6.0, -2.0, 10.0 ;; first numbers
+	FloatsB dq 1.98, 2.0, 2.0, 8.0, 3.0 ;; second numbers
 	FloatsC dq 3.9, 3.9, -2.0, 8.0, -3.0 ;; third numbers
 	
 	; and the second one
@@ -207,7 +207,7 @@ endm
 			  dq -4.1
 			  dq -12.0
 			  dq -2.0
-			  dq 10.0
+			  dq -10.0
 
 	firstConstant dq 2.0
 	secondConstant dq 23.0
