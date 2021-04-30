@@ -24,7 +24,7 @@ PrintInformationInWindow macro heightPosition, infoToShow
 	invoke CreateWindowEx,NULL,
             offset NameOfTheText, offset infoToShow,
             WS_VISIBLE or WS_CHILD or BS_TEXT or SS_CENTER  or BS_VCENTER,
-            16, heightPosition, 690, 50,
+            16, heightPosition, 890, 75,
             hWnd, 7044, hInstance, NULL
 endm
 
@@ -178,7 +178,7 @@ endm
 	BufferDdivTwenThree DB 32 DUP(?)
 	; Value of a - 4
 	BufferAdivFour DB 32 DUP(?)
-		
+
 	; Second Step
 	; Value of 2 * c - d / 23
 	BufferFirstPart DB 32 DUP(?)
@@ -234,7 +234,7 @@ endm
 	floatFinal DQ 0
 	
 	; for automating 
-	possibleHeight DD 20
+	possibleHeight DD 25
 	coefficientOfMultiplyingForTextHeight DD 3
 	valueForDQvalues DB 8
 
@@ -351,7 +351,7 @@ WinMainProto  proc hInst:HINSTANCE,hPrevInst:HINSTANCE,CmdShow:dword
                 offset NameOfMainWindows,
                 offset MsgBoxName,
                 WS_OVERLAPPEDWINDOW or DS_CENTER,
-                250, 100, 740, 450,
+                170, 50, 940, 550,
                 NULL, NULL, hInst, NULL
 		mov hWndOfMainWindow, eax
 
@@ -439,7 +439,7 @@ WndMainProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 		invoke CreateWindowEx,NULL,
                 offset NameOfTheButton, offset TextForOKButton,
                 WS_VISIBLE or WS_CHILD or BS_CENTER or BS_TEXT or BS_VCENTER,
-                295, 355, 150, 30,
+                395, 465, 150, 30,
                 hWnd, 7033, hInstance, NULL
 
 	.ELSEIF ourMSG==WM_COMMAND
