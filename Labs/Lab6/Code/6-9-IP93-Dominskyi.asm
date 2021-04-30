@@ -106,12 +106,34 @@ endm
 	;; Text, that We will show
 	TempPlaceForText DB 256 DUP(?)
 	
-	; Buffers for float numbers
+	; Buffers for final float numbers
 	BufferFloatA DB 32 DUP(?)
 	BufferFloatB DB 32 DUP(?)
 	BufferFloatC DB 32 DUP(?)
 	BufferFloatD DB 32 DUP(?)
 	BufferFloatFinal DB 32 DUP(?)
+	
+	; Start = (2 * c - d / 23) / (ln(b - a / 4))
+	
+	; Values for intermediate results
+	
+	; First Step
+	; Value of 2 * c
+	BufferIntermediateValueTwoMulC DB 32 DUP(?)
+	; Value of d / 23
+	BufferIntermediateValueDdivTwenThree DB 32 DUP(?)
+	; Value of a - 4
+	BufferIntermediateValueAsubFour DB 32 DUP(?)
+		
+	; Second Step
+	; Value of 2 * c - d / 23
+	BufferIntermediateValueFirstPart DB 32 DUP(?)
+	; Value of b - a / 4
+	BufferIntermediateValueBsubPartOfLn DB 32 DUP(?)
+	
+	; Third Step
+	; Value of ln(b - a / 4)
+	BufferIntermediateValueSecondPart DB 32 DUP(?)
 
 ; Data Segment
 .data
@@ -150,11 +172,27 @@ endm
 	;; global variables for interpolating for main window
 	;; (I will put some int into them and show in main window)
 	;; mostly used for negative nums
-	;intA DQ 0
-	;intB DQ 0
-	;intC DQ 0
-	;intD DQ 0
 	floatFinal DQ 0
+	
+	; Temp DT values for parsing them into string
+	
+	; First step
+	; Value of 2 * c
+	TwoMulC DT 0
+	; Value of d / 23
+	DdivTwenThree DT 0
+	; Value of a - 4
+	AsubFour DT 0
+	
+	; Second step
+	; Value of 2 * c - d / 23
+	FirstPart DT 0
+	; Value of b - a / 4
+	BsubPartOfLn DT 0
+	
+	; Third Step
+	; Value of ln(b - a / 4)
+	SecondPart DT 0
 	
 	; for automating 
 	possibleHeight DD 12
@@ -163,7 +201,7 @@ endm
 	; first text to show
 	variantToShow DB "My equation = (2 * c - d / 23) / (ln (b - a / 4))", 13, 0
 	; form, which I will be filling with variables
-	equationVariables DB "For a = (%s), b = (%s), c = (%s) and d = (%s) We have (2 * (%s) - (%s) / 23) / (ln( (%s) - (%s) / 4)) = (%s)", 13, 0
+	equationVariables DB "For a = (%s), b = (%s), c = (%s) and d = (%s) We have (2 * (%s) - (%s) / 23) / (ln( (%s) - (%s) / 4)) = ((%s) - (%s)) / (ln( (%s) - (%s))) = (%s) / (ln((%s))) = (%s) / (%s) = (%s)", 13, 0
 
 ; Code Segment
 .code
