@@ -32,6 +32,10 @@ endm
 DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	; Label for ending macros
 	Local EndThisMacros
+	; Label for checking, if numerator is zero (for zero division)
+	Local NumberIsZero
+	; Label for checking, if numerator is zero or less than it (for ln function)
+	Local NumberIsLessOrZero
 	
 	; My equation = (2 * c - d / 23) / (ln(b - a / 4))
 	
@@ -92,7 +96,21 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	; ln(b-a/4)
 	; ^ works
 	
-	;fcom 0.0
+	; zero comparing
+	fcom zero
+	fstsw ax
+	sahf
+	je NumberIsZero
+	
+	fcom negativeZero
+	fstsw ax
+	sahf
+	je NumberIsZero
+	
+	ftst
+	fstsw ax
+	sahf
+	je NumberIsZero
 	
 	fdiv ; st(0) = st(1)/st(0) = (2*c-d/23)/(ln(b-a/4))
 	
@@ -103,6 +121,21 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 
 	;; value for final result
 	invoke FloatToStr2, floatFinal, addr BufferFloatFinal
+	
+	;; parsing variables into TempPlaceForText
+	invoke wsprintf, addr TempPlaceForText, addr equationVariables, 
+	addr BufferFloatA, addr BufferFloatB, addr BufferFloatC, addr BufferFloatD,
+	addr BufferFloatC, addr BufferFloatD, addr BufferFloatB, addr BufferFloatA,
+	addr BufferTwoMulC, addr BufferDdivTwenThree, addr BufferFloatB,
+	addr BufferAdivFour, addr BufferFirstPart, addr BufferBsubPartOfLn,
+	addr BufferFirstPart, addr BufferSecondPart, addr BufferFloatFinal
+	
+	jmp EndThisMacros
+	
+	NumberIsZero:
+		;; parsing variables into TempPlaceForText
+		invoke wsprintf, addr TempPlaceForText, addr ZeroDivisionText
+		;jmp EndThisMacros
 
 	EndThisMacros:
 endm
@@ -165,13 +198,13 @@ endm
 	
 	; can't be 1 or 0
 	; first way of declaring array
-	FloatsA dq 0.3, 8.0, -6.0, -2.0, 10.0 ;; first numbers
-	FloatsB dq 1.98, 23.0, -2.0, 8.0, -3.0 ;; second numbers
-	FloatsC dq 3.9, 23.0, -2.0, 8.0, -3.0 ;; third numbers
+	FloatsA dq 0.3, 4.0, -6.0, -2.0, 10.0 ;; first numbers
+	FloatsB dq 1.98, 2.0, -2.0, 8.0, -3.0 ;; second numbers
+	FloatsC dq 3.9, 3.9, -2.0, 8.0, -3.0 ;; third numbers
 	
 	; and the second one
 	FloatsD dq -4.1 ;; fourth numbers
-			  dq 24.0
+			  dq -4.1
 			  dq -12.0
 			  dq -2.0
 			  dq 10.0
@@ -179,6 +212,9 @@ endm
 	firstConstant dq 2.0
 	secondConstant dq 23.0
 	thirdConstant dq 4.0
+	
+	zero dq 0.0
+	negativeZero dq -0.0
 	
 	;; global variables for interpolating for main window
 	;; (I will put some int into them and show in main window)
@@ -361,14 +397,6 @@ WndMainProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 
 		;; start macros with floats from arrays
 		DoArithmeticOperations FloatsA[8*edi], FloatsB[8*edi], FloatsC[8*edi], FloatsD[8*edi]
-	
-		;; parsing variables into TempPlaceForText
-		invoke wsprintf, addr TempPlaceForText, addr equationVariables, 
-		addr BufferFloatA, addr BufferFloatB, addr BufferFloatC, addr BufferFloatD,
-		addr BufferFloatC, addr BufferFloatD, addr BufferFloatB, addr BufferFloatA,
-		addr BufferTwoMulC, addr BufferDdivTwenThree, addr BufferFloatB,
-		addr BufferAdivFour, addr BufferFirstPart, addr BufferBsubPartOfLn,
-		addr BufferFirstPart, addr BufferSecondPart, addr BufferFloatFinal
 		
 		; mov possibleHeight into eax
 		mov eax, possibleHeight
