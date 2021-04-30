@@ -237,16 +237,16 @@ endm
 	
 	; can't be 1 or 0
 	; first way of declaring array
-	FloatsA dq 2.0, -16.0, 6.0, 0.001, 10.0 ;; first numbers
-	FloatsB dq 4.0, 23.091, -2.0, -3.33, 3.0 ;; second numbers
-	FloatsC dq -99.0, -2.111, -2.0, 123.4, -3.0 ;; third numbers
+	FloatsA dq 2.0, -16.0, -68.946, 0.001, 4.0 ;; first numbers
+	FloatsB dq 4.0, 23.091, 6.67, -3.33, 2.0 ;; second numbers
+	FloatsC dq -99.0, -2.111, -78.2, 123.4, 44.47 ;; third numbers
 	
 	; and the second one
 	FloatsD dq -15.125 ;; fourth numbers
 			  dq 0.5
-			  dq -12.0
+			  dq -22.1
 			  dq -9.0
-			  dq -10.0
+			  dq 12.2222
 
 	firstConstant dq 2.0
 	secondConstant dq 23.0
