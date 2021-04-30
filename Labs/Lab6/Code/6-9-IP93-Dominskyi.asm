@@ -89,6 +89,13 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	; b-a/4
 	; ^ works
 	
+	; zero or less comparing
+	fcom zero
+	fstsw ax
+	sahf
+	je NumberIsLessOrZero
+	jb NumberIsLessOrZero
+	
 	fyl2x ; st(0) = st(1)(st(0)) = ln(b - a/4), st(1) = 2*c-d/23
 	
 	;fstp SecondPart
@@ -135,8 +142,13 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	NumberIsZero:
 		;; parsing variables into TempPlaceForText
 		invoke wsprintf, addr TempPlaceForText, addr ZeroDivisionText
-		;jmp EndThisMacros
+		jmp EndThisMacros
 
+	NumberIsLessOrZero:
+		;; parsing variables into TempPlaceForText
+		invoke wsprintf, addr TempPlaceForText, addr NegativeOrZeroLnText
+		jmp EndThisMacros
+		
 	EndThisMacros:
 endm
 
@@ -181,7 +193,7 @@ endm
 .data
 	StartingText DB "У наступному вікні Ви побачите 5 різних арифметичних виразів", 13, 0
 	ZeroDivisionText DB "Даний вираз має ділення на нуль. Перевірте Свої значення", 13, 0
-	NegativeLnText DB "Даний вираз має негативне число або нуль в (ln). Перевірте Свої значення", 13, 0
+	NegativeOrZeroLnText DB "Даний вираз має негативне число або нуль в (ln). Перевірте Свої значення", 13, 0
 	
 	; Name Of Message Box
 	MsgBoxName  DB "6-9-IP93-Dominskyi", 0
@@ -199,7 +211,7 @@ endm
 	; can't be 1 or 0
 	; first way of declaring array
 	FloatsA dq 0.3, 4.0, 6.0, -2.0, 10.0 ;; first numbers
-	FloatsB dq 1.98, 2.0, 2.0, 8.0, 3.0 ;; second numbers
+	FloatsB dq 1.98, 2.0, -2.0, 8.0, 3.0 ;; second numbers
 	FloatsC dq 3.9, 3.9, -2.0, 8.0, -3.0 ;; third numbers
 	
 	; and the second one
