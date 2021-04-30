@@ -33,11 +33,11 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	; Label for ending macros
 	Local EndThisMacros
 	
-	; My equation = (2 * c - d / 23) / (ln( b - a / 4))
+	; My equation = (2 * c - d / 23) / (ln(b - a / 4))
 	
 	finit ; FPU Initialization
 	
-	fld numbersInEquation[0] ; st(0) = 2
+	fld firstConstant ; st(0) = 2
 	fld cFloat		 ; st(0) = c, st(1) = 2
 	fmul 			 ; st(0) = st(1) * st(0)
 
@@ -47,7 +47,7 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	; ^ works
 	
 	fld dFloat ; st(0) = d, st(1) = 2*c
-	fld numbersInEquation[8] ; st(0) = 23, st(1) = d, st(2) = 2*c
+	fld secondConstant ; st(0) = 23, st(1) = d, st(2) = 2*c
 
 	fdiv ; st(0) = st(1)/st(0) = d/23, st(1) = 2*c
 	
@@ -69,7 +69,7 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	fld bFloat ; st(0) = b, st(1) = ln(2), st(2) = 2*c-d/23
 	
 	fld aFloat ; st(0) = a, st(1) = b, st(2) = ln(2), st(3) = 2*c-d/23
-	fld numbersInEquation[16] ; st(0) = 4, st(1) = a, st(2) = b, st(3) = ln(2), st(4) = 2*c-d/23
+	fld thirdConstant ; st(0) = 4, st(1) = a, st(2) = b, st(3) = ln(2), st(4) = 2*c-d/23
 	
 	fdiv ; st(0) = st(1)/st(0) = a/4, st(1) = b, st(2) = ln(2), st(3) = 2*c-d/23
 	
@@ -92,12 +92,17 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	; ln(b-a/4)
 	; ^ works
 	
+	;fcom 0.0
+	
 	fdiv ; st(0) = st(1)/st(0) = (2*c-d/23)/(ln(b-a/4))
 	
 	; (2 * c - d / 23) / (ln( b - a / 4))
 	; ^ works
 	
 	fstp floatFinal
+
+	;; value for final result
+	invoke FloatToStr2, floatFinal, addr BufferFloatFinal
 
 	EndThisMacros:
 endm
@@ -143,7 +148,7 @@ endm
 .data
 	StartingText DB "У наступному вікні Ви побачите 5 різних арифметичних виразів", 13, 0
 	ZeroDivisionText DB "Даний вираз має ділення на нуль. Перевірте Свої значення", 13, 0
-	NegativeLnText DB "Даний вираз має негативне число в (ln). Перевірте Свої значення", 13, 0
+	NegativeLnText DB "Даний вираз має негативне число або нуль в (ln). Перевірте Свої значення", 13, 0
 	
 	; Name Of Message Box
 	MsgBoxName  DB "6-9-IP93-Dominskyi", 0
@@ -170,8 +175,10 @@ endm
 			  dq -12.0
 			  dq -2.0
 			  dq 10.0
-	
-	numbersInEquation   dq 2.0, 23.0, 4.0
+
+	firstConstant dq 2.0
+	secondConstant dq 23.0
+	thirdConstant dq 4.0
 	
 	;; global variables for interpolating for main window
 	;; (I will put some int into them and show in main window)
@@ -179,14 +186,14 @@ endm
 	floatFinal DQ 0
 	
 	; for automating 
-	possibleHeight DD 12
+	possibleHeight DD 20
 	coefficientOfMultiplyingForTextHeight DD 3
 	valueForDQvalues DB 8
 
 	; first text to show
-	variantToShow DB "My equation = (2 * c - d / 23) / (ln (b - a / 4))", 13, 0
+	variantToShow DB "My equation = (2 * c - d / 23) / (ln(b - a / 4))", 13, 0
 	; form, which I will be filling with variables
-	equationVariables DB "For a = (%s), b = (%s), c = (%s) and d = (%s) We have (2 * (%s) - (%s) / 23) / (ln( (%s) - (%s) / 4)) = ((%s) - (%s)) / (ln( (%s) - (%s))) = (%s) / (ln((%s))) = (%s) / (%s) = (%s)", 13, 0
+	equationVariables DB "For a = (%s), b = (%s), c = (%s) and d = (%s) We have (2 * (%s) - (%s) / 23) / (ln((%s) - (%s) / 4)) = ((%s) - (%s)) / (ln((%s) - (%s))) = (%s) / (ln((%s))) = (%s) / (%s) = (%s)", 13, 0
 
 ; Code Segment
 .code
@@ -296,7 +303,7 @@ WinMainProto  proc hInst:HINSTANCE,hPrevInst:HINSTANCE,CmdShow:dword
                 offset NameOfMainWindows,
                 offset MsgBoxName,
                 WS_OVERLAPPEDWINDOW or DS_CENTER,
-                250, 200, 740, 300,
+                250, 100, 740, 450,
                 NULL, NULL, hInst, NULL
 		mov hWndOfMainWindow, eax
 
@@ -345,16 +352,15 @@ WndMainProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 
 		;; do the loop
 		LoopItself:
-		
-		;; start macros with floats from arrays
-		DoArithmeticOperations FloatsA[8*edi], FloatsB[8*edi], FloatsC[8*edi], FloatsD[8*edi]
-		
-		;; values for equation and final result
+
+		;; values for equation
 		invoke FloatToStr2, FloatsA[8*edi], addr BufferFloatA
 		invoke FloatToStr2, FloatsB[8*edi], addr BufferFloatB
 		invoke FloatToStr2, FloatsC[8*edi], addr BufferFloatC
 		invoke FloatToStr2, FloatsD[8*edi], addr BufferFloatD
-		invoke FloatToStr2, floatFinal, addr BufferFloatFinal
+
+		;; start macros with floats from arrays
+		DoArithmeticOperations FloatsA[8*edi], FloatsB[8*edi], FloatsC[8*edi], FloatsD[8*edi]
 	
 		;; parsing variables into TempPlaceForText
 		invoke wsprintf, addr TempPlaceForText, addr equationVariables, 
@@ -393,7 +399,7 @@ WndMainProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 		invoke CreateWindowEx,NULL,
                 offset NameOfTheButton, offset TextForOKButton,
                 WS_VISIBLE or WS_CHILD or BS_CENTER or BS_TEXT or BS_VCENTER,
-                295, 215, 150, 30,
+                295, 355, 150, 30,
                 hWnd, 7033, hInstance, NULL
 
 	.ELSEIF ourMSG==WM_COMMAND
