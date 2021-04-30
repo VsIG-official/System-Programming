@@ -50,8 +50,8 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	; multiply 2 by c and move result into st(0)
 	fmul
 
-	; convert float to text with 7 digits after "," into buffer
-	invoke FpuFLtoA, 0, 16, addr BufferTwoMulC, SRC1_FPU or SRC2_DIMM
+	; convert float to text with 18 digits after "," into buffer
+	invoke FpuFLtoA, 0, 18, addr BufferTwoMulC, SRC1_FPU or SRC2_DIMM
 	
 	; d / 23
 	
@@ -63,16 +63,16 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	; divide d by 23 and move result into st(0), 2*c to st(1)
 	fdiv
 	
-	; convert float to text with 7 digits after "," into buffer
-	invoke FpuFLtoA, 0, 16, addr BufferDdivTwenThree, SRC1_FPU or SRC2_DIMM
+	; convert float to text with 18 digits after "," into buffer
+	invoke FpuFLtoA, 0, 18, addr BufferDdivTwenThree, SRC1_FPU or SRC2_DIMM
 	
 	; 2 * c - d / 23
 	
 	; subtract d/23 from 2*c, move result into st(0)
 	fsub
 	
-	; convert float to text with 7 digits after "," into buffer
-	invoke FpuFLtoA, 0, 16, addr BufferFirstPart, SRC1_FPU or SRC2_DIMM
+	; convert float to text with 18 digits after "," into buffer
+	invoke FpuFLtoA, 0, 18, addr BufferFirstPart, SRC1_FPU or SRC2_DIMM
 	
 	; move ln(2) into st(0) and 2*c-d/23 into st(1)
 	fldln2
@@ -88,14 +88,14 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	; divide a by 4 and move it into st(0), b into st(1), ln(2) into st(2) and 2*c-d/23 into st(3)
 	fdiv
 	
-	; convert float to text with 7 digits after "," into buffer
-	invoke FpuFLtoA, 0, 16, addr BufferAdivFour, SRC1_FPU or SRC2_DIMM
+	; convert float to text with 18 digits after "," into buffer
+	invoke FpuFLtoA, 0, 18, addr BufferAdivFour, SRC1_FPU or SRC2_DIMM
 
 	; subtract a/4 from b, move result into st(0), ln(2) into st(1) and 2*c-d/23 into st(2)
 	fsub
 	
-	; convert float to text with 7 digits after "," into buffer
-	invoke FpuFLtoA, 0, 16, addr BufferBsubPartOfLn, SRC1_FPU or SRC2_DIMM
+	; convert float to text with 18 digits after "," into buffer
+	invoke FpuFLtoA, 0, 18, addr BufferBsubPartOfLn, SRC1_FPU or SRC2_DIMM
 	
 	; compare, if number is zero or less for ln
 	
@@ -113,8 +113,8 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	; find ln(b - a/4) and move it into st(0), 2*c-d/23 into st(1)
 	fyl2x
 	
-	; convert float to text with 7 digits after "," into buffer
-	invoke FpuFLtoA, 0, 16, addr BufferSecondPart, SRC1_FPU or SRC2_DIMM
+	; convert float to text with 18 digits after "," into buffer
+	invoke FpuFLtoA, 0, 18, addr BufferSecondPart, SRC1_FPU or SRC2_DIMM
 	
 	; compare, if number is zero for dividing
 	
@@ -237,13 +237,13 @@ endm
 	
 	; can't be 1 or 0
 	; first way of declaring array
-	FloatsA dq 2.0, 4.0, 6.0, 0.001, 10.0 ;; first numbers
-	FloatsB dq 4.0, 2.0, -2.0, -3.33, 3.0 ;; second numbers
-	FloatsC dq -99.0, 3.9, -2.0, 123.4, -3.0 ;; third numbers
+	FloatsA dq 2.0, -16.0, 6.0, 0.001, 10.0 ;; first numbers
+	FloatsB dq 4.0, 23.091, -2.0, -3.33, 3.0 ;; second numbers
+	FloatsC dq -99.0, -2.111, -2.0, 123.4, -3.0 ;; third numbers
 	
 	; and the second one
 	FloatsD dq -15.125 ;; fourth numbers
-			  dq -4.1
+			  dq 0.5
 			  dq -12.0
 			  dq -9.0
 			  dq -10.0
