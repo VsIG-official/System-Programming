@@ -50,6 +50,7 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	fmul 			 ; st(0) = st(1) * st(0)
 
 	fstp TwoMulC
+	;invoke FpuFLtoA 0, 7, addr 
 	; 2*c
 	; ^ works
 	
@@ -180,25 +181,25 @@ endm
 	;; mostly used for negative nums
 	floatFinal DQ 0
 	
-	; Temp DQ values for parsing them into string
+	; Temp DT values for parsing them into string
 	
 	; First step
 	; Value of 2 * c
-	TwoMulC DQ 0
+	TwoMulC DT 0
 	; Value of d / 23
-	DdivTwenThree DQ 0
+	DdivTwenThree DT 0
 	; Value of a / 4
-	AdivFour DQ 0
+	AdivFour DT 0
 	
 	; Second step
 	; Value of 2 * c - d / 23
-	FirstPart DQ 0
+	FirstPart DT 0
 	; Value of b - a / 4
-	BsubPartOfLn DQ 0
+	BsubPartOfLn DT 0
 	
 	; Third Step
 	; Value of ln(b - a / 4)
-	SecondPart DQ 0
+	SecondPart DT 0
 	
 	; for automating 
 	possibleHeight DD 12
