@@ -6,17 +6,9 @@ option CaseMap:None
 WinWarningProto proto :dword,:dword,:dword
 WinMainProto proto :dword,:dword,:dword
 
-; ; Libraries And Macroses
-; includelib \masm32\lib\user32.lib
-; includelib \masm32\lib\kernel32.lib
-	
-; include \masm32\include\windows.inc
-; include \masm32\include\user32.inc
-; include \masm32\include\kernel32.inc
-; ; For FloatToStr and FloatToStr2
-; include \masm32\macros\macros.asm
-
 ; Libraries And Macroses
+includelib /masm32/lib/Fpu.lib
+include /masm32/include/Fpu.inc
 include /masm32/include/masm32rt.inc
 
 ; Our Macroses
@@ -49,8 +41,8 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	fld cFloat		 ; st(0) = c, st(1) = 2
 	fmul 			 ; st(0) = st(1) * st(0)
 
-	fstp TwoMulC
-	;invoke FpuFLtoA 0, 7, addr 
+	;fstp TwoMulC
+	invoke FpuFLtoA, 0, 7, addr BufferTwoMulC, SRC1_FPU or SRC2_DIMM
 	; 2*c
 	; ^ works
 	
@@ -59,13 +51,15 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 
 	fdiv ; st(0) = st(1)/st(0) = d/23, st(1) = 2*c
 	
-	fstp DdivTwenThree
+	;fstp DdivTwenThree
+	invoke FpuFLtoA, 0, 7, addr BufferDdivTwenThree, SRC1_FPU or SRC2_DIMM
 	; d/23
 	; ^ work
 	
 	fsub ; st(0) = st(1) - st(0) = 2*c - d/23
 	
-	fstp FirstPart
+	;fstp FirstPart
+	invoke FpuFLtoA, 0, 7, addr BufferFirstPart, SRC1_FPU or SRC2_DIMM
 	; 2*c-d/23
 	; ^ works
 	
@@ -79,19 +73,22 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	
 	fdiv ; st(0) = st(1)/st(0) = a/4, st(1) = b, st(2) = ln(2), st(3) = 2*c-d/23
 	
-	fstp AdivFour
+	;fstp AdivFour
+	invoke FpuFLtoA, 0, 7, addr BufferAdivFour, SRC1_FPU or SRC2_DIMM
 	; a/4
 	; ^ works
 	
 	fsub ; st(0) = st(1) - st(0) = b - a/4, st(1) = ln(2), st(2) = 2*c-d/23
 	
-	fstp BsubPartOfLn
+	;fstp BsubPartOfLn
+	invoke FpuFLtoA, 0, 7, addr BufferBsubPartOfLn, SRC1_FPU or SRC2_DIMM
 	; b-a/4
 	; ^ works
 	
 	fyl2x ; st(0) = st(1)(st(0)) = ln(b - a/4), st(1) = 2*c-d/23
 	
-	fstp SecondPart
+	;fstp SecondPart
+	invoke FpuFLtoA, 0, 7, addr BufferSecondPart, SRC1_FPU or SRC2_DIMM
 	; ln(b-a/4)
 	; ^ works
 	
@@ -377,14 +374,6 @@ WndMainProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 		invoke FloatToStr2, FloatsC[edi*8], addr BufferFloatC
 		invoke FloatToStr2, FloatsD[edi*8], addr BufferFloatD
 		invoke FloatToStr2, floatFinal, addr BufferFloatFinal
-		
-		;; values for intermediate results
-		invoke FloatToStr2, TwoMulC, addr BufferTwoMulC
-		invoke FloatToStr2, DdivTwenThree, addr BufferDdivTwenThree
-		invoke FloatToStr2, AdivFour, addr BufferAdivFour
-		invoke FloatToStr2, FirstPart, addr BufferFirstPart
-		invoke FloatToStr2, BsubPartOfLn, addr BufferBsubPartOfLn
-		invoke FloatToStr2, SecondPart, addr BufferSecondPart
 	
 		;; parsing variables into TempPlaceForText
 		invoke wsprintf, addr TempPlaceForText, addr equationVariables, 
