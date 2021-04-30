@@ -178,29 +178,10 @@ endm
 	;; mostly used for negative nums
 	floatFinal DQ 0
 	
-	; Temp DT values for parsing them into string
-	
-	; First step
-	; Value of 2 * c
-	TwoMulC DT 0
-	; Value of d / 23
-	DdivTwenThree DT 0
-	; Value of a / 4
-	AdivFour DT 0
-	
-	; Second step
-	; Value of 2 * c - d / 23
-	FirstPart DT 0
-	; Value of b - a / 4
-	BsubPartOfLn DT 0
-	
-	; Third Step
-	; Value of ln(b - a / 4)
-	SecondPart DT 0
-	
 	; for automating 
 	possibleHeight DD 12
 	coefficientOfMultiplyingForTextHeight DD 3
+	valueForDQvalues DB 8
 
 	; first text to show
 	variantToShow DB "My equation = (2 * c - d / 23) / (ln (b - a / 4))", 13, 0
@@ -366,13 +347,13 @@ WndMainProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 		LoopItself:
 		
 		;; start macros with floats from arrays
-		DoArithmeticOperations FloatsA[edi*8], FloatsB[edi*8], FloatsC[edi*8], FloatsD[edi*8]
+		DoArithmeticOperations FloatsA[8*edi], FloatsB[8*edi], FloatsC[8*edi], FloatsD[8*edi]
 		
 		;; values for equation and final result
-		invoke FloatToStr2, FloatsA[edi*8], addr BufferFloatA
-		invoke FloatToStr2, FloatsB[edi*8], addr BufferFloatB
-		invoke FloatToStr2, FloatsC[edi*8], addr BufferFloatC
-		invoke FloatToStr2, FloatsD[edi*8], addr BufferFloatD
+		invoke FloatToStr2, FloatsA[8*edi], addr BufferFloatA
+		invoke FloatToStr2, FloatsB[8*edi], addr BufferFloatB
+		invoke FloatToStr2, FloatsC[8*edi], addr BufferFloatC
+		invoke FloatToStr2, FloatsD[8*edi], addr BufferFloatD
 		invoke FloatToStr2, floatFinal, addr BufferFloatFinal
 	
 		;; parsing variables into TempPlaceForText
