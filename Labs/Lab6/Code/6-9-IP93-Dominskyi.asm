@@ -49,6 +49,7 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	fld cFloat		 ; st(0) = c, st(1) = 2
 	fmul 			 ; st(0) = st(1) * st(0)
 
+	fstp TwoMulC
 	; 2*c
 	; ^ works
 	
@@ -57,11 +58,13 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 
 	fdiv ; st(0) = st(1)/st(0) = d/23, st(1) = 2*c
 	
+	fstp DdivTwenThree
 	; d/23
 	; ^ work
 	
 	fsub ; st(0) = st(1) - st(0) = 2*c - d/23
 	
+	fstp FirstPart
 	; 2*c-d/23
 	; ^ works
 	
@@ -75,16 +78,19 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	
 	fdiv ; st(0) = st(1)/st(0) = a/4, st(1) = b, st(2) = ln(2), st(3) = 2*c-d/23
 	
+	fstp AdivFour
 	; a/4
 	; ^ works
 	
 	fsub ; st(0) = st(1) - st(0) = b - a/4, st(1) = ln(2), st(2) = 2*c-d/23
 	
+	fstp BsubPartOfLn
 	; b-a/4
 	; ^ works
 	
 	fyl2x ; st(0) = st(1)(st(0)) = ln(b - a/4), st(1) = 2*c-d/23
 	
+	fstp SecondPart
 	; ln(b-a/4)
 	; ^ works
 	
@@ -119,21 +125,21 @@ endm
 	
 	; First Step
 	; Value of 2 * c
-	BufferIntermediateValueTwoMulC DB 32 DUP(?)
+	BufferTwoMulC DB 32 DUP(?)
 	; Value of d / 23
-	BufferIntermediateValueDdivTwenThree DB 32 DUP(?)
+	BufferDdivTwenThree DB 32 DUP(?)
 	; Value of a - 4
-	BufferIntermediateValueAsubFour DB 32 DUP(?)
+	BufferAdivFour DB 32 DUP(?)
 		
 	; Second Step
 	; Value of 2 * c - d / 23
-	BufferIntermediateValueFirstPart DB 32 DUP(?)
+	BufferFirstPart DB 32 DUP(?)
 	; Value of b - a / 4
-	BufferIntermediateValueBsubPartOfLn DB 32 DUP(?)
+	BufferBsubPartOfLn DB 32 DUP(?)
 	
 	; Third Step
 	; Value of ln(b - a / 4)
-	BufferIntermediateValueSecondPart DB 32 DUP(?)
+	BufferSecondPart DB 32 DUP(?)
 
 ; Data Segment
 .data
@@ -174,25 +180,25 @@ endm
 	;; mostly used for negative nums
 	floatFinal DQ 0
 	
-	; Temp DT values for parsing them into string
+	; Temp DQ values for parsing them into string
 	
 	; First step
 	; Value of 2 * c
-	TwoMulC DT 0
+	TwoMulC DQ 0
 	; Value of d / 23
-	DdivTwenThree DT 0
-	; Value of a - 4
-	AsubFour DT 0
+	DdivTwenThree DQ 0
+	; Value of a / 4
+	AdivFour DQ 0
 	
 	; Second step
 	; Value of 2 * c - d / 23
-	FirstPart DT 0
+	FirstPart DQ 0
 	; Value of b - a / 4
-	BsubPartOfLn DT 0
+	BsubPartOfLn DQ 0
 	
 	; Third Step
 	; Value of ln(b - a / 4)
-	SecondPart DT 0
+	SecondPart DQ 0
 	
 	; for automating 
 	possibleHeight DD 12
@@ -360,33 +366,32 @@ WndMainProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 
 		;; do the loop
 		LoopItself:
-
-		; ;; mov int with sign extending into global variable
-		;FloatToStr2 BufferFloatA, FloatsA[edi]
-		
-		; ;; mov int with sign extending into global variable
-		; mov intB, FloatsB[edi]
-		
-		; ;; mov int with sign extending into global variable
-		; mov intC, FloatsC[edi]
-		
-		; ;; mov int with sign extending into global variable
-		; mov intD, FloatsD[edi]
 		
 		;; start macros with floats from arrays
 		DoArithmeticOperations FloatsA[edi*8], FloatsB[edi*8], FloatsC[edi*8], FloatsD[edi*8]
 		
-	invoke FloatToStr2, FloatsA[edi*8], addr BufferFloatA
-	invoke FloatToStr2, FloatsB[edi*8], addr BufferFloatB
-	invoke FloatToStr2, FloatsC[edi*8], addr BufferFloatC
-	invoke FloatToStr2, FloatsD[edi*8], addr BufferFloatD
-	invoke FloatToStr2, floatFinal, addr BufferFloatFinal
+		;; values for equation and final result
+		invoke FloatToStr2, FloatsA[edi*8], addr BufferFloatA
+		invoke FloatToStr2, FloatsB[edi*8], addr BufferFloatB
+		invoke FloatToStr2, FloatsC[edi*8], addr BufferFloatC
+		invoke FloatToStr2, FloatsD[edi*8], addr BufferFloatD
+		invoke FloatToStr2, floatFinal, addr BufferFloatFinal
+		
+		;; values for intermediate results
+		invoke FloatToStr2, TwoMulC, addr BufferTwoMulC
+		invoke FloatToStr2, DdivTwenThree, addr BufferDdivTwenThree
+		invoke FloatToStr2, AdivFour, addr BufferAdivFour
+		invoke FloatToStr2, FirstPart, addr BufferFirstPart
+		invoke FloatToStr2, BsubPartOfLn, addr BufferBsubPartOfLn
+		invoke FloatToStr2, SecondPart, addr BufferSecondPart
 	
-	;; parsing variables into TempPlaceForText
-	invoke wsprintf, addr TempPlaceForText, addr equationVariables, 
-	addr BufferFloatA, addr BufferFloatB, addr BufferFloatC, addr BufferFloatD,
-	addr BufferFloatC, addr BufferFloatD, addr BufferFloatB, addr BufferFloatA,
-	addr BufferFloatFinal
+		;; parsing variables into TempPlaceForText
+		invoke wsprintf, addr TempPlaceForText, addr equationVariables, 
+		addr BufferFloatA, addr BufferFloatB, addr BufferFloatC, addr BufferFloatD,
+		addr BufferFloatC, addr BufferFloatD, addr BufferFloatB, addr BufferFloatA,
+		addr BufferTwoMulC, addr BufferDdivTwenThree, addr BufferFloatB,
+		addr BufferAdivFour, addr BufferFirstPart, addr BufferBsubPartOfLn,
+		addr BufferFirstPart, addr BufferSecondPart, addr BufferFloatFinal
 		
 		; mov possibleHeight into eax
 		mov eax, possibleHeight
