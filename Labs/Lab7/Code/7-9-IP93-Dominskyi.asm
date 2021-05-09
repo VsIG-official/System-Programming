@@ -216,7 +216,7 @@ endm
 	
 	BufferUpperLeftPart DB 32 DUP(?)
 	BufferUpperRightPart DB 32 DUP(?)
-	BufferDownPart DB 32 DUP(?)
+	BufferLowerPart DB 32 DUP(?)
 
 ; Data Segment
 .data
@@ -272,6 +272,8 @@ endm
 	; form, which I will be filling with variables
 	equationVariables DB "For a = (%s), b = (%s), c = (%s) and d = (%s) We have (2 * (%s) - (%s) / 23) / (ln((%s) - (%s) / 4)) = ((%s) - (%s)) / (ln((%s) - (%s))) = (%s) / (ln((%s))) = (%s) / (%s) = (%s)", 13, 0
 
+	public FloatsB, FloatsA, BufferLowerPart
+	extern SecondPartProc@0:near
 ; Code Segment
 .code
 
