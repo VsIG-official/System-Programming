@@ -309,7 +309,7 @@ mov ecx, [ebp+8] ; get access to second argument (d)
 mov edx, [ebp+12] ; get access to third argument (secondConstant)
 
 ; move d into st(0) and 2*c into st(1)
-fld qword ptr [edx]
+fld qword ptr [ecx]
 
 ; move 23 into st(0), d into st(1) and 2*c into st(2)
 fld qword ptr [edx]
