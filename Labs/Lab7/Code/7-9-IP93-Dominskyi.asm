@@ -62,9 +62,9 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	
 	; 2 * c - d / 23
 	
-	fld qword ptr [BufferUpperPart]
+	fld qword ptr [BufferUpperLeftPart]
 	
-	fld qword ptr [BufferDownPart]
+	fld qword ptr [BufferUpperRightPart]
 	
 	; subtract d/23 from 2*c, move result into st(0)
 	fsub
@@ -214,7 +214,8 @@ endm
 	; Value of ln(b - a / 4)
 	BufferSecondPart DB 32 DUP(?)
 	
-	BufferUpperPart DB 32 DUP(?)
+	BufferUpperLeftPart DB 32 DUP(?)
+	BufferUpperRightPart DB 32 DUP(?)
 	BufferDownPart DB 32 DUP(?)
 
 ; Data Segment
@@ -289,7 +290,7 @@ finit
 	; convert float to text with 18 digits after "," into buffer
 	invoke FpuFLtoA, 0, 18, addr BufferTwoMulC, SRC1_FPU or SRC2_DIMM
 
-	mov eax, offset BufferUpperPart
+	mov eax, offset BufferUpperLeftPart
 	fstp qword ptr [eax]
 
 ret
@@ -310,10 +311,10 @@ DdivTwenThreeProc proc ; beginning of procedure describing
 	mov edx, [ebp+12] ; get access to third argument (secondConstant)
 
 	; move d into st(0) and 2*c into st(1)
-	fld qword ptr [ecx]
+	fld qword ptr [ecx] ; The first operator forces the expression to be treated as having the specified type. The second operator specifies a pointer to type
 
 	; move 23 into st(0), d into st(1) and 2*c into st(2)
-	fld qword ptr [edx]
+	fld qword ptr [edx] ; The first operator forces the expression to be treated as having the specified type. The second operator specifies a pointer to type
 
 	; divide d by 23 and move result into st(0), 2*c to st(1)
 	fdiv
@@ -321,8 +322,8 @@ DdivTwenThreeProc proc ; beginning of procedure describing
 	; convert float to text with 18 digits after "," into buffer
 	invoke FpuFLtoA, 0, 18, addr BufferDdivTwenThree, SRC1_FPU or SRC2_DIMM
 
-	mov ebx, offset BufferDownPart
-	fstp qword ptr [ebx]
+	mov ebx, offset BufferUpperRightPart
+	fstp qword ptr [ebx] ; The first operator forces the expression to be treated as having the specified type. The second operator specifies a pointer to type
 
 	pop ebp ; epilog - continuation of EBP
 
