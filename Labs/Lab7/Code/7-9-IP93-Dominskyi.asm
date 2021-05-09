@@ -44,19 +44,21 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	; 2 * c
 	
 	lea eax, firstConstant
-	lea edx, cFloat
+	lea ebx, cFloat
 	
-	call TwoMulCProc
+	call TwoMulCProc ; mov 2 * c into eax
+	
+
 	
 	; d / 23
 	
-	lea ebx, secondConstant
-	lea ecx, dFloat
+	lea ecx, secondConstant
+	lea edx, dFloat
 	
-	push ebx
 	push ecx
+	push edx
 	
-	call DdivTwenThreeProc
+	call DdivTwenThreeProc  ; mov d / 23 into ebx
 	
 	finit
 	
@@ -275,14 +277,14 @@ finit
 	; move 2 into st(0)
 	fld qword ptr [eax]
 	; move c into st(0) and 2 into st(1)
-	fld qword ptr [edx]
+	fld qword ptr [ebx]
 	; multiply 2 by c and move result into st(0)
 	fmul
 
 	; convert float to text with 18 digits after "," into buffer
 	invoke FpuFLtoA, 0, 18, addr BufferTwoMulC, SRC1_FPU or SRC2_DIMM
 
-	fstp qword ptr [edx]
+	fstp qword ptr [eax]
 
 ret
 TwoMulCProc endp
@@ -297,14 +299,14 @@ mov ebp, esp ; prolog - EBP initialization
 
 ; first argument always is address of return
 ; all arguments take 4 bytes
-mov ebx, [ebp+8] ; get access to second argument (d)
-mov ecx, [ebp+12] ; get access to third argument (secondConstant)
+mov ecx, [ebp+8] ; get access to second argument (d)
+mov edx, [ebp+12] ; get access to third argument (secondConstant)
 
 ; move d into st(0) and 2*c into st(1)
-fld qword ptr [ebx]
+fld qword ptr [edx]
 
 ; move 23 into st(0), d into st(1) and 2*c into st(2)
-fld qword ptr [ecx]
+fld qword ptr [edx]
 
 ; divide d by 23 and move result into st(0), 2*c to st(1)
 fdiv
@@ -312,7 +314,7 @@ fdiv
 ; convert float to text with 18 digits after "," into buffer
 invoke FpuFLtoA, 0, 18, addr BufferDdivTwenThree, SRC1_FPU or SRC2_DIMM
 
-fstp qword ptr [ecx]
+fstp qword ptr [ebx]
 
 pop ebp ; epilog - continuation of EBP
 
