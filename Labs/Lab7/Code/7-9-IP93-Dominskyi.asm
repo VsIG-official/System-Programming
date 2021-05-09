@@ -48,8 +48,6 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	
 	call TwoMulCProc ; mov 2 * c into eax
 	
-
-	
 	; d / 23
 	
 	lea ecx, secondConstant
@@ -63,6 +61,10 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	finit
 	
 	; 2 * c - d / 23
+	
+	fld qword ptr [BufferUpperPart]
+	
+	fld qword ptr [BufferDownPart]
 	
 	; subtract d/23 from 2*c, move result into st(0)
 	fsub
@@ -211,6 +213,9 @@ endm
 	; Third Step
 	; Value of ln(b - a / 4)
 	BufferSecondPart DB 32 DUP(?)
+	
+	BufferUpperPart DB 32 DUP(?)
+	BufferDownPart DB 32 DUP(?)
 
 ; Data Segment
 .data
@@ -284,6 +289,7 @@ finit
 	; convert float to text with 18 digits after "," into buffer
 	invoke FpuFLtoA, 0, 18, addr BufferTwoMulC, SRC1_FPU or SRC2_DIMM
 
+	mov eax, offset BufferUpperPart
 	fstp qword ptr [eax]
 
 ret
@@ -314,6 +320,7 @@ fdiv
 ; convert float to text with 18 digits after "," into buffer
 invoke FpuFLtoA, 0, 18, addr BufferDdivTwenThree, SRC1_FPU or SRC2_DIMM
 
+mov ebx, offset BufferDownPart
 fstp qword ptr [ebx]
 
 pop ebp ; epilog - continuation of EBP
