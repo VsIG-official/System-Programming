@@ -293,39 +293,43 @@ finit
 	fstp qword ptr [eax]
 
 ret
+
 TwoMulCProc endp
 
 ; Procedure #2 using stack for d / 23 
 DdivTwenThreeProc proc ; beginning of procedure describing 
 
-finit
+	finit
 
-push ebp ; prolog - saving EBP
-mov ebp, esp ; prolog - EBP initialization
+	push ebp ; prolog - saving EBP
+	mov ebp, esp ; prolog - EBP initialization
 
-; first argument always is address of return
-; all arguments take 4 bytes
-mov ecx, [ebp+8] ; get access to second argument (d)
-mov edx, [ebp+12] ; get access to third argument (secondConstant)
+	; first argument always is address of return
+	; all arguments take 4 bytes
+	mov ecx, [ebp+8] ; get access to second argument (d)
+	mov edx, [ebp+12] ; get access to third argument (secondConstant)
 
-; move d into st(0) and 2*c into st(1)
-fld qword ptr [ecx]
+	; move d into st(0) and 2*c into st(1)
+	fld qword ptr [ecx]
 
-; move 23 into st(0), d into st(1) and 2*c into st(2)
-fld qword ptr [edx]
+	; move 23 into st(0), d into st(1) and 2*c into st(2)
+	fld qword ptr [edx]
 
-; divide d by 23 and move result into st(0), 2*c to st(1)
-fdiv
+	; divide d by 23 and move result into st(0), 2*c to st(1)
+	fdiv
 
-; convert float to text with 18 digits after "," into buffer
-invoke FpuFLtoA, 0, 18, addr BufferDdivTwenThree, SRC1_FPU or SRC2_DIMM
+	; convert float to text with 18 digits after "," into buffer
+	invoke FpuFLtoA, 0, 18, addr BufferDdivTwenThree, SRC1_FPU or SRC2_DIMM
 
-mov ebx, offset BufferDownPart
-fstp qword ptr [ebx]
+	mov ebx, offset BufferDownPart
+	fstp qword ptr [ebx]
 
-pop ebp ; epilog - continuation of EBP
+	pop ebp ; epilog - continuation of EBP
 
-ret 8 ; stack clearing
+	ret 8 ; stack clearing, where n is the number of bytes by which you want to increase the content
+			   ; ESP register after the address is read from the stack
+			   ; return, ie the stack will be "aligned"
+	
 DdivTwenThreeProc endp 
 
 start: ; Generates program start-up code
