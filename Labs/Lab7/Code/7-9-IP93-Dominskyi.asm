@@ -28,32 +28,6 @@ PrintInformationInWindow macro heightPosition, infoToShow
             hWnd, 7044, hInstance, NULL
 endm
 
-; Procedure #1 using registers for 2 * c 
-TwoMulCProc proc  ; beginning of procedure describing 
-
-
-
-ret
-TwoMulCProc endp
-
-; Procedure #2 using stack for d / 23 
-DdivTwenThreeProc proc ; beginning of procedure describing 
-
-finit
-
-push ebp ; prolog - saving EBP
-mov ebp, esp ; prolog - EBP initialization
-
-; first argument always is address of return
-; all arguments take 4 bytes
-mov ecx, [ebp+8] ; get access to second argument (secondConstant)
-mov ebx, [ebp+12] ; get access to third argument (d)
-
-pop ebp ; epilog - continuation of EBP
-
-ret 8 ; stack clearing
-DdivTwenThreeProc endp 
-
 ; Macros #2 for calculating
 DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	; Label for ending macros
@@ -88,18 +62,20 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	push ecx
 	
 	call DdivTwenThreeProc
-	;///////////////////////////////////
-	; move d into st(0) and 2*c into st(1)
-	fld dFloat
-	; move 23 into st(0), d into st(1) and 2*c into st(2)
-	fld secondConstant
-
-	; divide d by 23 and move result into st(0), 2*c to st(1)
-	fdiv
 	
-	; convert float to text with 18 digits after "," into buffer
-	invoke FpuFLtoA, 0, 18, addr BufferDdivTwenThree, SRC1_FPU or SRC2_DIMM
-	;///////////////////////////////////
+	; ;///////////////////////////////////
+	; ; move d into st(0) and 2*c into st(1)
+	; fld dFloat
+	; ; move 23 into st(0), d into st(1) and 2*c into st(2)
+	; fld secondConstant
+
+	; ; divide d by 23 and move result into st(0), 2*c to st(1)
+	; fdiv
+	
+	; ; convert float to text with 18 digits after "," into buffer
+	; invoke FpuFLtoA, 0, 18, addr BufferDdivTwenThree, SRC1_FPU or SRC2_DIMM
+	; ;///////////////////////////////////
+	
 	; 2 * c - d / 23
 	
 	; subtract d/23 from 2*c, move result into st(0)
@@ -306,6 +282,46 @@ endm
 
 ; Code Segment
 .code
+
+; Procedure #1 using registers for 2 * c 
+TwoMulCProc proc  ; beginning of procedure describing 
+
+
+
+ret
+TwoMulCProc endp
+
+; Procedure #2 using stack for d / 23 
+DdivTwenThreeProc proc ; beginning of procedure describing 
+
+finit
+
+push ebp ; prolog - saving EBP
+mov ebp, esp ; prolog - EBP initialization
+
+; first argument always is address of return
+; all arguments take 4 bytes
+mov ebx, [ebp+8] ; get access to second argument (d)
+mov ecx, [ebp+12] ; get access to third argument (secondConstant)
+
+; MATH fld qword ptr [eax]
+; move d into st(0) and 2*c into st(1)
+fld qword ptr [ebx]
+
+; move 23 into st(0), d into st(1) and 2*c into st(2)
+fld qword ptr [ecx]
+
+; divide d by 23 and move result into st(0), 2*c to st(1)
+fdiv
+	
+; convert float to text with 18 digits after "," into buffer
+invoke FpuFLtoA, 0, 18, addr BufferDdivTwenThree, SRC1_FPU or SRC2_DIMM
+
+pop ebp ; epilog - continuation of EBP
+
+ret 8 ; stack clearing
+DdivTwenThreeProc endp 
+
 start: ; Generates program start-up code
 	invoke WinWarningProto, hInstance,NULL, SW_SHOWDEFAULT ;invoke function
 
