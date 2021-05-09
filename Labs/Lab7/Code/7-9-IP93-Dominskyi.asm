@@ -58,7 +58,7 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	
 	call DdivTwenThreeProc  ; mov d / 23 into ebx
 	
-	finit
+	;finit
 	
 	; 2 * c - d / 23
 	
@@ -71,6 +71,10 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	
 	; convert float to text with 18 digits after "," into buffer
 	invoke FpuFLtoA, 0, 18, addr BufferFirstPart, SRC1_FPU or SRC2_DIMM
+	
+	; (ln( b - a / 4))
+	
+	;///////////////////////////
 	
 	; move ln(2) into st(0) and 2*c-d/23 into st(1)
 	fldln2
@@ -114,6 +118,8 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	; convert float to text with 18 digits after "," into buffer
 	invoke FpuFLtoA, 0, 18, addr BufferSecondPart, SRC1_FPU or SRC2_DIMM
 	
+	;//////////////////////
+	
 	; compare, if number is zero for dividing
 	
 	; compares the contents of st (0) to the source
@@ -142,6 +148,8 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	sahf
 	; jump, if equal to zero
 	je NumberIsZero
+	
+	;///////////////////////
 	
 	; divides 2*c-d/23 by ln(b-a/4) and move it into st(0)
 	fdiv
@@ -272,7 +280,7 @@ endm
 	; form, which I will be filling with variables
 	equationVariables DB "For a = (%s), b = (%s), c = (%s) and d = (%s) We have (2 * (%s) - (%s) / 23) / (ln((%s) - (%s) / 4)) = ((%s) - (%s)) / (ln((%s) - (%s))) = (%s) / (ln((%s))) = (%s) / (%s) = (%s)", 13, 0
 
-	public FloatsB, FloatsA, BufferLowerPart
+	public FloatsB, FloatsA, BufferLowerPart, thirdConstant
 	extern SecondPartProc@0:near
 ; Code Segment
 .code
@@ -280,7 +288,7 @@ endm
 ; Procedure #1 using registers for 2 * c 
 TwoMulCProc proc  ; beginning of procedure describing 
 
-finit
+	finit
 
 	; move 2 into st(0)
 	fld qword ptr [eax]

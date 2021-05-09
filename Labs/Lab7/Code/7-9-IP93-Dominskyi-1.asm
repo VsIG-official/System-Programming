@@ -5,7 +5,7 @@ option CaseMap:None
 
 .data
 .code
-extern FloatsB: qword, FloatsA: qword, BufferLowerPart: qword
+extern FloatsB: qword, FloatsA: qword, BufferLowerPart: qword, thirdConstant: qword
 public SecondPartProc
 SecondPartProc proc
     fld a_arr[8*edi] ; st(0) = a
