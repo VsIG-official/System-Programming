@@ -300,7 +300,6 @@ mov ebp, esp ; prolog - EBP initialization
 mov ebx, [ebp+8] ; get access to second argument (d)
 mov ecx, [ebp+12] ; get access to third argument (secondConstant)
 
-; MATH fld qword ptr [eax]
 ; move d into st(0) and 2*c into st(1)
 fld qword ptr [ebx]
 
@@ -309,7 +308,7 @@ fld qword ptr [ecx]
 
 ; divide d by 23 and move result into st(0), 2*c to st(1)
 fdiv
-	
+
 ; convert float to text with 18 digits after "," into buffer
 invoke FpuFLtoA, 0, 18, addr BufferDdivTwenThree, SRC1_FPU or SRC2_DIMM
 
