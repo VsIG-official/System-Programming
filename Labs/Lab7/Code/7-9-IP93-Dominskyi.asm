@@ -39,19 +39,14 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	
 	; My equation = (2 * c - d / 23) / (ln(b - a / 4))
 	
-	finit ; FPU Initialization
+	; finit ; FPU Initialization
 	
 	; 2 * c
 	
-	; move 2 into st(0)
-	fld firstConstant
-	; move c into st(0) and 2 into st(1)
-	fld cFloat
-	; multiply 2 by c and move result into st(0)
-	fmul
-
-	; convert float to text with 18 digits after "," into buffer
-	invoke FpuFLtoA, 0, 18, addr BufferTwoMulC, SRC1_FPU or SRC2_DIMM
+	lea eax, firstConstant
+	lea edx, cFloat
+	
+	call TwoMulCProc
 	
 	; d / 23
 	
@@ -63,18 +58,7 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	
 	call DdivTwenThreeProc
 	
-	; ;///////////////////////////////////
-	; ; move d into st(0) and 2*c into st(1)
-	; fld dFloat
-	; ; move 23 into st(0), d into st(1) and 2*c into st(2)
-	; fld secondConstant
-
-	; ; divide d by 23 and move result into st(0), 2*c to st(1)
-	; fdiv
-	
-	; ; convert float to text with 18 digits after "," into buffer
-	; invoke FpuFLtoA, 0, 18, addr BufferDdivTwenThree, SRC1_FPU or SRC2_DIMM
-	; ;///////////////////////////////////
+	finit
 	
 	; 2 * c - d / 23
 	
@@ -286,7 +270,19 @@ endm
 ; Procedure #1 using registers for 2 * c 
 TwoMulCProc proc  ; beginning of procedure describing 
 
+finit
 
+	; move 2 into st(0)
+	fld qword ptr [eax]
+	; move c into st(0) and 2 into st(1)
+	fld qword ptr [edx]
+	; multiply 2 by c and move result into st(0)
+	fmul
+
+	; convert float to text with 18 digits after "," into buffer
+	invoke FpuFLtoA, 0, 18, addr BufferTwoMulC, SRC1_FPU or SRC2_DIMM
+
+	fstp qword ptr [edx]
 
 ret
 TwoMulCProc endp
@@ -316,6 +312,8 @@ fdiv
 	
 ; convert float to text with 18 digits after "," into buffer
 invoke FpuFLtoA, 0, 18, addr BufferDdivTwenThree, SRC1_FPU or SRC2_DIMM
+
+fstp qword ptr [ecx]
 
 pop ebp ; epilog - continuation of EBP
 
