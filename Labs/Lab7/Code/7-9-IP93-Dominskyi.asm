@@ -281,7 +281,7 @@ endm
 	equationVariables DB "For a = (%s), b = (%s), c = (%s) and d = (%s) We have (2 * (%s) - (%s) / 23) / (ln((%s) - (%s) / 4)) = ((%s) - (%s)) / (ln((%s) - (%s))) = (%s) / (ln((%s))) = (%s) / (%s) = (%s)", 13, 0
 
 	public FloatsB, FloatsA, BufferLowerPart, thirdConstant
-	extern SecondPartProc@0:near
+	;extern SecondPartProc@0:near
 ; Code Segment
 .code
 
