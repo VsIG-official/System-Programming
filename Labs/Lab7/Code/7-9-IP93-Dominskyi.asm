@@ -340,6 +340,7 @@ DdivTwenThreeProc proc ; beginning of procedure describing
 	ret 8 ; stack clearing, where n is the number of bytes by which you want to increase the content
 			   ; ESP register after the address is read from the stack
 			   ; return, ie the stack will be "aligned"
+			   ; 8 is for EIP and EBP
 	
 DdivTwenThreeProc endp 
 
