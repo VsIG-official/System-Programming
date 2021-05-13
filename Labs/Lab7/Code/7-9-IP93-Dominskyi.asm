@@ -34,6 +34,8 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	Local EndThisMacros
 	; Label for checking, if numerator is zero (for zero division)
 	Local NumberIsZero
+	; Label for checking, if numerator is zero or less than it (for ln function)
+	Local NumberIsLessOrZero
 	
 	; My equation = (2 * c - d / 23) / (ln(b - a / 4))
 	
@@ -74,57 +76,7 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	
 	; (ln( b - a / 4))
 	
-	;///////////////////////////
-	
-	; ; move ln(2) into st(0) and 2*c-d/23 into st(1)
-	; fldln2
-	
-	; ; move b into st(0), ln(2) into st(1) and 2*c-d/23 into st(2)
-	; fld bFloat
-	
-	; ; move a into st(0), b into st(1), ln(2) into st(2) 2*c-d/23 into st(3)
-	; fld aFloat
-	; ; move 4 into st(0), a into st(1), b into st(2), ln(2) into st(3) and 2*c-d/23 into st(4)
-	; fld thirdConstant
-	
-	; ; divide a by 4 and move it into st(0), b into st(1), ln(2) into st(2) and 2*c-d/23 into st(3)
-	; fdiv
-	
-	; ; convert float to text with 18 digits after "," into buffer
-	; invoke FpuFLtoA, 0, 18, addr BufferAdivFour, SRC1_FPU or SRC2_DIMM
-
-	; ; subtract a/4 from b, move result into st(0), ln(2) into st(1) and 2*c-d/23 into st(2)
-	; fsub
-	
-	; ; convert float to text with 18 digits after "," into buffer
-	; invoke FpuFLtoA, 0, 18, addr BufferBsubPartOfLn, SRC1_FPU or SRC2_DIMM
-	
-	; ; compare, if number is zero or less for ln
-	
-	; ; compares the contents of st (0) to the source
-	; fcom zero
-	; ; saves the current value of the SR register to the receiver
-	; fstsw ax
-	; ; loads flags
-	; sahf
-	; ; jump, if equal to zero
-	; je NumberIsLessOrZero
-	; ; jump, if less than zero
-	; jb NumberIsLessOrZero
-	
-	; ; find ln(b - a/4) and move it into st(0), 2*c-d/23 into st(1)
-	; fyl2x
-	
-	; ; convert float to text with 18 digits after "," into buffer
-	; invoke FpuFLtoA, 0, 18, addr BufferSecondPart, SRC1_FPU or SRC2_DIMM
-	
-	;//////////////////////
-	
 	call  SecondPartProc@0
-	
-	;//////////////////////
-	
-	
 	
 	;; parsing variables into TempPlaceForText
 	invoke wsprintf, addr TempPlaceForText, addr equationVariables, 
@@ -133,6 +85,16 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	addr BufferTwoMulC, addr BufferDdivTwenThree, addr BufferFloatB,
 	addr BufferAdivFour, addr BufferFirstPart, addr BufferBsubPartOfLn,
 	addr BufferFirstPart, addr BufferSecondPart, addr BufferFloatFinal
+	
+		NumberIsZero:
+		;; parsing variables into TempPlaceForText
+		invoke wsprintf, addr TempPlaceForText, addr ZeroDivisionText
+		jmp EndThisMacros
+
+	NumberIsLessOrZero:
+		;; parsing variables into TempPlaceForText
+		invoke wsprintf, addr TempPlaceForText, addr NegativeOrZeroLnText
+		jmp EndThisMacros
 
 	EndThisMacros:
 endm

@@ -10,39 +10,41 @@ include /masm32/include/masm32rt.inc
 
 .data
 	NegativeOrZeroLnText DB "Даний вираз має негативне число або нуль в (ln). Перевірте Свої значення", 13, 0
-		ZeroDivisionText DB "Даний вираз має ділення на нуль. Перевірте Свої значення", 13, 0
+	ZeroDivisionText DB "Даний вираз має ділення на нуль. Перевірте Свої значення", 13, 0
 	
 	zero dq 0.0
 	negativeZero dq -0.0
 	
 	thirdConstant dq 4.0
 	
-	floatFinal DQ 0
+	floatFinal DQ 0.0
 	
 .code
 extern FloatsB: qword, FloatsA: qword, BufferAdivFour: byte, BufferBsubPartOfLn: byte, BufferSecondPart: byte, TempPlaceForText: byte, BufferFloatFinal: byte
 public SecondPartProc
 SecondPartProc proc
 
-	; move ln(2) into st(0) and 2*c-d/23 into st(1)
+
+
+; Start = (2 * c - d / 23) / (ln(b - a / 4))
+
+	; move ln(2) into st(0) 
 	fldln2
 	
-	; move b into st(0), ln(2) into st(1) and 2*c-d/23 into st(2)
+	; move b into st(0), ln(2) into st(1)
 	fld FloatsB[8*edi]
 	
-	; move a into st(0), b into st(1), ln(2) into st(2) 2*c-d/23 into st(3)
+	; move a into st(0), b into st(1), ln(2) into st(2)
 	fld FloatsA[8*edi]
-	; move 4 into st(0), a into st(1), b into st(2), ln(2) into st(3) and 2*c-d/23 into st(4)
-	fld thirdConstant
 	
-	; divide a by 4 and move it into st(0), b into st(1), ln(2) into st(2) and 2*c-d/23 into st(3)
-	fdiv
+	; divide a by 4 and move it into st(0), b into st(1), ln(2) into st(2)
+	fdiv thirdConstant
 	
 	; convert float to text with 18 digits after "," into buffer
 	invoke FpuFLtoA, 0, 18, addr BufferAdivFour, SRC1_FPU or SRC2_DIMM
 
-	; subtract a/4 from b, move result into st(0), ln(2) into st(1) and 2*c-d/23 into st(2)
-	fsub
+	; subtract a/4 from b, move result into st(0), ln(2) into st(1)
+	fsubp st(1), st(0)
 	
 	; convert float to text with 18 digits after "," into buffer
 	invoke FpuFLtoA, 0, 18, addr BufferBsubPartOfLn, SRC1_FPU or SRC2_DIMM
@@ -56,9 +58,7 @@ SecondPartProc proc
 	; loads flags
 	sahf
 	; jump, if equal to zero
-	je NumberIsLessOrZero
-	; jump, if less than zero
-	jb NumberIsLessOrZero
+	jbe NumberIsLessOrZero
 	
 	; find ln(b - a/4) and move it into st(0), 2*c-d/23 into st(1)
 	fyl2x
@@ -66,7 +66,7 @@ SecondPartProc proc
 	; convert float to text with 18 digits after "," into buffer
 	invoke FpuFLtoA, 0, 18, addr BufferSecondPart, SRC1_FPU or SRC2_DIMM
 	
-; compare, if number is zero for dividing ///////////////
+	; compare, if number is zero for dividing
 	
 	; compares the contents of st (0) to the source
 	fcom zero
@@ -95,8 +95,6 @@ SecondPartProc proc
 	; jump, if equal to zero
 	je NumberIsZero
 	
-	;///////////////////////
-	
 	; divides 2*c-d/23 by ln(b-a/4) and move it into st(0)
 	fdiv
 	
@@ -107,19 +105,6 @@ SecondPartProc proc
 
 	;; value for final result
 	invoke FloatToStr2, floatFinal, addr BufferFloatFinal
-	
-	jmp EndThisMacrosThirdProc
-
-	NumberIsZero:
-		;; parsing variables into TempPlaceForText
-		invoke wsprintf, addr TempPlaceForText, addr ZeroDivisionText
-		jmp EndThisMacrosThirdProc
-
-	NumberIsLessOrZero:
-		;; parsing variables into TempPlaceForText
-		invoke wsprintf, addr TempPlaceForText, addr NegativeOrZeroLnText
-
-	EndThisMacrosThirdProc:
 
     ret
 SecondPartProc endp
