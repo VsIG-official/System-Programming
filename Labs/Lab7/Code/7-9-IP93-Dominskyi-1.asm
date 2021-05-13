@@ -9,9 +9,6 @@ include /masm32/include/Fpu.inc
 include /masm32/include/masm32rt.inc
 
 .data
-	NegativeOrZeroLnText DB "Даний вираз має негативне число або нуль в (ln). Перевірте Свої значення", 13, 0
-	ZeroDivisionText DB "Даний вираз має ділення на нуль. Перевірте Свої значення", 13, 0
-	
 	zero dq 0.0
 	negativeZero dq -0.0
 	
@@ -20,13 +17,9 @@ include /masm32/include/masm32rt.inc
 	floatFinal DQ 0.0
 	
 .code
-extern FloatsB: qword, FloatsA: qword, BufferAdivFour: byte, BufferBsubPartOfLn: byte, BufferSecondPart: byte, TempPlaceForText: byte, BufferFloatFinal: byte
+extern FloatsB: qword, FloatsA: qword, BufferAdivFour: byte, BufferBsubPartOfLn: byte, BufferSecondPart: byte, TempPlaceForText: byte, BufferFloatFinal: byte, FirstLabel: dword, SecondLabel: dword
 public SecondPartProc
 SecondPartProc proc
-
-
-
-; Start = (2 * c - d / 23) / (ln(b - a / 4))
 
 	; move ln(2) into st(0) 
 	fldln2
@@ -58,7 +51,7 @@ SecondPartProc proc
 	; loads flags
 	sahf
 	; jump, if equal to zero
-	jbe NumberIsLessOrZero
+	jbe NumberIsLessOrZeroProtected
 	
 	; find ln(b - a/4) and move it into st(0), 2*c-d/23 into st(1)
 	fyl2x
@@ -75,7 +68,7 @@ SecondPartProc proc
 	; loads flags
 	sahf
 	; jump, if equal to zero.zero
-	je NumberIsZero
+	je NumberIsZeroProtected
 	
 	; compares the contents of st (0) to the source
 	fcom negativeZero
@@ -84,7 +77,7 @@ SecondPartProc proc
 	; loads flags
 	sahf
 	; jump, if equal to negative zero.zero
-	je NumberIsZero
+	je NumberIsZeroProtected
 	
 	; compares the contents of st (0) to zero
 	ftst
@@ -93,7 +86,7 @@ SecondPartProc proc
 	; loads flags
 	sahf
 	; jump, if equal to zero
-	je NumberIsZero
+	je NumberIsZeroProtected
 	
 	; divides 2*c-d/23 by ln(b-a/4) and move it into st(0)
 	fdiv
@@ -105,6 +98,28 @@ SecondPartProc proc
 
 	;; value for final result
 	invoke FloatToStr2, floatFinal, addr BufferFloatFinal
+
+	jmp EndThisMacrosThirdProc
+	
+	NumberIsLessOrZeroProtected:
+	
+	pop edx
+	
+	push FirstLabel
+	
+	mov edx, 0
+	
+	jmp EndThisMacrosThirdProc
+	
+	NumberIsZeroProtected:
+	
+	pop edx
+	
+	push SecondLabel
+	
+	mov edx, 0
+
+	EndThisMacrosThirdProc:
 
     ret
 SecondPartProc endp

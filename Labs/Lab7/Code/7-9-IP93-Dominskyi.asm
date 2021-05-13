@@ -76,6 +76,12 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	
 	; (ln( b - a / 4))
 	
+	push NumberIsLessOrZero
+	pop FirstLabel
+	
+	push NumberIsZero
+	pop SecondLabel
+	
 	call  SecondPartProc@0
 	
 	;; parsing variables into TempPlaceForText
@@ -86,7 +92,9 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	addr BufferAdivFour, addr BufferFirstPart, addr BufferBsubPartOfLn,
 	addr BufferFirstPart, addr BufferSecondPart, addr BufferFloatFinal
 	
-		NumberIsZero:
+	jmp EndThisMacros
+	
+	NumberIsZero:
 		;; parsing variables into TempPlaceForText
 		invoke wsprintf, addr TempPlaceForText, addr ZeroDivisionText
 		jmp EndThisMacros
@@ -142,6 +150,8 @@ endm
 ; Data Segment
 .data
 	StartingText DB "У наступному вікні Ви побачите 5 різних арифметичних виразів", 13, 0
+	NegativeOrZeroLnText DB "Даний вираз має негативне число або нуль в (ln). Перевірте Свої значення", 13, 0
+	ZeroDivisionText DB "Даний вираз має ділення на нуль. Перевірте Свої значення", 13, 0
 	
 	; Name Of Message Box
 	MsgBoxName  DB "6-9-IP93-Dominskyi", 0
@@ -184,13 +194,17 @@ endm
 	possibleHeight DD 25
 	coefficientOfMultiplyingForTextHeight DD 3
 	valueForDQvalues DB 8
+	
+	; Global Labels
+	FirstLabel dd 0
+	SecondLabel dd 0
 
 	; first text to show
 	variantToShow DB "My equation = (2 * c - d / 23) / (ln(b - a / 4))", 13, 0
 	; form, which I will be filling with variables
 	equationVariables DB "For a = (%s), b = (%s), c = (%s) and d = (%s) We have (2 * (%s) - (%s) / 23) / (ln((%s) - (%s) / 4)) = ((%s) - (%s)) / (ln((%s) - (%s))) = (%s) / (ln((%s))) = (%s) / (%s) = (%s)", 13, 0
 
-	public FloatsB, FloatsA, BufferAdivFour, BufferBsubPartOfLn, zero, BufferSecondPart,TempPlaceForText, BufferFloatFinal
+	public FloatsB, FloatsA, BufferAdivFour, BufferBsubPartOfLn, zero, BufferSecondPart,TempPlaceForText, BufferFloatFinal, FirstLabel, SecondLabel
 	extern SecondPartProc@0:near ; we use near, because of "flat" model
 	
 ; Code Segment
