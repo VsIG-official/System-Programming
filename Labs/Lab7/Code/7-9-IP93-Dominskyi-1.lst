@@ -1,0 +1,60 @@
+Microsoft (R) Macro Assembler Version 6.14.8444		    05/12/21 22:40:08
+7-9-IP93-Dominskyi-1.asm				     Page 1 - 1
+
+
+				; Processors
+				.386
+				.model flat, stdcall
+				option CaseMap:None
+
+ 00000000			.data
+ 00000000			.code
+				extern FloatsB: qword, FloatsA: qword, BufferLowerPart: qword, thirdConstant: qword
+				public SecondPartProc
+ 00000000			SecondPartProc proc
+
+ 00000000  C3			    ret
+ 00000001			SecondPartProc endp
+				end
+Microsoft (R) Macro Assembler Version 6.14.8444		    05/12/21 22:40:08
+7-9-IP93-Dominskyi-1.asm				     Symbols 2 - 1
+
+
+
+
+Segments and Groups:
+
+                N a m e                 Size     Length   Align   Combine Class
+
+FLAT . . . . . . . . . . . . . .	GROUP
+_DATA  . . . . . . . . . . . . .	32 Bit	 00000000 DWord	  Public  'DATA'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 00000001 DWord	  Public  'CODE'	
+
+
+Procedures,  parameters and locals:
+
+                N a m e                 Type     Value    Attr
+
+SecondPartProc . . . . . . . . .	P Near	 00000000 _TEXT	Length= 00000001 Public STDCALL
+
+
+Symbols:
+
+                N a m e                 Type     Value    Attr
+
+@CodeSize  . . . . . . . . . . .	Number	 00000000h   
+@DataSize  . . . . . . . . . . .	Number	 00000000h   
+@Interface . . . . . . . . . . .	Number	 00000003h   
+@Model . . . . . . . . . . . . .	Number	 00000007h   
+@code  . . . . . . . . . . . . .	Text   	 _TEXT
+@data  . . . . . . . . . . . . .	Text   	 FLAT
+@fardata?  . . . . . . . . . . .	Text   	 FLAT
+@fardata . . . . . . . . . . . .	Text   	 FLAT
+@stack . . . . . . . . . . . . .	Text   	 FLAT
+BufferLowerPart  . . . . . . . .	QWord	 00000000 FLAT	External STDCALL
+FloatsA  . . . . . . . . . . . .	QWord	 00000000 FLAT	External STDCALL
+FloatsB  . . . . . . . . . . . .	QWord	 00000000 FLAT	External STDCALL
+thirdConstant  . . . . . . . . .	QWord	 00000000 FLAT	External STDCALL
+
+	   0 Warnings
+	   0 Errors
