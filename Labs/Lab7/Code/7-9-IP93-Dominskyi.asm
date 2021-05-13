@@ -122,51 +122,9 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	
 	call  SecondPartProc@0
 	
-	fld dword ptr [BufferSecondPart]
-	
 	;//////////////////////
 	
-	; compare, if number is zero for dividing
 	
-	; compares the contents of st (0) to the source
-	fcom zero
-	; saves the current value of the SR register to the receiver
-	fstsw ax
-	; loads flags
-	sahf
-	; jump, if equal to zero.zero
-	je NumberIsZero
-	
-	; compares the contents of st (0) to the source
-	fcom negativeZero
-	; saves the current value of the SR register to the receiver
-	fstsw ax
-	; loads flags
-	sahf
-	; jump, if equal to negative zero.zero
-	je NumberIsZero
-	
-	; compares the contents of st (0) to zero
-	ftst
-	; saves the current value of the SR register to the receiver
-	fstsw ax
-	; loads flags
-	sahf
-	; jump, if equal to zero
-	je NumberIsZero
-	
-	;///////////////////////
-	
-	; divides 2*c-d/23 by ln(b-a/4) and move it into st(0)
-	fdiv
-	
-	; (2 * c - d / 23) / (ln( b - a / 4))
-	
-	; saves st(0) into variable
-	fstp floatFinal
-
-	;; value for final result
-	invoke FloatToStr2, floatFinal, addr BufferFloatFinal
 	
 	;; parsing variables into TempPlaceForText
 	invoke wsprintf, addr TempPlaceForText, addr equationVariables, 
@@ -175,13 +133,6 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	addr BufferTwoMulC, addr BufferDdivTwenThree, addr BufferFloatB,
 	addr BufferAdivFour, addr BufferFirstPart, addr BufferBsubPartOfLn,
 	addr BufferFirstPart, addr BufferSecondPart, addr BufferFloatFinal
-	
-	jmp EndThisMacros
-	
-	NumberIsZero:
-		;; parsing variables into TempPlaceForText
-		invoke wsprintf, addr TempPlaceForText, addr ZeroDivisionText
-		jmp EndThisMacros
 
 	EndThisMacros:
 endm
@@ -229,7 +180,6 @@ endm
 ; Data Segment
 .data
 	StartingText DB "У наступному вікні Ви побачите 5 різних арифметичних виразів", 13, 0
-	ZeroDivisionText DB "Даний вираз має ділення на нуль. Перевірте Свої значення", 13, 0
 	
 	; Name Of Message Box
 	MsgBoxName  DB "6-9-IP93-Dominskyi", 0
@@ -278,7 +228,7 @@ endm
 	; form, which I will be filling with variables
 	equationVariables DB "For a = (%s), b = (%s), c = (%s) and d = (%s) We have (2 * (%s) - (%s) / 23) / (ln((%s) - (%s) / 4)) = ((%s) - (%s)) / (ln((%s) - (%s))) = (%s) / (ln((%s))) = (%s) / (%s) = (%s)", 13, 0
 
-	public FloatsB, FloatsA, BufferAdivFour, BufferBsubPartOfLn, zero, BufferSecondPart,TempPlaceForText
+	public FloatsB, FloatsA, BufferAdivFour, BufferBsubPartOfLn, zero, BufferSecondPart,TempPlaceForText, BufferFloatFinal
 	extern SecondPartProc@0:near ; we use near, because of "flat" model
 	
 ; Code Segment

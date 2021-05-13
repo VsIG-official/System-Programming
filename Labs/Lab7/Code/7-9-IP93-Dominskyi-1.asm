@@ -10,12 +10,17 @@ include /masm32/include/masm32rt.inc
 
 .data
 	NegativeOrZeroLnText DB "Даний вираз має негативне число або нуль в (ln). Перевірте Свої значення", 13, 0
+		ZeroDivisionText DB "Даний вираз має ділення на нуль. Перевірте Свої значення", 13, 0
 	
 	zero dq 0.0
+	negativeZero dq -0.0
+	
 	thirdConstant dq 4.0
 	
+	floatFinal DQ 0
+	
 .code
-extern FloatsB: qword, FloatsA: qword, BufferAdivFour: byte, BufferBsubPartOfLn: byte, BufferSecondPart: byte, TempPlaceForText: byte
+extern FloatsB: qword, FloatsA: qword, BufferAdivFour: byte, BufferBsubPartOfLn: byte, BufferSecondPart: byte, TempPlaceForText: byte, BufferFloatFinal: byte
 public SecondPartProc
 SecondPartProc proc
 
@@ -61,10 +66,54 @@ SecondPartProc proc
 	; convert float to text with 18 digits after "," into buffer
 	invoke FpuFLtoA, 0, 18, addr BufferSecondPart, SRC1_FPU or SRC2_DIMM
 	
-	mov ecx, offset BufferSecondPart
-	fstp dword ptr [ecx]
+; compare, if number is zero for dividing ///////////////
+	
+	; compares the contents of st (0) to the source
+	fcom zero
+	; saves the current value of the SR register to the receiver
+	fstsw ax
+	; loads flags
+	sahf
+	; jump, if equal to zero.zero
+	je NumberIsZero
+	
+	; compares the contents of st (0) to the source
+	fcom negativeZero
+	; saves the current value of the SR register to the receiver
+	fstsw ax
+	; loads flags
+	sahf
+	; jump, if equal to negative zero.zero
+	je NumberIsZero
+	
+	; compares the contents of st (0) to zero
+	ftst
+	; saves the current value of the SR register to the receiver
+	fstsw ax
+	; loads flags
+	sahf
+	; jump, if equal to zero
+	je NumberIsZero
+	
+	;///////////////////////
+	
+	; divides 2*c-d/23 by ln(b-a/4) and move it into st(0)
+	fdiv
+	
+	; (2 * c - d / 23) / (ln( b - a / 4))
+	
+	; saves st(0) into variable
+	fstp floatFinal
+
+	;; value for final result
+	invoke FloatToStr2, floatFinal, addr BufferFloatFinal
 	
 	jmp EndThisMacrosThirdProc
+
+	NumberIsZero:
+		;; parsing variables into TempPlaceForText
+		invoke wsprintf, addr TempPlaceForText, addr ZeroDivisionText
+		jmp EndThisMacrosThirdProc
 
 	NumberIsLessOrZero:
 		;; parsing variables into TempPlaceForText
