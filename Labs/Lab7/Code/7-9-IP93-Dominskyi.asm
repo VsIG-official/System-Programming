@@ -43,6 +43,7 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	
 	; 2 * c
 	
+	; use "Load Effective Address", because mov with/without offset doesn't work
 	lea eax, firstConstant
 	lea ebx, cFloat
 	
@@ -50,6 +51,7 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	
 	; d / 23
 	
+	; use "Load Effective Address", because mov with/without offset doesn't work
 	lea ecx, secondConstant
 	lea edx, dFloat
 	
