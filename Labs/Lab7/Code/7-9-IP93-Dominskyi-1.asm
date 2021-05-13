@@ -61,6 +61,9 @@ SecondPartProc proc
 	; convert float to text with 18 digits after "," into buffer
 	invoke FpuFLtoA, 0, 18, addr BufferSecondPart, SRC1_FPU or SRC2_DIMM
 	
+	mov ecx, offset BufferSecondPart
+	fstp dword ptr [ecx]
+	
 	jmp EndThisMacrosThirdProc
 
 	NumberIsLessOrZero:

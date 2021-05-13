@@ -122,7 +122,7 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	
 	call  SecondPartProc@0
 	
-	fld qword ptr [BufferSecondPart]
+	fld dword ptr [BufferSecondPart]
 	
 	;//////////////////////
 	
