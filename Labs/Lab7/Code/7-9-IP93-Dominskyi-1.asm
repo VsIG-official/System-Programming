@@ -9,8 +9,13 @@ include /masm32/include/Fpu.inc
 include /masm32/include/masm32rt.inc
 
 .data
+	NegativeOrZeroLnText DB "Даний вираз має негативне число або нуль в (ln). Перевірте Свої значення", 13, 0
+	
+	zero dq 0.0
+	thirdConstant dq 4.0
+	
 .code
-extern FloatsB: qword, FloatsA: qword, BufferLowerPart: byte, thirdConstant: qword, BufferAdivFour: byte, BufferBsubPartOfLn: byte, zero: qword, BufferSecondPart: byte, TempPlaceForText: byte, NegativeOrZeroLnText: byte
+extern FloatsB: qword, FloatsA: qword, BufferAdivFour: byte, BufferBsubPartOfLn: byte, BufferSecondPart: byte, TempPlaceForText: byte
 public SecondPartProc
 SecondPartProc proc
 
@@ -18,10 +23,10 @@ SecondPartProc proc
 	fldln2
 	
 	; move b into st(0), ln(2) into st(1) and 2*c-d/23 into st(2)
-	fld FloatsB[edi]
+	fld FloatsB[8*edi]
 	
 	; move a into st(0), b into st(1), ln(2) into st(2) 2*c-d/23 into st(3)
-	fld FloatsA[edi]
+	fld FloatsA[8*edi]
 	; move 4 into st(0), a into st(1), b into st(2), ln(2) into st(3) and 2*c-d/23 into st(4)
 	fld thirdConstant
 	
@@ -61,7 +66,6 @@ SecondPartProc proc
 	NumberIsLessOrZero:
 		;; parsing variables into TempPlaceForText
 		invoke wsprintf, addr TempPlaceForText, addr NegativeOrZeroLnText
-		jmp EndThisMacrosThirdProc
 
 	EndThisMacrosThirdProc:
 

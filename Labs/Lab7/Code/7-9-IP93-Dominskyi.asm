@@ -122,6 +122,8 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	
 	call  SecondPartProc@0
 	
+	fld qword ptr [BufferSecondPart]
+	
 	;//////////////////////
 	
 	; compare, if number is zero for dividing
@@ -223,13 +225,11 @@ endm
 	
 	BufferUpperLeftPart DB 32 DUP(?)
 	BufferUpperRightPart DB 32 DUP(?)
-	BufferLowerPart DB 32 DUP(?)
 
 ; Data Segment
 .data
 	StartingText DB "У наступному вікні Ви побачите 5 різних арифметичних виразів", 13, 0
 	ZeroDivisionText DB "Даний вираз має ділення на нуль. Перевірте Свої значення", 13, 0
-	NegativeOrZeroLnText DB "Даний вираз має негативне число або нуль в (ln). Перевірте Свої значення", 13, 0
 	
 	; Name Of Message Box
 	MsgBoxName  DB "6-9-IP93-Dominskyi", 0
@@ -259,7 +259,6 @@ endm
 
 	firstConstant dq 2.0
 	secondConstant dq 23.0
-	thirdConstant dq 4.0
 	
 	zero dq 0.0
 	negativeZero dq -0.0
@@ -279,7 +278,7 @@ endm
 	; form, which I will be filling with variables
 	equationVariables DB "For a = (%s), b = (%s), c = (%s) and d = (%s) We have (2 * (%s) - (%s) / 23) / (ln((%s) - (%s) / 4)) = ((%s) - (%s)) / (ln((%s) - (%s))) = (%s) / (ln((%s))) = (%s) / (%s) = (%s)", 13, 0
 
-	public FloatsB, FloatsA, BufferLowerPart, thirdConstant, BufferAdivFour, BufferBsubPartOfLn, zero, BufferSecondPart,TempPlaceForText, NegativeOrZeroLnText
+	public FloatsB, FloatsA, BufferAdivFour, BufferBsubPartOfLn, zero, BufferSecondPart,TempPlaceForText
 	extern SecondPartProc@0:near ; we use near, because of "flat" model
 	
 ; Code Segment
