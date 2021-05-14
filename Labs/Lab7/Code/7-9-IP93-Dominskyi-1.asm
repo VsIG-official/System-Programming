@@ -107,23 +107,29 @@ SecondPartProc proc
 
 	jmp EndThisMacrosThirdProc
 	
-	; this 
+	; this label is for creating "global label"to return
 	NumberIsLessOrZeroFromProc:
 	
+	; do some popping
 	pop edx
 	
 	push NumberIsLessOrZeroFromFirstFile
 	
+	; clear register
 	mov edx, 0
 	
 	jmp EndThisMacrosThirdProc
 	
+	; this label is for creating "global label"to return
 	NumberIsZeroFromProc:
 	
+	; do some popping
 	pop edx
 	
+	; push 
 	push NumberIsZeroFromFirstFile
 	
+	; clear register
 	mov edx, 0
 
 	EndThisMacrosThirdProc:

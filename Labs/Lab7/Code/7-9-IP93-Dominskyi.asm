@@ -45,6 +45,7 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	lea eax, firstConstant
 	lea ebx, cFloat
 	
+	; call first procedure
 	call TwoMulCProc ; mov 2 * c into eax
 	
 	; d / 23
@@ -53,9 +54,11 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	lea ecx, secondConstant
 	lea edx, dFloat
 	
+	; push registers into stack
 	push ecx
 	push edx
 	
+	; call second procedure
 	call DdivTwenThreeProc  ; mov d / 23 into ebx
 	
 	finit
@@ -74,12 +77,15 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	
 	; (ln( b - a / 4))
 	
+	; activating our global labels
 	push NumberIsLessOrZero
 	pop NumberIsLessOrZeroFromFirstFile
 	
+	; activating our global labels
 	push NumberIsZero
 	pop NumberIsZeroFromFirstFile
 	
+	; call third procedure
 	call  SecondPartProc@0
 	
 	;; parsing variables into TempPlaceForText
