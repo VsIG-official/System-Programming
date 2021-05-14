@@ -79,11 +79,11 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	
 	; activating our global labels
 	push NumberIsLessOrZero
-	pop NumberIsLessOrZeroFromFirstFile
+	pop NumberIsLessOrZeroFromFirstPrimaryFile
 	
 	; activating our global labels
 	push NumberIsZero
-	pop NumberIsZeroFromFirstFile
+	pop NumberIsZeroFromFirstPrimaryFile
 	
 	; call third procedure
 	call  SecondPartProc@0
@@ -199,15 +199,16 @@ endm
 	coefficientOfMultiplyingForTextHeight DD 3
 	
 	; Global Labels
-	NumberIsLessOrZeroFromFirstFile DD 0
-	NumberIsZeroFromFirstFile DD 0
+	NumberIsLessOrZeroFromFirstPrimaryFile DD 0
+	NumberIsZeroFromFirstPrimaryFile DD 0
 
 	; first text to show
 	variantToShow DB "My equation = (2 * c - d / 23) / (ln(b - a / 4))", 13, 0
 	; form, which I will be filling with variables
 	equationVariables DB "For a = (%s), b = (%s), c = (%s) and d = (%s) We have (2 * (%s) - (%s) / 23) / (ln((%s) - (%s) / 4)) = ((%s) - (%s)) / (ln((%s) - (%s))) = (%s) / (ln((%s))) = (%s) / (%s) = (%s)", 13, 0
-
-	public FloatsB, FloatsA, BufferAdivFour, BufferBsubPartOfLn, zero, BufferSecondPart,TempPlaceForText, BufferFloatFinal, NumberIsLessOrZeroFromFirstFile, NumberIsZeroFromFirstFile
+	
+	;; Our arrays, buffers and global labels
+	public FloatsB, FloatsA, BufferAdivFour, BufferBsubPartOfLn, zero, BufferSecondPart,TempPlaceForText, BufferFloatFinal, NumberIsLessOrZeroFromFirstPrimaryFile, NumberIsZeroFromFirstPrimaryFile
 	extern SecondPartProc@0:near ; we use near, because of "flat" model
 	
 ; Code Segment
@@ -228,10 +229,8 @@ TwoMulCProc proc  ; beginning of procedure describing
 	; convert float to text with 18 digits after "," into buffer
 	invoke FpuFLtoA, 0, 18, addr BufferTwoMulC, SRC1_FPU or SRC2_DIMM
 
-	; move value of BufferUpperLeftPart into eax
-	mov eax, offset BufferUpperLeftPart
 	; The first operator forces the expression to be treated as having the specified type. The second operator specifies a pointer to type
-	fstp qword ptr [eax]
+	fstp qword ptr [BufferUpperLeftPart]
 
 ret
 
@@ -270,10 +269,10 @@ DdivTwenThreeProc proc ; beginning of procedure describing
 	pop ebp ; epilog - continuation of EBP
 
 	ret 8 ; stack clearing, where n is the number of bytes by which you want to increase the content
-			   ; ESP register after the address is read from the stack
-			   ; return, ie the stack will be "aligned"
-			   ; 8 is for EIP and EBP
-	
+		; ESP register after the address is read from the stack
+		; return, ie the stack will be "aligned"
+		; 8 is for EIP and EBP
+
 DdivTwenThreeProc endp 
 
 start: ; Generates program start-up code

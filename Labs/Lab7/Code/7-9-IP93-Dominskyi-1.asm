@@ -20,8 +20,11 @@ include /masm32/include/masm32rt.inc
 	floatFinal DQ 0.0
 	
 .code
-extern FloatsB: QWORD, FloatsA: QWORD, BufferAdivFour: BYTE, BufferBsubPartOfLn: BYTE, BufferSecondPart: BYTE, TempPlaceForText: BYTE, BufferFloatFinal: BYTE, NumberIsLessOrZeroFromFirstFile: DWORD, NumberIsZeroFromFirstFile: DWORD
+
+;; Our arrays, buffers and global labels
+extern FloatsB: QWORD, FloatsA: QWORD, BufferAdivFour: BYTE, BufferBsubPartOfLn: BYTE, BufferSecondPart: BYTE, TempPlaceForText: BYTE, BufferFloatFinal: BYTE, NumberIsLessOrZeroFromFirstPrimaryFile: DWORD, NumberIsZeroFromFirstPrimaryFile: DWORD
 public SecondPartProc
+
 SecondPartProc proc
 
 	; move ln(2) into st(0) 
@@ -113,7 +116,7 @@ SecondPartProc proc
 	; do some popping
 	pop edx
 	
-	push NumberIsLessOrZeroFromFirstFile
+	push NumberIsLessOrZeroFromFirstPrimaryFile
 	
 	; clear register
 	mov edx, 0
@@ -127,7 +130,7 @@ SecondPartProc proc
 	pop edx
 	
 	; push 
-	push NumberIsZeroFromFirstFile
+	push NumberIsZeroFromFirstPrimaryFile
 	
 	; clear register
 	mov edx, 0
