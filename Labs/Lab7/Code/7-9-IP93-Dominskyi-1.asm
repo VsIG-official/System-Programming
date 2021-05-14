@@ -30,14 +30,17 @@ SecondPartProc proc
 	; move a into st(0), b into st(1), ln(2) into st(2)
 	fld FloatsA[8*edi]
 	
+	; move 4 into st(0), a into st(1), b into st(2), ln(2) into st(3)
+	fld thirdConstant
+	
 	; divide a by 4 and move it into st(0), b into st(1), ln(2) into st(2)
-	fdiv thirdConstant
+	fdiv
 	
 	; convert float to text with 18 digits after "," into buffer
 	invoke FpuFLtoA, 0, 18, addr BufferAdivFour, SRC1_FPU or SRC2_DIMM
 
 	; subtract a/4 from b, move result into st(0), ln(2) into st(1)
-	fsubp st(1), st(0)
+	fsub
 	
 	; convert float to text with 18 digits after "," into buffer
 	invoke FpuFLtoA, 0, 18, addr BufferBsubPartOfLn, SRC1_FPU or SRC2_DIMM

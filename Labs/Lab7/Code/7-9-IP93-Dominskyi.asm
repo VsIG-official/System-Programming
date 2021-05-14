@@ -39,8 +39,6 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	
 	; My equation = (2 * c - d / 23) / (ln(b - a / 4))
 	
-	; finit ; FPU Initialization
-	
 	; 2 * c
 	
 	; use "Load Effective Address", because mov with/without offset doesn't work
