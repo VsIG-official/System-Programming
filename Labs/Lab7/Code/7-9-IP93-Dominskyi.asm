@@ -75,10 +75,10 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 	; (ln( b - a / 4))
 	
 	push NumberIsLessOrZero
-	pop FirstLabel
+	pop NumberIsLessOrZeroFromFirstFile
 	
 	push NumberIsZero
-	pop SecondLabel
+	pop NumberIsZeroFromFirstFile
 	
 	call  SecondPartProc@0
 	
@@ -152,7 +152,7 @@ endm
 	ZeroDivisionText DB "Даний вираз має ділення на нуль. Перевірте Свої значення", 13, 0
 	
 	; Name Of Message Box
-	MsgBoxName  DB "6-9-IP93-Dominskyi", 0
+	MsgBoxName  DB "7-9-IP93-Dominskyi", 0
 
 	NameOfTheWarnWindows DB "Window with warn text", 0 ; the name of our warn window class
 	NameOfMainWindows DB "Window with main text", 0 ; the name of our success window class
@@ -166,43 +166,42 @@ endm
 	
 	; can't be 1 or 0
 	; first way of declaring array
-	FloatsA dq 2.0, -16.0, -68.946, 0.001, 4.0 ;; first numbers
-	FloatsB dq 4.0, 23.091, 6.67, -3.33, 2.0 ;; second numbers
-	FloatsC dq -99.0, -2.111, -78.2, 123.4, 44.47 ;; third numbers
+	FloatsA DQ 2.0, -16.0, -68.946, 0.001, 4.0 ;; first numbers
+	FloatsB DQ 4.0, 23.091, 6.67, -3.33, 2.0 ;; second numbers
+	FloatsC DQ -99.0, -2.111, -78.2, 123.4, 44.47 ;; third numbers
 	
 	; and the second one
-	FloatsD dq -15.125 ;; fourth numbers
-			  dq 0.5
-			  dq -22.1
-			  dq -9.0
-			  dq 12.2222
+	FloatsD DQ -15.125 ;; fourth numbers
+			  DQ 0.5
+			  DQ -22.1
+			  DQ -9.0
+			  DQ 12.2222
 
-	firstConstant dq 2.0
-	secondConstant dq 23.0
+	firstConstant DQ 2.0
+	secondConstant DQ 23.0
 	
-	zero dq 0.0
-	negativeZero dq -0.0
+	zero DQ 0.0
+	negativeZero DQ -0.0
 	
 	;; global variables for interpolating for main window
 	;; (I will put some int into them and show in main window)
 	;; mostly used for negative nums
-	floatFinal DQ 0
+	floatFinal DQ 0.0
 	
 	; for automating 
 	possibleHeight DD 25
 	coefficientOfMultiplyingForTextHeight DD 3
-	valueForDQvalues DB 8
 	
 	; Global Labels
-	FirstLabel dd 0
-	SecondLabel dd 0
+	NumberIsLessOrZeroFromFirstFile DD 0
+	NumberIsZeroFromFirstFile DD 0
 
 	; first text to show
 	variantToShow DB "My equation = (2 * c - d / 23) / (ln(b - a / 4))", 13, 0
 	; form, which I will be filling with variables
 	equationVariables DB "For a = (%s), b = (%s), c = (%s) and d = (%s) We have (2 * (%s) - (%s) / 23) / (ln((%s) - (%s) / 4)) = ((%s) - (%s)) / (ln((%s) - (%s))) = (%s) / (ln((%s))) = (%s) / (%s) = (%s)", 13, 0
 
-	public FloatsB, FloatsA, BufferAdivFour, BufferBsubPartOfLn, zero, BufferSecondPart,TempPlaceForText, BufferFloatFinal, FirstLabel, SecondLabel
+	public FloatsB, FloatsA, BufferAdivFour, BufferBsubPartOfLn, zero, BufferSecondPart,TempPlaceForText, BufferFloatFinal, NumberIsLessOrZeroFromFirstFile, NumberIsZeroFromFirstFile
 	extern SecondPartProc@0:near ; we use near, because of "flat" model
 	
 ; Code Segment
@@ -223,7 +222,9 @@ TwoMulCProc proc  ; beginning of procedure describing
 	; convert float to text with 18 digits after "," into buffer
 	invoke FpuFLtoA, 0, 18, addr BufferTwoMulC, SRC1_FPU or SRC2_DIMM
 
+	; move value of BufferUpperLeftPart into eax
 	mov eax, offset BufferUpperLeftPart
+	; The first operator forces the expression to be treated as having the specified type. The second operator specifies a pointer to type
 	fstp qword ptr [eax]
 
 ret
@@ -255,8 +256,10 @@ DdivTwenThreeProc proc ; beginning of procedure describing
 	; convert float to text with 18 digits after "," into buffer
 	invoke FpuFLtoA, 0, 18, addr BufferDdivTwenThree, SRC1_FPU or SRC2_DIMM
 
+	; move value of BufferUpperRightPart into ebx
 	mov ebx, offset BufferUpperRightPart
-	fstp qword ptr [ebx] ; The first operator forces the expression to be treated as having the specified type. The second operator specifies a pointer to type
+	; The first operator forces the expression to be treated as having the specified type. The second operator specifies a pointer to type
+	fstp qword ptr [ebx]
 
 	pop ebp ; epilog - continuation of EBP
 
