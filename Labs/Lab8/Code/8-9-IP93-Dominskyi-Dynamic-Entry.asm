@@ -33,8 +33,7 @@ endm
 	hWndOfWarnWindow HWND ? ; Handle of our warn window
 	hWndOfMainWindow HWND ? ; Handle of our main window
 	
-	;; Text, that We will show
-	TempPlaceForText DB 256 DUP(?)
+	
 	
 	; address for Library
 	hLib DWORD ?
@@ -45,7 +44,7 @@ endm
 ; Data Segment
 .data
 	StartingText DB "У наступному вікні Ви побачите 5 різних арифметичних виразів", 13, 0
-	
+	TempPlaceForText DB 256 DUP(0)
 	; Name Of Message Box
 	MsgBoxName  DB "8-9-IP93-Dominskyi", 0
 
@@ -84,6 +83,7 @@ endm
 
 	; first text to show
 	variantToShow DB "My equation = (2 * c - d / 23) / (ln(b - a / 4))", 13, 0
+	someText db "%s, %s, %s,%s,%s", 0
 
 ; Code Segment
 .code
@@ -266,8 +266,6 @@ WndMainProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 
 		call [DoArithmeticOperationsAddress]
 		
-		;INVOKE MessageBox, 0, ADDR TempPlaceForText, ADDR MsgBoxName, MB_OK
-		
 		; mov possibleHeight into eax
 		mov eax, possibleHeight
 		;; Convert byte to word
@@ -285,7 +283,7 @@ WndMainProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 		imul esi
 		
 		; print text
-		PrintInformationInWindow eax, offset TempPlaceForText
+		PrintInformationInWindow eax, TempPlaceForText
 		
 		inc edi
 		inc esi

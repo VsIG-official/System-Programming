@@ -11,6 +11,9 @@ include /masm32/include/masm32rt.inc
 .data?
 	; Start = (2 * c - d / 23) / (ln(b - a / 4))
 	
+	;; Text, that We will show
+
+	
 	; Buffers for final float numbers
 	BufferFloatA DB 32 DUP(?)
 	BufferFloatB DB 32 DUP(?)
@@ -69,7 +72,7 @@ include /masm32/include/masm32rt.inc
     DLLmain endp
 
 	; procedure #1 for calculating
-	DoArithmeticOperations proc aFloat: ptr qword, bFloat: ptr qword, cFloat: ptr qword, dFloat: ptr qword, TempPlaceForText: ptr byte	
+	DoArithmeticOperations proc aFloat: ptr qword, bFloat: ptr qword, cFloat: ptr qword, dFloat: ptr qword, TempPlaceForText: dword
 		; My equation = (2 * c - d / 23) / (ln(b - a / 4))
 		
 		;; values for equation
@@ -204,7 +207,7 @@ include /masm32/include/masm32rt.inc
 		invoke FloatToStr2, floatFinal, addr BufferFloatFinal
 	
 		;; parsing variables into TempPlaceForText
-		invoke wsprintf, addr TempPlaceForText, addr equationVariables, 
+		invoke wsprintf, TempPlaceForText, addr equationVariables, 
 		addr BufferFloatA, addr BufferFloatB, addr BufferFloatC, addr BufferFloatD,
 		addr BufferFloatC, addr BufferFloatD, addr BufferFloatB, addr BufferFloatA,
 		addr BufferTwoMulC, addr BufferDdivTwenThree, addr BufferFloatB,
@@ -215,16 +218,16 @@ include /masm32/include/masm32rt.inc
 	
 		NumberIsZero:
 		;; parsing variables into TempPlaceForText
-		invoke wsprintf, addr TempPlaceForText, addr ZeroDivisionText
+		invoke wsprintf, TempPlaceForText, addr ZeroDivisionText
 		jmp EndThisMacros
 
 		NumberIsLessOrZero:
 		;; parsing variables into TempPlaceForText
-		invoke wsprintf, addr TempPlaceForText, addr NegativeOrZeroLnText
+		invoke wsprintf, TempPlaceForText, addr NegativeOrZeroLnText
 		jmp EndThisMacros
 
 		EndThisMacros:
-		INVOKE MessageBox, 0, ADDR TempPlaceForText, ADDR MsgBoxName, MB_OK
+		;INVOKE MessageBox, 0, ADDR TempPlaceForText, ADDR MsgBoxName, MB_OK
 		ret
 DoArithmeticOperations endp
 
