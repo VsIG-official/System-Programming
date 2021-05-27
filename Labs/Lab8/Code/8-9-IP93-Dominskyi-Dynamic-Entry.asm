@@ -36,35 +36,6 @@ endm
 	;; Text, that We will show
 	TempPlaceForText DB 256 DUP(?)
 	
-	; Buffers for final float numbers
-	BufferFloatA DB 32 DUP(?)
-	BufferFloatB DB 32 DUP(?)
-	BufferFloatC DB 32 DUP(?)
-	BufferFloatD DB 32 DUP(?)
-	BufferFloatFinal DB 32 DUP(?)
-	
-	; Start = (2 * c - d / 23) / (ln(b - a / 4))
-	
-	; Buffers for intermediate results
-	
-	; First Step
-	; Value of 2 * c
-	BufferTwoMulC DB 32 DUP(?)
-	; Value of d / 23
-	BufferDdivTwenThree DB 32 DUP(?)
-	; Value of a - 4
-	BufferAdivFour DB 32 DUP(?)
-
-	; Second Step
-	; Value of 2 * c - d / 23
-	BufferFirstPart DB 32 DUP(?)
-	; Value of b - a / 4
-	BufferBsubPartOfLn DB 32 DUP(?)
-	
-	; Third Step
-	; Value of ln(b - a / 4)
-	BufferSecondPart DB 32 DUP(?)
-	
 	; address for Library
 	hLib DWORD ?
 	
@@ -74,8 +45,6 @@ endm
 ; Data Segment
 .data
 	StartingText DB "У наступному вікні Ви побачите 5 різних арифметичних виразів", 13, 0
-	ZeroDivisionText DB "Даний вираз має ділення на нуль. Перевірте Свої значення", 13, 0
-	NegativeOrZeroLnText DB "Даний вираз має негативне число або нуль в (ln). Перевірте Свої значення", 13, 0
 	
 	; Name Of Message Box
 	MsgBoxName  DB "8-9-IP93-Dominskyi", 0
@@ -108,28 +77,13 @@ endm
 			  dq -22.1
 			  dq -9.0
 			  dq 12.2222
-
-	firstConstant dq 2.0
-	secondConstant dq 23.0
-	thirdConstant dq 4.0
-	
-	zero dq 0.0
-	negativeZero dq -0.0
-	
-	;; global variables for interpolating for main window
-	;; (I will put some int into them and show in main window)
-	;; mostly used for negative nums
-	floatFinal DQ 0
 	
 	; for automating 
 	possibleHeight DD 25
 	coefficientOfMultiplyingForTextHeight DD 3
-	valueForDQvalues DB 8
 
 	; first text to show
 	variantToShow DB "My equation = (2 * c - d / 23) / (ln(b - a / 4))", 13, 0
-	; form, which I will be filling with variables
-	equationVariables DB "For a = (%s), b = (%s), c = (%s) and d = (%s) We have (2 * (%s) - (%s) / 23) / (ln((%s) - (%s) / 4)) = ((%s) - (%s)) / (ln((%s) - (%s))) = (%s) / (ln((%s))) = (%s) / (%s) = (%s)", 13, 0
 
 ; Code Segment
 .code
@@ -298,18 +252,15 @@ WndMainProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 
 		;; do the loop
 		LoopItself:
-
-		;; values for equation
-		invoke FloatToStr2, FloatsA[8*edi], addr BufferFloatA
-		invoke FloatToStr2, FloatsB[8*edi], addr BufferFloatB
-		invoke FloatToStr2, FloatsC[8*edi], addr BufferFloatC
-		invoke FloatToStr2, FloatsD[8*edi], addr BufferFloatD
-
+		
+		lea ebx, TempPlaceForText
+		push ebx
+		push dword ptr FloatsD[8*edi]
+		push dword ptr FloatsC[8*edi]
+		push dword ptr FloatsB[8*edi]
+		push dword ptr FloatsA[8*edi]
 
 		call [DoArithmeticOperationsAddress]
-		
-		;; start macros with floats from arrays
-		;DoArithmeticOperations FloatsA[8*edi], FloatsB[8*edi], FloatsC[8*edi], FloatsD[8*edi]
 		
 		; mov possibleHeight into eax
 		mov eax, possibleHeight
@@ -335,6 +286,9 @@ WndMainProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 		
 		cmp edi, 5
 		jne LoopItself
+		
+		; free library
+		invoke FreeLibrary, hLib
 		
 		; create button
 		invoke CreateWindowEx,NULL,

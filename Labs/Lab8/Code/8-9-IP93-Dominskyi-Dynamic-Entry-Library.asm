@@ -8,8 +8,41 @@ includelib /masm32/lib/Fpu.lib
 include /masm32/include/Fpu.inc
 include /masm32/include/masm32rt.inc
 
+.data?
+	; Start = (2 * c - d / 23) / (ln(b - a / 4))
+	
+	; Buffers for final float numbers
+	BufferFloatA DB 32 DUP(?)
+	BufferFloatB DB 32 DUP(?)
+	BufferFloatC DB 32 DUP(?)
+	BufferFloatD DB 32 DUP(?)
+	BufferFloatFinal DB 32 DUP(?)
+	
+	; Buffers for intermediate results
+	
+	; First Step
+	; Value of 2 * c
+	BufferTwoMulC DB 32 DUP(?)
+	; Value of d / 23
+	BufferDdivTwenThree DB 32 DUP(?)
+	; Value of a - 4
+	BufferAdivFour DB 32 DUP(?)
+
+	; Second Step
+	; Value of 2 * c - d / 23
+	BufferFirstPart DB 32 DUP(?)
+	; Value of b - a / 4
+	BufferBsubPartOfLn DB 32 DUP(?)
+	
+	; Third Step
+	; Value of ln(b - a / 4)
+	BufferSecondPart DB 32 DUP(?)
+
 ; Data Segment
 .data
+	ZeroDivisionText DB "Даний вираз має ділення на нуль. Перевірте Свої значення", 13, 0
+	NegativeOrZeroLnText DB "Даний вираз має негативне число або нуль в (ln). Перевірте Свої значення", 13, 0
+
 	firstConstant dq 2.0
 	secondConstant dq 23.0
 	thirdConstant dq 4.0
@@ -21,30 +54,26 @@ include /masm32/include/masm32rt.inc
 	;; (I will put some int into them and show in main window)
 	;; mostly used for negative nums
 	floatFinal DQ 0
-	
-	valueForDQvalues DB 8
 
 	; form, which I will be filling with variables
 	equationVariables DB "For a = (%s), b = (%s), c = (%s) and d = (%s) We have (2 * (%s) - (%s) / 23) / (ln((%s) - (%s) / 4)) = ((%s) - (%s)) / (ln((%s) - (%s))) = (%s) / (ln((%s))) = (%s) / (%s) = (%s)", 13, 0
 
 ; Code Segment
 .code
-
     DLLmain proc hInstDLL: HINSTANCE, reason: DWORD, unused: DWORD
         mov eax, 1
         ret
     DLLmain endp
 
 	; procedure #1 for calculating
-	DoArithmeticOperations proc aFloat: qword, bFloat: qword, cFloat: qword, dFloat: qword, 
-		; Label for ending macros
-		Local EndThisMacros
-		; Label for checking, if numerator is zero (for zero division)
-		Local NumberIsZero
-		; Label for checking, if numerator is zero or less than it (for ln function)
-		Local NumberIsLessOrZero
-	
+	DoArithmeticOperations proc aFloat: qword, bFloat: qword, cFloat: qword, dFloat: qword, TempPlaceForText: byte	
 		; My equation = (2 * c - d / 23) / (ln(b - a / 4))
+		
+		;; values for equation
+		invoke FloatToStr2, aFloat, addr BufferFloatA
+		invoke FloatToStr2, bFloat, addr BufferFloatB
+		invoke FloatToStr2, cFloat, addr BufferFloatC
+		invoke FloatToStr2, dFloat, addr BufferFloatD
 	
 		finit ; FPU Initialization
 	
@@ -184,6 +213,6 @@ include /masm32/include/masm32rt.inc
 		jmp EndThisMacros
 
 		EndThisMacros:
-endp
+DoArithmeticOperations endp
 
 end DLLmain
