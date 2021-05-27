@@ -64,6 +64,12 @@ endm
 	; Third Step
 	; Value of ln(b - a / 4)
 	BufferSecondPart DB 32 DUP(?)
+	
+	; address for Library
+	hLib DWORD ?
+	
+	; address for function
+	DoArithmeticOperationsAddress DWORD ?
 
 ; Data Segment
 .data
@@ -280,6 +286,16 @@ WndMainProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 		; invoke macros #1 one time to create text
 		PrintInformationInWindow possibleHeight, offset variantToShow
 
+		; Dynamically Load Library
+		invoke LoadLibrary, addr LibraryName
+		; save descriptor
+		mov hLib, eax
+		
+		; get function
+		invoke GetProcAddress, hLib, addr DoArithmeticOperationsFunctionFromTheLib
+		; save function
+		mov DoArithmeticOperationsAddress, eax
+
 		;; do the loop
 		LoopItself:
 
@@ -289,8 +305,11 @@ WndMainProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 		invoke FloatToStr2, FloatsC[8*edi], addr BufferFloatC
 		invoke FloatToStr2, FloatsD[8*edi], addr BufferFloatD
 
+
+		call [DoArithmeticOperationsAddress]
+		
 		;; start macros with floats from arrays
-		DoArithmeticOperations FloatsA[8*edi], FloatsB[8*edi], FloatsC[8*edi], FloatsD[8*edi]
+		;DoArithmeticOperations FloatsA[8*edi], FloatsB[8*edi], FloatsC[8*edi], FloatsD[8*edi]
 		
 		; mov possibleHeight into eax
 		mov eax, possibleHeight
