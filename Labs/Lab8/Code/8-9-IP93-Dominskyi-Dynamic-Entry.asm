@@ -255,12 +255,18 @@ WndMainProc proc hWnd:HWND, ourMSG:UINT, wParam:WPARAM, lParam:LPARAM
 		
 		lea ebx, TempPlaceForText
 		push ebx
-		push dword ptr FloatsD[8*edi]
-		push dword ptr FloatsC[8*edi]
-		push dword ptr FloatsB[8*edi]
-		push dword ptr FloatsA[8*edi]
+		lea  ebx, FloatsD[8*edi]
+		push  ebx
+		lea  ebx, FloatsC[8*edi]
+		push  ebx
+		lea  ebx, FloatsB[8*edi]
+		push  ebx
+		lea  ebx, FloatsA[8*edi]
+		push  ebx
 
 		call [DoArithmeticOperationsAddress]
+		
+		;INVOKE MessageBox, 0, ADDR TempPlaceForText, ADDR MsgBoxName, MB_OK
 		
 		; mov possibleHeight into eax
 		mov eax, possibleHeight

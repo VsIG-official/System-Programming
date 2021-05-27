@@ -43,6 +43,9 @@ include /masm32/include/masm32rt.inc
 	ZeroDivisionText DB "Даний вираз має ділення на нуль. Перевірте Свої значення", 13, 0
 	NegativeOrZeroLnText DB "Даний вираз має негативне число або нуль в (ln). Перевірте Свої значення", 13, 0
 
+	; Name Of Message Box
+	MsgBoxName  DB "8-9-IP93-Dominskyi", 0
+
 	firstConstant dq 2.0
 	secondConstant dq 23.0
 	thirdConstant dq 4.0
@@ -60,20 +63,24 @@ include /masm32/include/masm32rt.inc
 
 ; Code Segment
 .code
-    DLLmain proc hInstDLL: HINSTANCE, reason: DWORD, unused: DWORD
+    DLLmain proc hInstDLL: DWORD, reason: DWORD, unused: DWORD
         mov eax, 1
         ret
     DLLmain endp
 
 	; procedure #1 for calculating
-	DoArithmeticOperations proc aFloat: qword, bFloat: qword, cFloat: qword, dFloat: qword, TempPlaceForText: byte	
+	DoArithmeticOperations proc aFloat: ptr qword, bFloat: ptr qword, cFloat: ptr qword, dFloat: ptr qword, TempPlaceForText: ptr byte	
 		; My equation = (2 * c - d / 23) / (ln(b - a / 4))
 		
 		;; values for equation
-		invoke FloatToStr2, aFloat, addr BufferFloatA
-		invoke FloatToStr2, bFloat, addr BufferFloatB
-		invoke FloatToStr2, cFloat, addr BufferFloatC
-		invoke FloatToStr2, dFloat, addr BufferFloatD
+		mov eax, cFloat
+		invoke FloatToStr2, [eax], addr BufferFloatA
+		mov eax, bFloat
+		invoke FloatToStr2, [eax], addr BufferFloatB
+		mov eax, cFloat
+		invoke FloatToStr2, [eax], addr BufferFloatC
+		mov eax, dFloat
+		invoke FloatToStr2, [eax], addr BufferFloatD
 	
 		finit ; FPU Initialization
 	
@@ -82,7 +89,8 @@ include /masm32/include/masm32rt.inc
 		; move 2 into st(0)
 		fld firstConstant
 		; move c into st(0) and 2 into st(1)
-		fld cFloat
+		mov eax, cFloat
+		fld qword ptr [eax]
 		; multiply 2 by c and move result into st(0)
 		fmul
 
@@ -92,7 +100,8 @@ include /masm32/include/masm32rt.inc
 		; d / 23
 	
 		; move d into st(0) and 2*c into st(1)
-		fld dFloat
+		mov eax, dFloat
+		fld qword ptr [eax]
 		; move 23 into st(0), d into st(1) and 2*c into st(2)
 		fld secondConstant
 
@@ -114,10 +123,12 @@ include /masm32/include/masm32rt.inc
 		fldln2
 	
 		; move b into st(0), ln(2) into st(1) and 2*c-d/23 into st(2)
-		fld bFloat
+		mov eax, bFloat
+		fld qword ptr [eax]
 	
 		; move a into st(0), b into st(1), ln(2) into st(2) 2*c-d/23 into st(3)
-		fld aFloat
+		mov eax, aFloat
+		fld qword ptr [eax]
 		; move 4 into st(0), a into st(1), b into st(2), ln(2) into st(3) and 2*c-d/23 into st(4)
 		fld thirdConstant
 	
@@ -213,6 +224,8 @@ include /masm32/include/masm32rt.inc
 		jmp EndThisMacros
 
 		EndThisMacros:
+		INVOKE MessageBox, 0, ADDR TempPlaceForText, ADDR MsgBoxName, MB_OK
+		ret
 DoArithmeticOperations endp
 
 end DLLmain
