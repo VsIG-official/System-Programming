@@ -72,7 +72,13 @@ endm
 	NegativeOrZeroLnText DB "Даний вираз має негативне число або нуль в (ln). Перевірте Свої значення", 13, 0
 	
 	; Name Of Message Box
-	MsgBoxName  DB "6-9-IP93-Dominskyi", 0
+	MsgBoxName  DB "8-9-IP93-Dominskyi", 0
+
+	; Name of the Library to use
+	LibraryName DB "8-9-IP93-Dominskyi-Dynamic-Entry-Library", 0
+	
+	; Name of the Function to use
+	DoArithmeticOperationsFunctionFromTheLib DB "DoArithmeticOperations", 0
 
 	NameOfTheWarnWindows DB "Window with warn text", 0 ; the name of our warn window class
 	NameOfMainWindows DB "Window with main text", 0 ; the name of our success window class

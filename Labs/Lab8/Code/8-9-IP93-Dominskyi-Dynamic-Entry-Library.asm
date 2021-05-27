@@ -10,8 +10,6 @@ include /masm32/include/masm32rt.inc
 
 ; Data Segment
 .data
-	NameOfTheDLL DB "EntryIsHere", 0 ; the name of our ///////////////
-
 	firstConstant dq 2.0
 	secondConstant dq 23.0
 	thirdConstant dq 4.0
@@ -32,10 +30,10 @@ include /masm32/include/masm32rt.inc
 ; Code Segment
 .code
 
-        StartOfTheConnection proc hInst2: HINSTANCE, reason: DWORD, reserved: DWORD
-                mov eax,TRUE
+        DLLmain proc hInstDLL: HINSTANCE, reason: DWORD, unused: DWORD
+                mov eax, 1
                 ret
-        StartOfTheConnection endp
+        DLLmain endp
 
 
 ; Macros #2 for calculating
@@ -188,3 +186,5 @@ DoArithmeticOperations macro aFloat, bFloat, cFloat, dFloat
 
 	EndThisMacros:
 endm
+
+end DLLmain
