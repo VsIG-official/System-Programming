@@ -49,7 +49,7 @@ endm
 	MsgBoxName  DB "8-9-IP93-Dominskyi", 0
 
 	; Name of the Library to use
-	LibraryName DB "8-9-IP93-Dominskyi-Dynamic-Entry-Library", 0
+	LibraryName DB "8-9-IP93-Dominskyi-Dynamic-WithoutEntry-Library", 0
 	
 	; Name of the Function to use
 	DoArithmeticOperationsFunctionFromTheLib DB "DoArithmeticOperations", 0
