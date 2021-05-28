@@ -1,13 +1,24 @@
-@echo off
-    set filename="8-9-IP93-Dominskyi-Static-Entry"
-    set libname="8-9-IP93-Dominskyi-Static-Entry-Library"
+:: Our variables (two .asm files, two .obj files, .dll, .def and name of the .exe)
+set NameOfTheFileAsASMParametr="8-9-IP93-Dominskyi-Static-Entry.asm"
+set NameOfTheFileAsOBJParametr="8-9-IP93-Dominskyi-Static-Entry.obj"
+set NameOfTheFileAsEXEParametr="8-9-IP93-Dominskyi-Static-Entry.exe"
+set NameOfTheFileAsDEFParametr="8-9-IP93-Dominskyi-Static-Entry.def"
 
-    \masm32\bin\ml /c /coff "%libname%.asm"
-    \masm32\bin\Link.exe /OUT:"%libname%.dll" /DEF:%filename%.def /DLL "%libname%.obj"
+set NameOfTheLibraryAsASMParametr="8-9-IP93-Dominskyi-Static-Entry-Library.asm"
+set NameOfTheLibraryAsDLLParametr="8-9-IP93-Dominskyi-Static-Entry-Library.dll"
+set NameOfTheLibraryAsOBJParametr="8-9-IP93-Dominskyi-Static-Entry-Library.obj"
 
-    \masm32\bin\ml /c /coff "%filename%.asm"
+:: There We are combining main file with dll one .exe
+:: We can write there, for example, %OurDisk%\masm32\bin\ml, but We have masm commands in environment variables, so need to write only relative path
+\masm32\bin\ml /c /coff "%NameOfTheLibraryAsASMParametr%"
+\masm32\bin\Link.exe /OUT:"%NameOfTheLibraryAsDLLParametr%" /DEF:%NameOfTheFileAsDEFParametr% /DLL "%NameOfTheLibraryAsOBJParametr%"
 
-    \masm32\bin\Link.exe /SUBSYSTEM:console "%filename%.obj"
+\masm32\bin\ml /c /coff "%NameOfTheFileAsASMParametr%"
 
-%filename%.exe
-pause
+\masm32\bin\Link.exe /SUBSYSTEM:console "%NameOfTheFileAsOBJParametr%"
+
+:: if You want window to pause after procedure, then uncomment next row (but You need it, only if You have some problem with code)
+:: pause
+
+:: if You don't want program to run after procedure, then comment next row
+%NameOfTheFileAsEXEParametr%
