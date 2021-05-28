@@ -8,10 +8,18 @@ WinWarningProto proto :dword,:dword,:dword
 WinMainProto proto :dword,:dword,:dword
 
 ; Libraries And Macroses
+;; just my library
 includelib 8-9-IP93-Dominskyi-Static-Entry-Library.lib
-includelib /masm32/lib/Fpu.lib
-include /masm32/include/Fpu.inc
-include /masm32/include/masm32rt.inc
+
+include /masm32/include/windows.inc ;; hInstance, WNDCLASSEX, SW_SHOWDEFAULT, HWND && NULL
+
+;; CreateWindowEx, DestroyWindow, PostQuitMessage, DefWindowProc, DispatchMessage && wsprintf
+include /masm32/include/user32.inc
+includelib /masm32/lib/user32.lib
+
+;; GetModuleHandle, ExitProcess, LoadLibrary, GetProcAddress && FreeLibrary
+include /masm32/include/kernel32.inc
+includelib /masm32/lib/kernel32.lib
 
 ; Our Macroses
 ; We place them here, 'cause it won't degrade the readability of the code

@@ -4,9 +4,17 @@
 option CaseMap:None
 
 ; Libraries And Macroses
+;; implementation of FpuFLtoA
 includelib /masm32/lib/Fpu.lib
 include /masm32/include/Fpu.inc
-include /masm32/include/masm32rt.inc
+
+;; CreateWindowEx, DestroyWindow, PostQuitMessage, DefWindowProc, DispatchMessage && wsprintf
+include /masm32/include/user32.inc
+includelib /masm32/lib/user32.lib
+
+; ;; implementation of FloatToStr2
+include /masm32/include/masm32.inc
+includelib /masm32/lib/masm32.lib
 
 .data?
 	; Start = (2 * c - d / 23) / (ln(b - a / 4))
