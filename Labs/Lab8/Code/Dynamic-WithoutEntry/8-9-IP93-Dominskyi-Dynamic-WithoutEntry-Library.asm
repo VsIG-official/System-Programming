@@ -71,7 +71,7 @@ include /masm32/include/masm32rt.inc
 		; My equation = (2 * c - d / 23) / (ln(b - a / 4))
 		
 		;; values for equation
-		mov eax, cFloat
+		mov eax, aFloat
 		invoke FloatToStr2, [eax], addr BufferFloatA
 		mov eax, bFloat
 		invoke FloatToStr2, [eax], addr BufferFloatB

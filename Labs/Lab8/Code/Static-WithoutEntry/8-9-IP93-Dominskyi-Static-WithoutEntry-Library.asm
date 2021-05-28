@@ -11,9 +11,6 @@ include /masm32/include/masm32rt.inc
 .data?
 	; Start = (2 * c - d / 23) / (ln(b - a / 4))
 	
-	;; Text, that We will show
-
-	
 	; Buffers for final float numbers
 	BufferFloatA DB 32 DUP(?)
 	BufferFloatB DB 32 DUP(?)
@@ -66,11 +63,6 @@ include /masm32/include/masm32rt.inc
 
 ; Code Segment
 .code
-    DLLmain proc hInstDLL: DWORD, reason: DWORD, unused: DWORD
-        mov eax, 1
-        ret
-    DLLmain endp
-
 	; procedure #1 for calculating
 	DoArithmeticOperations proc aFloat: ptr qword, bFloat: ptr qword, cFloat: ptr qword, dFloat: ptr qword, TempPlaceForText: dword
 		; My equation = (2 * c - d / 23) / (ln(b - a / 4))
@@ -230,5 +222,4 @@ include /masm32/include/masm32rt.inc
 		;INVOKE MessageBox, 0, ADDR TempPlaceForText, ADDR MsgBoxName, MB_OK
 		ret
 DoArithmeticOperations endp
-
-end DLLmain
+end
