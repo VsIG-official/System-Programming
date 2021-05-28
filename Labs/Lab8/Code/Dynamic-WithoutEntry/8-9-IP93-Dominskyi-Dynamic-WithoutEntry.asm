@@ -43,7 +43,7 @@ endm
 
 ; Data Segment
 .data
-	StartingText DB "У наступному вікні Ви побачите 5 різних арифметичних виразів", 13, 0
+	StartingText DB "пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 5 пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ", 13, 0
 	TempPlaceForText DB 256 DUP(0)
 	; Name Of Message Box
 	MsgBoxName  DB "8-9-IP93-Dominskyi", 0
@@ -60,7 +60,7 @@ endm
 	NameOfTheButton DB "Button", 0 ; the name of our button class
 	NameOfTheText DB "Static", 0 ; the name of our text class
 	
-	TextForOKButton DB "ОК", 0
+	TextForOKButton DB "пїЅпїЅ", 0
 	
 	; My equation = (2 * c - d / 23) / (ln( b - a / 4))
 	

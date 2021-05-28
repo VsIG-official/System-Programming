@@ -1,13 +1,31 @@
-@echo off
-    set filename="8-9-IP93-Dominskyi-Dynamic-WithoutEntry"
-    set libname="8-9-IP93-Dominskyi-Dynamic-WithoutEntry-Library"
+:: Our variables (two .asm files, two .obj files, dll and name of the .exe)
+set NameOfTheFileAsASMParametr="8-9-IP93-Dominskyi-Dynamic-WithoutEntry.asm"
+set NameOfTheFileAsOBJParametr="8-9-IP93-Dominskyi-Dynamic-WithoutEntry.obj"
+set NameOfTheFileAsEXEParametr="8-9-IP93-Dominskyi-Dynamic-WithoutEntry.exe"
 
-    \masm32\bin\ml /c /coff "%libname%.asm"
-    \masm32\bin\Link.exe /OUT:"%libname%.dll" /EXPORT:DoArithmeticOperations /NOENTRY /DLL "%libname%.obj"
+set NameOfTheLibraryAsASMParametr="8-9-IP93-Dominskyi-Dynamic-WithoutEntry-Library.asm"
+set NameOfTheLibraryAsDLLParametr="8-9-IP93-Dominskyi-Dynamic-WithoutEntry-Library.dll"
+set NameOfTheLibraryAsOBJParametr="8-9-IP93-Dominskyi-Dynamic-WithoutEntry-Library.obj"
 
-    \masm32\bin\ml /c /coff "%filename%.asm"
+:: There We are combining main file with dll one .exe
+\masm32\bin\ml /c /coff "%NameOfTheLibraryAsASMParametr%"
 
-    \masm32\bin\Link.exe /SUBSYSTEM:console "%filename%.obj"
-	
-%filename%.exe
-pause
+\masm32\bin\Link.exe /OUT:"%libname%.dll" /EXPORT:DoArithmeticOperations /NOENTRY /DLL "%libname%.obj"
+
+\masm32\bin\ml /c /coff "%filename%.asm"
+
+\masm32\bin\Link.exe /SUBSYSTEM:console "%filename%.obj"
+
+
+
+\masm32\bin\Link.exe /OUT:"%NameOfTheLibraryAsDLLParametr%" /EXPORT:DoArithmeticOperations /NOENTRY /DLL "%NameOfTheLibraryAsOBJParametr%"
+
+\masm32\bin\ml /c /coff "%NameOfTheFileAsASMParametr%"
+
+\masm32\bin\Link.exe /SUBSYSTEM:console "%NameOfTheFileAsOBJParametr%"
+
+:: if You want window to pause after procedure, then uncomment next row (but You need it, only if You have some problem with code)
+:: pause
+
+:: if You don't want program to run after procedure, then comment next row
+%NameOfTheFileAsEXEParametr%
