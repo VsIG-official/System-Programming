@@ -227,7 +227,6 @@ includelib /masm32/lib/masm32.lib
 		jmp EndThisMacros
 
 		EndThisMacros:
-		;INVOKE MessageBox, 0, ADDR TempPlaceForText, ADDR MsgBoxName, MB_OK
 		ret
 DoArithmeticOperations endp
 end

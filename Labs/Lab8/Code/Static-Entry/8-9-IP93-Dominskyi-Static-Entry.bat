@@ -11,7 +11,7 @@ set NameOfTheLibraryAsOBJParametr="8-9-IP93-Dominskyi-Static-Entry-Library.obj"
 :: There We are combining main file with dll one .exe
 :: We can write there, for example, %OurDisk%\masm32\bin\ml, but We have masm commands in environment variables, so need to write only relative path
 \masm32\bin\ml /c /coff "%NameOfTheLibraryAsASMParametr%"
-\masm32\bin\Link.exe /OUT:"%NameOfTheLibraryAsDLLParametr%" /DLL /DEF:%NameOfTheFileAsDEFParametr%  "%NameOfTheLibraryAsOBJParametr%"
+\masm32\bin\Link.exe /out:"%NameOfTheLibraryAsDLLParametr%" /dll /def:%NameOfTheFileAsDEFParametr%  "%NameOfTheLibraryAsOBJParametr%"
 
 \masm32\bin\ml /c /coff "%NameOfTheFileAsASMParametr%"
 
