@@ -19,9 +19,6 @@ includelib /masm32/lib/masm32.lib
 .data?
 	; Start = (2 * c - d / 23) / (ln(b - a / 4))
 	
-	;; Text, that We will show
-
-	
 	; Buffers for final float numbers
 	BufferFloatA DB 32 DUP(?)
 	BufferFloatB DB 32 DUP(?)

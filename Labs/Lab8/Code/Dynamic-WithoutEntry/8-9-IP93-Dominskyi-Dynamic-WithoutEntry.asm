@@ -39,13 +39,11 @@ endm
 	hWndOfWarnWindow HWND ? ; Handle of our warn window
 	hWndOfMainWindow HWND ? ; Handle of our main window
 	
-	
-	
 	; address for Library
-	hLib DWORD ?
+	hLib dword ?
 	
 	; address for function
-	DoArithmeticOperationsAddress DWORD ?
+	DoArithmeticOperationsAddress dword ?
 
 ; Data Segment
 .data
@@ -89,7 +87,6 @@ endm
 
 	; first text to show
 	variantToShow DB "My equation = (2 * c - d / 23) / (ln(b - a / 4))", 13, 0
-	someText db "%s, %s, %s,%s,%s", 0
 
 ; Code Segment
 .code
