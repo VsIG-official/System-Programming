@@ -1,7 +1,7 @@
-# Project Title
+# System Programming
 
 <p align="center">
-  <img src="https://github.com/VsIG-official/Images/blob/master/LogoFinalWhite.png" data-canonical-src="https://github.com/VsIG-official/Images/blob/master/LogoFinalWhite.png" width="200" height="100" />
+  <img src="https://github.com/VsIG-official/System-Programming/blob/master/Labs/MASM.png" data-canonical-src="https://github.com/VsIG-official/System-Programming/blob/master/Labs/MASM.png" width="600" />
 </p>
 
 ## Table of Contents
@@ -13,45 +13,55 @@
 
 ### Description
 
-> Subtitle or Short Description Goes Here
+My Labs for System Programming
 
 ## Badges
 
-[![Build Status](http://img.shields.io/travis/badges/badgerbadgerbadger.svg?style=flat-square)](https://travis-ci.org/badges/badgerbadgerbadger) [![Dependency Status](http://img.shields.io/gemnasium/badges/badgerbadgerbadger.svg?style=flat-square)](https://gemnasium.com/badges/badgerbadgerbadger) [![Gem Version](http://img.shields.io/gem/v/badgerbadgerbadger.svg?style=flat-square)](https://rubygems.org/gems/badgerbadgerbadger) [![License](http://img.shields.io/:license-mit-blue.svg?style=flat-square)](http://badges.mit-license.org) [![Badges](http://img.shields.io/:badges-9/9-ff6799.svg?style=flat-square)](https://github.com/badges/badgerbadgerbadger)
+[![Theme](https://img.shields.io/badge/Theme-SysProg-blue)](https://img.shields.io/badge/Theme-SysProg-blue)
+[![Assembly](https://img.shields.io/badge/Assembly-MASM-blue)](https://img.shields.io/badge/Assembly-MASM-blue)
 
 ---
 
-## Example (Optional)
+## Example
 
-```csharp
-/// <summary>
-	/// Class for Api Client
-	/// </summary>
-	public static class ApiHelper
-	{
-		// Create static, 'cause We need one client per application
-		public static HttpClient ApiClient { get; set; }
+```asm
+	;; do the loop
+	LoopItself:
 
-		/// <summary>
-		/// Initializes API client
-		/// </summary>
-		public static void Initialize()
-		{
-			ApiClient = new HttpClient
-			{
-				// a lot of adresses will begin with the same string,
-				// so We can put the beginning here
-				// but won't, because We need more than one adress
-				/*
-				BaseAddress = new Uri("http://somesite.com/")
-				*/
-			};
-			ApiClient.DefaultRequestHeaders.Accept.Clear();
-			// give Us json, not webpage or etc.
-			ApiClient.DefaultRequestHeaders.Accept.Add(new
-				MediaTypeWithQualityHeaderValue("application/json"));
-		}
-	}
+	;; values for equation
+        invoke FloatToStr2, FloatsA[8*edi], addr BufferFloatA
+        invoke FloatToStr2, FloatsB[8*edi], addr BufferFloatB
+        invoke FloatToStr2, FloatsC[8*edi], addr BufferFloatC
+        invoke FloatToStr2, FloatsD[8*edi], addr BufferFloatD
+
+        ;; start macros with floats from arrays
+        DoArithmeticOperations FloatsA[8*edi], FloatsB[8*edi], FloatsC[8*edi], FloatsD[8*edi]
+        
+        ; mov possibleHeight into eax
+        mov eax, possibleHeight
+        ;; Convert byte to word
+        cbw
+        
+        ; mov possibleHeight into ebx
+        mov ebx, coefficientOfMultiplyingForTextHeight
+        ;; Convert byte to word
+        cbw
+        
+        ;; coefficientOfMultiplyingForTextHeight * possibleHeight
+        ;; eax * ebx
+        imul ebx
+
+        imul esi
+        
+        ; print text
+        PrintInformationInWindow eax, offset TempPlaceForText
+        
+        inc edi
+        inc esi
+        
+        cmp edi, 5
+        jne LoopItself
+
 ```
 
 ---
